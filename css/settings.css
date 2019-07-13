@@ -1,0 +1,268 @@
+
+.settings {
+	display: flex;
+	justify-content: space-between;
+	align-items: stretch;
+
+}
+
+.settings input,  select {
+	border-radius: 5px;
+	padding-left: 0.5em;		
+}
+
+.settings label {
+	display: block;
+	font-size: 0.8em;
+	font-weight: bold;
+}
+
+.settings .btn {
+	border: 1px solid;
+	font-weight: bold;
+	font-size: 0.7em;
+	padding-left: 2em;
+	padding-right: 2em;
+	border-color: #61B74A;
+	color: #61B74A;
+}
+
+.settings .btn:hover {
+	background:#61B74A;
+	color: #FFFFFF;
+}
+
+.settings__common {
+	flex-grow: 1;
+}
+
+.settings__users {
+	flex-grow: 2;
+	margin-left: 20px;
+}
+
+.settings-list {
+	background: #fff;
+	border: 1px solid #c6c7cc;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.3);
+    border-radius: 4px;
+	padding: 1em;
+}
+
+.settings-category {
+	font-size: 1em;
+	color: #333;
+}
+
+.logo-uploader {
+	text-align: center;
+	padding: 1.5em 0;
+	border-bottom: 1px solid #C5C5C5;
+}
+
+.logo-uploader__img {
+	display: inline-block;
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	background: #3c4558 url(../img/logo.png) no-repeat;
+	background-size: contain;
+	background-position: center;
+}
+
+.logo-uploader__info {
+	color: #9099a3;
+	font-size: 0.8em;
+	line-height: 1.2em;
+	margin-bottom: 0.5em;
+}
+
+.hidden-input {
+	display: none;
+}
+
+
+.main-settings {
+	padding: 1em 0;
+}
+
+.field-list {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	margin-bottom: 0.4em;
+}
+
+.field-list__item {
+	display: inline-block;
+	box-sizing: border-box;
+}
+
+.field-list__item:first-child {
+	width: 100%;
+	margin-bottom: 1em;
+}
+
+
+.field__input {
+	font-size: 1em;
+	width: 2.5em;
+}
+
+.field-list__item:first-child  .field__input {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.btn-save-main {
+	display: none;
+}
+
+.btn-save-main::after {
+	content: 'Сохранить изменения';
+}
+
+
+
+.discounts-editor {
+	padding-top: 1.3em;
+	border-top: 1px solid #C5C5C5;
+}
+
+
+.discounts-editor__table {
+	width: 100%;
+	border-collapse: separate;
+	font-size: 0.9em;
+	margin-bottom: 1em;
+	text-align: center;
+}
+
+
+.table-header {
+	background: linear-gradient(0deg, rgba(72,60,88,1) 11%, rgba(72,60,88,1) 16%, rgba(72,60,88,1) 25%, rgba(60,69,88,1) 48%);
+	color: #CACACA;
+	font-size: 0.9em;
+}
+
+.table-header th {
+	padding: 0.4em 0;
+}
+
+
+.table-header :first-child{
+	width: 15%;
+	border-top-left-radius: 5px;
+	border-right: 1px solid #f8f7f7;
+}
+
+
+.table-header :last-child{
+	width: 22%;
+	border-top-right-radius: 5px;
+	border-left: 1px solid #f8f7f7;
+}
+
+.discounts-editor__table td {
+	border-left: 1px solid #3c4558;
+	border-bottom: 1px solid #3c4558;
+	padding: 0.2em 0;
+}
+
+.discounts-editor__table td:last-child {
+	border-right: 1px solid #3c4558;
+}
+
+.discount-info:last-child :last-child{
+	border-bottom-right-radius: 5px;
+}
+
+.discount-info:last-child :first-child{
+	border-bottom-left-radius: 5px;
+}
+
+
+
+
+.discounts-editor__table tbody[contenteditable = 'true'] {
+	background-color: rgb(255, 235, 153);
+}
+
+.btn-edit-discounts::after {
+	content: 'Редактировать';
+}
+
+.btn-edit-discounts.active::after {
+	content: 'Сохранить изменения';
+}
+
+.btn-add-discount {
+	margin-left: 0.8em;
+	display: none;
+}
+
+.settings .btn-add-discount, 
+.settings .btn-add-user {
+	border-color: #21A1DC;
+	color: #21A1DC;
+}
+
+.settings .btn-add-discount:hover, 
+.settings .btn-add-user:hover {
+	background:#21A1DC;;
+	color: #FFFFFF;
+}
+
+.users-list__item {
+	display: flex;
+	padding: 0.8em 0;
+	border-bottom: 1px dashed #B8B8B8;
+}
+
+.user__info {
+	line-height: 1em;
+	margin-right:0.5em;
+}
+
+.user__info input{
+	width: 100%;
+}
+
+.user__info select,
+.user__info input {
+	box-sizing: border-box;
+	font-size: 0.9em;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+}
+
+.settings .info-label {
+	font-size: 0.7em;
+}
+
+.btn-remove-user {
+	display: flex;
+  	flex-direction: column;
+	color: #CC1414;
+	font-size: 1.1em;
+	width: 2em;
+}
+
+.btn-remove-user i {
+	margin-top: auto;
+	margin-bottom: 0.35em;
+}
+
+.btn-add-user {
+	margin:0px;
+	margin-top: 0.3em;
+}
+
+.users-list__item:last-child {
+	border-bottom: none;
+}
+
+.btn-save-users-changes {
+	display: none;
+	margin-left: 0.8em;
+}
