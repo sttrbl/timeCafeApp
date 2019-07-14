@@ -1,96 +1,94 @@
-//**************Создание контента***************//
-const visitsPage = (function () {
+
+//*********Модуль для рендера раздела "Посещения"**********//
+
+const visitsPage = ( () => {
+
 
 function createVisitsPage(shiftInfo) {
-	const content = document.createElement('section');
-	content.className = 'page__content';
 
-	if (shiftInfo) {
-		content.appendChild( createDayPanel(true) );
-		content.appendChild( createVisitsPanel(shiftInfo) );
-	} else {
-		content.appendChild( createDayPanel() );
-	}
+	const content = helper.create('section', 'page__content');
+
+	content.appendChild( createDayPanel( !!shiftInfo ) );
+
+	if (shiftInfo) content.appendChild( createVisitsPanel(shiftInfo) );
 
 	return content;
 }
 
 
+//Аргумент - true/false
 function createDayPanel(active) {
-	const elem = document.createElement('div');
-	const dateElem = document.createElement('h4');
-	const button = document.createElement('button');
 
-	elem.className = 'today-info clearfix';
-	dateElem.className = 'today-info__date';
-	button.className = 'btn btn-day-controller';
-
-	if (active) {
-		button.classList.add('active');
+	function formatDate(date) {
+		return date.toLocaleString('ru-RU', { month: 'long', day: 'numeric'}) + ', ' +
+			   date.toLocaleString('ru-RU', { weekday: 'long'})[0].toUpperCase() +
+			   date.toLocaleString('ru-RU', { weekday: 'long'}).slice(1);
 	}
 
-	dateElem.textContent = formatDate(new Date());
+	const elem = helper.create('div', 'today-info clearfix'); 
+	const dateElem = helper.create('h4', 'today-info__date', formatDate( new Date() )); 
+	const shiftContollButton = helper.create('button', 'btn btn-day-controller'); 
 
-	button.addEventListener('click', function(e) {
-		const self = this;
+	if (active) {
+		shiftContollButton.classList.add('active');
+	}
 
-		if (!self.matches('.active')) {
-			if (!confirm('Начать смену?')) return;
+
+	shiftContollButton.addEventListener('click', e => {
+		const self = e.currentTarget;
+
+		if ( !self.matches('.active') ) {
+
+			if ( !confirm('Начать смену?') ) return;
+
 			startShift().then(result => {
-				if (result.error) {
-					alert(result.error);
-					return;
-				}
 		  		self.closest('.page__content').appendChild( createVisitsPanel(result) );
 		  		self.classList.toggle('active');	
 			});
 
 		} else {
-			if (!confirm('Завершить смену?')) return;
+
+			if ( !confirm('Завершить смену?') ) return;
+
 			const visitsListElem = self.closest('.page__content').querySelector('.visits-list');
+
 			endShift( visitsListElem.getAttribute('shift-id') ).then(result => {
-				if (result.error) {
-					alert(result.error);
-					return;
-				}
-			  	this.closest('.page__content').querySelector('.visits-panel').remove();
-				this.classList.toggle('active');		
+				const visitsPanelElem = self.closest('.page__content').querySelector('.visits-panel');
+			  	visitsPanelElem.remove();
+				self.classList.toggle('active');		
 			});
 		}
 	});
 
-	elem.append(dateElem, button);
+	elem.append(dateElem, shiftContollButton);
 	return elem;
 }
 
 
 function createVisitsPanel(options) {
-	const elem = document.createElement('div');
-	const visitsList = document.createElement('ul');
-	
-	elem.className = 'visits-panel';
-	visitsList.className = 'visits-list';
+	const elem = helper.create('div', 'visits-panel'); 
+	const visitsList = helper.create('ul', 'visits-list');
+
 	visitsList.setAttribute('shift-id', options.shiftId);
 
-	visitsList.addEventListener('click', function(e) {
-		e = e || event;
+
+	visitsList.addEventListener('click', e => {
 
 		const button = e.target.closest('button');
-
-		if (!button) {
-			return;
-		}
-
 		const visitRootElem = e.target.closest('.visits-list__item');
 
-		if (button.matches('.btn-remove-visit')) {
-			removeVisit(visitRootElem);
-		}
+		if (!button) return;
 
-		if (e.target.closest('.btn-visit-controller')) {
-			const currentVisitStatus = visitRootElem.classList[visitRootElem.classList.length - 1];
+
+		if ( button.matches('.btn-remove-visit') ) {
+
+			removeVisit(visitRootElem);
+
+		} else if ( button.matches('.btn-visit-controller') ) {
+
+			const visitStatus = visitRootElem.classList[1];
 			
-			switch (currentVisitStatus) {
+			switch (visitStatus) {
 				case 'new':
 					startVisit(visitRootElem);
 					break;
@@ -104,43 +102,43 @@ function createVisitsPanel(options) {
 		}
 	});
 
-	visitsList.addEventListener('change', function(e) {
-		e = e || event;
-		if (!e.target.closest('.visit__discount')) return;
-		const visitElem = e.target.closest('.visit');
+
+	visitsList.addEventListener('change', e => {
+
+		if ( !e.target.closest('.visit__discount') ) return;
+
+		const discountElem = e.target;
+
+		const visitElem = discountElem.closest('.visit');
 		const totalElem = visitElem.querySelector('.visit__total');
-		const discount = +e.target.value;
+		
+		if ( !totalElem.hasAttribute('pure-total') ) return;
 
-		if (!totalElem.hasAttribute('pure-total')) return;
+		const discountValue = +discountElem.value;
+		let totalValue = +totalElem.getAttribute('pure-total');
 
-		let total = +totalElem.getAttribute('pure-total');
-
-		if (discount != 0) {
-			total = Math.round( total - ((total / 100) * discount) ) ;
+		if (discountValue != 0) {
+			totalValue = Math.round( totalValue - ( (totalValue / 100) * discountValue) ) ;
 		}
 
-		totalElem.textContent = total;
+		totalElem.textContent = totalValue;
 	});
 
 
-	const addVisitButton = document.createElement('button');
-	addVisitButton.className = 'btn btn-add-visit';
-	addVisitButton.textContent = 'Добавить +';
+	const addVisitButton = helper.create('button', 'btn btn-add-visit', 'Добавить +');
 
-	getDiscountsValues().then(discountsValues => {
+	addVisitButton.addEventListener('click', () => {
+		const visits = visitsList.querySelectorAll('.visit');
+		visitsList.appendChild( createVisit(visits.length + 1, options.discountsValues) );
+	});
 
-		addVisitButton.addEventListener('click', function() {
-			const visits = visitsList.querySelectorAll('.visit');
-			visitsList.appendChild( createVisit(visits.length + 1, discountsValues) );
-		});
 
-		if (options.visits) {
-			for (let i = 0; i < options.visits.length; i++) {
-				visitsList.appendChild( createVisit(i + 1, discountsValues, options.visits[i]) );
-			}
+	if (options.visits) {
+		for (let i = 0; i < options.visits.length; i++) {
+			visitsList.appendChild( createVisit(i + 1, options.discountsValues, options.visits[i]) );
 		}
+	}
   		
-	});
 
 	elem.append(visitsList, addVisitButton);
 	return elem;
@@ -243,14 +241,11 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 	return visitContainer;
 }
 
+
+
 	//**************Вспомогательные функции и функции для работы с сервером ***************//
 
-	function formatDate(date) {
-		return date.toLocaleString('ru-RU', { month: 'long', day: 'numeric'}) + ', ' +
-			   date.toLocaleString('ru-RU', { weekday: 'long'})[0].toUpperCase() +
-			   date.toLocaleString('ru-RU', { weekday: 'long'}).slice(1);
-	}
-
+	
 
 	function getShiftInfo() {
 		return new Promise((resolve, reject) => {
@@ -258,33 +253,20 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 			    type: "POST",
 			    url: "php/visitsPage.php",
 			    data: {action:'getShiftInfo'},
-			    success: function(resp) {
-			    	resp = JSON.parse(resp);
-			    	if (resp.error) return alert(resp.error);
-           			resolve(resp);
+			    success: resp => {
+			    	try {
+			    		resp = JSON.parse(resp);
+			    		if (resp.error) return helper.showError(resp.error);
+           				resolve(resp);
+			    	} catch(e) {
+			    		helper.showError("Ошибка чтения данных!");
+			    		throw e;
+			    	}
+			    	
 		        },
-		        error: function() {
-		        	reject()
-		        }
-			});
-		});
-		return shiftInfo;
-	}
-
-	function getDiscountsValues() {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-			    type: "POST",
-			    url: "php/visitsPage.php",
-			    data: {action:'getDiscountsValues'},
-			    success: function(resp) {
-			    	resp = JSON.parse(resp);
-			    	if (resp.error) return alert(resp.error);
-           			resolve(resp);
-		        },
-		        error: function() {
-		        	reject()
-		        }
+		        error: () => {
+	     			helper.showError("Ошибка соединения с сервером!");
+	        	}
 			});
 		});
 	}
@@ -296,13 +278,20 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 			    type: "POST",
 			    url: "php/visitsPage.php",
 			    data: {action:'startShift'},
-			    success: function(resp) {
-           			resp = JSON.parse(resp);
-           			resolve(resp);
+			    success: resp => {
+			    	try {
+			    		resp = JSON.parse(resp);
+			    		if (resp.error) return helper.showError(resp.error);
+			    		resolve(resp);
+			    	}
+           			catch(e) {
+			    		helper.showError(`Ошибка чтения данных : ${e.name}`);
+			    		throw e;
+			    	}
 		        },
-		        error: function() {
-		        	reject()
-		        }
+		        error: () => {
+	     			helper.showError("Ошибка соединения с сервером!")
+	        	}
 			});
 		});
 	}
@@ -313,19 +302,44 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 			    type: "POST",
 			    url: "php/visitsPage.php",
 			    data: {action:'endShift', shiftId:id},
-			    success: function(resp) {
-			    	if (resp.error) {
-			    		resolve(JSON.parse(resp));
-			    		return;
+			    success: resp => {
+			    	try {
+			    		resp = JSON.parse(resp);
+			    		if (resp.error) return helper.showError(resp.error);
+			    		resolve(resp);
 			    	}
-           			resolve(resp);
+           			catch(e) {
+			    		helper.showError(`Ошибка чтения данных : ${e.name}`);
+			    		throw e;
+			    	}
 		        },
-		        error: function() {
-		        	reject()
-		        }
+		        error: () => {
+	     			helper.showError("Ошибка соединения с сервером!")
+	        	}
+
 			});
 		});
 	}
+
+
+	function getDiscountsValues() {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+			    type: "POST",
+			    url: "php/visitsPage.php",
+			    data: {action:'getDiscountsValues'},
+			    success: resp => {
+			    	resp = JSON.parse(resp);
+			    	if (resp.error) return helper.showError(resp.error);
+           			resolve(resp);
+		        },
+		        error: () => {
+	     			helper.showError("Ошибка соединения с сервером!")
+	        	}
+			});
+		});
+	}
+
 
 	function removeVisit(node) {
 		if (!confirm('Удалить посещение?')) return false;
@@ -337,14 +351,14 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 		    type: "POST",
 		    url: "php/visitsPage.php",
 		    data: {action:'removeVisit', data:data},
-		    success: function(resp) {
+		    success: resp => {
 		    	const visitsList = node.parentElement;
 				node.remove();
 				updateNums(visitsList);
 	        },
-	        error: function() {
-	     		alert('Серверная ошибка!')
-	        }
+	        error: () => {
+     			helper.showError("Ошибка соединения с сервером!")
+        	}
 		});
 
 
@@ -372,7 +386,7 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 		    type: "POST",
 		    url: "php/visitsPage.php",
 		    data: {action:'startNewVisit', visitInfo:data},
-		    success: function(resp) {
+		    success: resp => {
 		    	resp = JSON.parse(resp);
 		    	if (resp.error) return alert(resp.error);
 		    	node.classList.remove('new');
@@ -384,9 +398,9 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 				const newTagElem = helper.create('span',tagElem.className, tagElem.value);
 				tagElem.parentElement.replaceChild(newTagElem, tagElem);
 	        },
-	        error: function() {
-	     		alert('Серверная ошибка!')
-	        }
+	        error: () => {
+     			helper.showError("Ошибка соединения с сервером!")
+        	}
 		});
 
 		function validateInput(inputElem) {
@@ -410,7 +424,7 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 		    type: "POST",
 		    url: "php/visitsPage.php",
 		    data: {action:'calculateVisit', data:data},
-		    success: function(resp) {
+		    success: resp => {
 		    	resp = JSON.parse(resp);
 		    	if (resp.error) return alert(resp.error);
 
@@ -431,9 +445,9 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 		    	node.classList.remove('active');
 				node.classList.add('calculated');
 	        },
-	        error: function() {
-	     		alert('Серверная ошибка!')
-	        }
+	        error: () => {
+     			helper.showError("Ошибка соединения с сервером!")
+        	}
 		});
 
 		
@@ -454,7 +468,7 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 		    type: "POST",
 		    url: "php/visitsPage.php",
 		    data: {action:'endVisit', data:data},
-		    success: function(resp) {
+		    success: resp => {
 		    	resp = JSON.parse(resp);
 		    	
 
@@ -472,16 +486,15 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 				node.classList.remove('calculated');
 				node.classList.add('completed');
 	        },
-	        error: function() {
-	     		alert('Серверная ошибка!')
-	        }
+	        error: () => {
+     			helper.showError("Ошибка соединения с сервером!")
+        	}
 		});
-
 	}
 
 
 	return {
-		getElem: createVisitsPage,
+		getContent: createVisitsPage,
 		getShiftInfo: getShiftInfo
 	}
 })();

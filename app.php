@@ -106,10 +106,10 @@ $userFullName = $usersInfo['surname'].' '.mb_substr($usersInfo['name'], 0,1).'.'
 	
 
 	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
-	<script src="js/helper.js" defer></script>
-	<script src="js/visitsPage.js" defer></script>
-	<script src="js/archivePage.js" defer></script>
-	<script src="js/settingsPage.js" defer></script>
-	<script src="js/main.js" defer></script>
+	<script src="js/helper.js"></script>
+	<script src="js/visitsPage.js"></script>
+	<script src="js/archivePage.js"></script>
+	<script src="js/settingsPage.js"></script>
+	<script src="js/main.js"></script>
 </body>
 </html>

@@ -1,14 +1,20 @@
 const helper = (function () {
 
-	function createCustomElement(type, classname, content){
-		const elem = document.createElement(type);
+	function createCustomElement(tag, classname, textContent){
+		const elem = document.createElement(tag);
 		elem.className = classname;
-		elem.textContent = content;
+		elem.textContent = textContent;
 		return elem;
 	}
 
+	function showError(text) {
+		// Здесь можно сделать кастомный вариант вывода ошибки
+		alert(text);
+	}
+
 	return {
-		create: createCustomElement
+		create: createCustomElement,
+		showError: showError
 	}
 
 })();

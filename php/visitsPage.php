@@ -47,6 +47,12 @@ function isExist($visitId) {
 	return true; 
 }
 
+function getDiscountsValues() {
+	global $pdo;
+	$discountValues = $pdo->query('SELECT id, value FROM discounts')->fetchAll();
+	return $discountValues;
+}
+
 
 function getShiftInfo() {
 	global $pdo;
@@ -60,15 +66,9 @@ function getShiftInfo() {
 						 AS start_time, date_format(end_time,'%H:%i') AS end_time, discount, 
 						 total, status FROM current_shift");
 	$visits = $stmt->fetchAll();
-	echo json_encode( array('shiftId' => $shiftId, 'visits' => $visits) );
+	echo json_encode( array('shiftId' => $shiftId, 'visits' => $visits, 'discountsValues' => getDiscountsValues() ) );
 }
 
-
-function getDiscountsValues() {
-	global $pdo;
-	$discountValues = $pdo->query('SELECT id, value FROM discounts')->fetchAll();
-	echo json_encode($discountValues);
-}
 
 
 function startShift() {
@@ -103,7 +103,7 @@ function endShift($shiftId) {
 
 	$stmt->execute(array('shift_id' => $shiftId));
 	$pdo->query('TRUNCATE TABLE current_shift');
-	$pdo->query('ALTER TABLE name_table AUTO_INCREMENT = 1');
+	$pdo->query('ALTER TABLE current_shift AUTO_INCREMENT = 1');
 	echo json_encode(true);
 }
 
