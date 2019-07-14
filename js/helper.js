@@ -1,8 +1,13 @@
 const helper = (function () {
 
-	function createCustomElement(tag, classname, textContent){
+	function createCustomElement(tag, className, textContent = ''){
+
 		const elem = document.createElement(tag);
-		elem.className = classname;
+
+		if (className) {
+			elem.className = className;
+		}
+		
 		elem.textContent = textContent;
 		return elem;
 	}
@@ -12,9 +17,15 @@ const helper = (function () {
 		alert(text);
 	}
 
+	function showSuccess(text) {
+		// Здесь можно сделать кастомный вариант вывода ошибки
+		alert(text);
+	}
+
 	return {
 		create: createCustomElement,
-		showError: showError
+		showError: showError,
+		showSuccess: showSuccess
 	}
 
 })();

@@ -1,5 +1,5 @@
 
-//*********Модуль для рендера раздела "Посещения"**********//
+//********* Модуль для подготовки компонентов раздела "Посещения" **********//
 
 const visitsPage = ( () => {
 
@@ -65,14 +65,16 @@ function createDayPanel(active) {
 }
 
 
-function createVisitsPanel(options) {
+function createVisitsPanel({shiftId, visits: visitsList, discountsValues: discountsValuesList }) {
+
 	const elem = helper.create('div', 'visits-panel'); 
-	const visitsList = helper.create('ul', 'visits-list');
+	const visitsListElem = helper.create('ul', 'visits-list');
 
-	visitsList.setAttribute('shift-id', options.shiftId);
+	visitsListElem.setAttribute('shift-id', shiftId);
 
 
-	visitsList.addEventListener('click', e => {
+	//Описание функциональности кнопок в блоках посещений через делегирование
+	visitsListElem.addEventListener('click', e => {
 
 		const button = e.target.closest('button');
 		const visitRootElem = e.target.closest('.visits-list__item');
@@ -103,12 +105,12 @@ function createVisitsPanel(options) {
 	});
 
 
-	visitsList.addEventListener('change', e => {
+	//Обработчик изменения значения скидки в блоке (через делегирование)
+	visitsListElem.addEventListener('change', e => {
 
 		if ( !e.target.closest('.visit__discount') ) return;
 
 		const discountElem = e.target;
-
 		const visitElem = discountElem.closest('.visit');
 		const totalElem = visitElem.querySelector('.visit__total');
 		
@@ -125,22 +127,26 @@ function createVisitsPanel(options) {
 	});
 
 
-	const addVisitButton = helper.create('button', 'btn btn-add-visit', 'Добавить +');
+	const addButtonElem = helper.create('button', 'btn btn-add-visit', 'Добавить +');
 
-	addVisitButton.addEventListener('click', () => {
-		const visits = visitsList.querySelectorAll('.visit');
-		visitsList.appendChild( createVisit(visits.length + 1, options.discountsValues) );
+	addButtonElem.addEventListener('click', () => {
+		const visitsElems = visitsListElem.querySelectorAll('.visit');
+		const lastVisitNum = visitsElems.length + 1;
+		visitsListElem.appendChild( createVisit(lastVisitNum, discountsValuesList) );
 	});
 
 
-	if (options.visits) {
-		for (let i = 0; i < options.visits.length; i++) {
-			visitsList.appendChild( createVisit(i + 1, options.discountsValues, options.visits[i]) );
+	//visitsList - массив с информацией (из БД) о посещениях за текущую смену
+	if (visitsList) {
+
+		for (let i = 0; i < visitsList.length; i++) {
+			visitsListElem.appendChild( createVisit(i + 1, discountsValuesList, visitsList[i]) );
 		}
+
 	}
   		
 
-	elem.append(visitsList, addVisitButton);
+	elem.append(visitsListElem, addButtonElem);
 	return elem;
 }
 
@@ -151,101 +157,79 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 							 ['Комментарий :','comment'], ['Начало :','start-time'], 
 							 ['Окончание :','end-time'], ['Скидка :','discount'], ['Итого :','total']];
 
-	const visitContainer = helper.create('li', 'visits-list__item ');
-
-	const visitElem = document.createElement('ul');
 	let visitStatus = 'new';
-
+	const visitContainer = helper.create('li', 'visits-list__item ');
+	const visitElem = helper.create('ul', 'visit');
+	
 	if (visitInfo) {
-		visitStatus = visitInfo['status'];
-		visitContainer.setAttribute('real-id', visitInfo['id'])
-		visitContainer.classList.add(visitInfo['status']);
+		visitStatus = visitInfo.status;
+		visitContainer.setAttribute('real-id', visitInfo.id);
 	}
 
 	visitContainer.classList.add(visitStatus);
-	visitElem.className = 'visit';
 	visitContainer.appendChild(visitElem);
 
-	for (let i = 0; i < visitItemsNames.length + 2; i++) {
-		const item = document.createElement('li');
-		item.className = 'visit-info-item';
-
-		if (i < visitItemsNames.length) {
-			const itemHeadline = document.createElement('h5');
-			itemHeadline.textContent = visitItemsNames[i][0];
-			let itemValue;
-
-			if (visitStatus != 'completed' && visitItemsNames[i][1] == 'discount' ) {
-
-				itemValue = document.createElement('select');
-				itemValue.appendChild(new Option('', 0));
-
-				for (let i = 0; i < discountsValues.length; i++) {
-					itemValue.appendChild(new Option(discountsValues[i]['id'], discountsValues[i]['value']));
-				}
-
-			} else if (visitItemsNames[i][1] == 'num') {
-				itemValue = document.createElement('span');
-				itemValue.textContent = visitNum;
-			} else if (visitStatus == 'new') {
-
-				switch (visitItemsNames[i][1]) {
-					case 'person-tag':
-						itemValue = document.createElement('input');
-						itemValue.type = 'number';
-						break;
-					case 'comment':
-						itemValue = document.createElement('input');
-						itemValue.type = 'text';
-						itemValue.setAttribute('maxlength', 40);
-						break;
-					default:
-						itemValue = document.createElement('span');
-						break;
-				}
-
-			} else {
-				itemValue = document.createElement('span');
-				itemValue.textContent = visitInfo[visitItemsNames[i][1].replace('-','_')];
-			}
-
-			itemValue.classList.add('visit__' + visitItemsNames[i][1]);
-
-			if (itemValue.matches('visit__total') || visitStatus == 'calculated') {
-
-				itemValue.setAttribute('pure-total', visitInfo['total']);
-			}
-
-			item.append(itemHeadline,itemValue);
-		} else {
-			const button = document.createElement('button');
-
-			switch (i) {
-				case visitItemsNames.length:
-					button.className = 'btn btn-visit-controller';
-					break;
-				case visitItemsNames.length + 1:
-					button.className = 'btn-remove-visit';
-					button.innerHTML = '<i class="far fa-trash-alt"></i>';
-					break;
-				default:
-					break;
-			}
-
-			item.appendChild(button);
-		}
-
+	for (let i = 0; i < visitItemsNames.length + 2; i++) { 
+		const item = helper.create('li', 'visit-info-item');
 		visitElem.appendChild(item);
 	}
+
+
+	visitItemsNames.forEach( (itemName, i) => {
+
+		const itemHeadline = helper.create('h5', null, itemName[0]);
+		let itemContent;
+
+		if (visitStatus != 'completed' && itemName[1] == 'discount') {
+			itemContent = document.createElement('select');
+
+			itemContent.appendChild( new Option('', 0)) ;
+
+			for (let i = 0; i < discountsValues.length; i++) {
+				itemContent.appendChild(new Option(discountsValues[i]['id'], discountsValues[i]['value']));
+			}
+
+		} else if (visitStatus == 'new' && i > 0) {
+
+			switch (itemName[1]) {
+				case 'person-tag':
+					itemContent = document.createElement('input');
+					itemContent.type = 'number';
+					break;
+				case 'comment':
+					itemContent = document.createElement('input');
+					itemContent.type = 'text';
+					itemContent.setAttribute('maxlength', 40);
+					break;
+				default:
+					itemContent = document.createElement('span');
+					break;
+			}
+
+		} else {
+			itemContent = document.createElement('span');
+			const itemNameOnServer = itemName[1].replace('-','_');
+			itemContent.textContent = (i > 0) ? visitInfo[itemNameOnServer] : visitNum;
+		}
+
+		itemContent.classList.add('visit__' + itemName[1]);
+	
+		visitElem.children[i].append(itemHeadline, itemContent);
+	});
+
+	const controllButton = helper.create('button', 'btn btn-visit-controller');
+	const removeButton = helper.create('button', 'btn-remove-visit');
+
+	removeButton.innerHTML = '<i class="far fa-trash-alt"></i>';
+	visitElem.children[visitItemsNames.length].append(controllButton);
+	visitElem.lastElementChild.append(removeButton);
 
 	return visitContainer;
 }
 
 
 
-	//**************Вспомогательные функции и функции для работы с сервером ***************//
-
-	
+//************** Функции для работы с сервером ***************//
 
 	function getShiftInfo() {
 		return new Promise((resolve, reject) => {
@@ -296,6 +280,7 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 		});
 	}
 
+
 	function endShift(id) {
 		return new Promise((resolve, reject) => {
 			$.ajax({
@@ -322,73 +307,79 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 	}
 
 
-	function getDiscountsValues() {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-			    type: "POST",
-			    url: "php/visitsPage.php",
-			    data: {action:'getDiscountsValues'},
-			    success: resp => {
-			    	resp = JSON.parse(resp);
-			    	if (resp.error) return helper.showError(resp.error);
-           			resolve(resp);
-		        },
-		        error: () => {
-	     			helper.showError("Ошибка соединения с сервером!")
-	        	}
-			});
-		});
-	}
-
-
 	function removeVisit(node) {
 		if (!confirm('Удалить посещение?')) return false;
 
-		const visitId = node.getAttribute('real-id');
-		const data = {id:visitId};
+		const data = {
+			id : node.getAttribute('real-id')
+		};
 
 		$.ajax({
 		    type: "POST",
 		    url: "php/visitsPage.php",
 		    data: {action:'removeVisit', data:data},
 		    success: resp => {
-		    	const visitsList = node.parentElement;
-				node.remove();
-				updateNums(visitsList);
+				try {
+		    		resp = JSON.parse(resp);
+		    		
+		    		if (resp.error) return helper.showError(resp.error);
+		  
+			    	const visitsList = node.parentElement;
+					node.remove();
+
+					visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => {
+						numElem.textContent = i + 1;
+					});
+								
+			    }
+       			catch(e) {
+		    		helper.showError(`Ошибка чтения данных : ${e.name}`);
+		    		throw e;
+		    	}
 	        },
 	        error: () => {
      			helper.showError("Ошибка соединения с сервером!")
         	}
 		});
-
-
-		function updateNums(visitsList) {
-			const numElems = visitsList.querySelectorAll('.visit__num');
-			for (let i = 0; i < numElems.length; i++) {
-				numElems[i].textContent = i + 1;
-			}
-		}
 	}
 
 
 	function startVisit(node) {
-		const inputsList = node.querySelectorAll('input');
+
+		function validateInput(inputElem) {
+			//Дописать
+			if ( !inputElem.matches('.visit__comment') && inputElem.value.trim() == '') {
+				return false;
+			}
+			return true;
+		}
+
 		let data = {};
 
-		for (let i = 0; i < inputsList.length; i++) {
-			const input = inputsList[i];
-			if ( !validateInput(input) ) return false;
-			const key = input.className.replace('-','_').replace('visit__','');
-			data[key] = input.value; 
-		}
+		node.querySelectorAll('input').forEach((inputElem) => {
+			
+			if ( !validateInput(inputElem) ) return helper.showError('Заполните все обязательные поля.'); 
+
+			const key = inputElem.className.replace('-','_').replace('visit__','');
+			data[key] = inputElem.value; 
+		});
+		
 
 		$.ajax({
 		    type: "POST",
 		    url: "php/visitsPage.php",
 		    data: {action:'startNewVisit', visitInfo:data},
 		    success: resp => {
-		    	resp = JSON.parse(resp);
-		    	if (resp.error) return alert(resp.error);
+		    	try {
+		    		resp = JSON.parse(resp);
+		    		
+		    		if (resp.error) return helper.showError(resp.error);			
+			    }
+       			catch(e) {
+		    		helper.showError(`Ошибка чтения данных : ${e.name}`);
+		    		throw e;
+		    	}
+		    	
 		    	node.classList.remove('new');
 				node.classList.add('active');
 				node.setAttribute('real-id', resp.visitId);
@@ -397,36 +388,38 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 				const tagElem = node.querySelector('.visit__person-tag');
 				const newTagElem = helper.create('span',tagElem.className, tagElem.value);
 				tagElem.parentElement.replaceChild(newTagElem, tagElem);
+
+				//(ДОПИСАТЬ!): решить, что делать с комментарием к посещению
+		    	
 	        },
 	        error: () => {
      			helper.showError("Ошибка соединения с сервером!")
         	}
 		});
 
-		function validateInput(inputElem) {
-			//Дописать
-			if ( !inputElem.matches('.visit__comment') && inputElem.value.trim() == '') {
-				alert('Заполните все обязательные поля.'); 
-				return false;
-			}
-			return true;
-		}
-
 	}
 
 
-
 	function calculateVisit(node) {
-		let data = {};
-		data.visitId = node.getAttribute('real-id');
+		let data = {
+			visitId: node.getAttribute('real-id')
+		};
 
 		$.ajax({
 		    type: "POST",
 		    url: "php/visitsPage.php",
 		    data: {action:'calculateVisit', data:data},
 		    success: resp => {
-		    	resp = JSON.parse(resp);
-		    	if (resp.error) return alert(resp.error);
+
+		    	try {
+		    		resp = JSON.parse(resp);
+		    		
+		    		if (resp.error) return helper.showError(resp.error);			
+			    }
+       			catch(e) {
+		    		helper.showError(`Ошибка чтения данных : ${e.name}`);
+		    		throw e;
+		    	}
 
 		    	const endTimeElem = node.querySelector('.visit__end-time');
 		 		const totalElem = node.querySelector('.visit__total');
@@ -448,17 +441,14 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 	        error: () => {
      			helper.showError("Ошибка соединения с сервером!")
         	}
-		});
-
-		
-
-			
+		});	
 	}
 
 	function endVisit(node) {
-		let data = {};
-		data.visitId = node.getAttribute('real-id');
-		data.finalTotal = node.querySelector('.visit__total').textContent;
+		let data = {
+			visitId: node.getAttribute('real-id'),
+			finalTotal: node.querySelector('.visit__total').textContent
+		};
 
 		const discountSelect = node.querySelector('.visit__discount');
 		const selectedElem = discountSelect.querySelector('[value ="'+ discountSelect.value +'"]')
@@ -469,11 +459,16 @@ function createVisit(visitNum, discountsValues, visitInfo) {
 		    url: "php/visitsPage.php",
 		    data: {action:'endVisit', data:data},
 		    success: resp => {
-		    	resp = JSON.parse(resp);
-		    	
 
-		    	node.classList.remove('calculated');
-				node.classList.add('completed');
+		    	try {
+		    		resp = JSON.parse(resp);
+		    		
+		    		if (resp.error) return helper.showError(resp.error);			
+			    }
+       			catch(e) {
+		    		helper.showError(`Ошибка чтения данных : ${e.name}`);
+		    		throw e;
+		    	}
 
 				const commentElem = node.querySelector('.visit__comment');
 				const newCommentElem = helper.create('span', commentElem.className, commentElem.value);

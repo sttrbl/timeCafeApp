@@ -80,7 +80,7 @@ function startShift() {
 
 	$stmt = $pdo->prepare("INSERT INTO shifts(start_user) VALUES (:user_id)");
 	$stmt->execute(array('user_id' => $_SESSION['user']['id']));
-	echo json_encode( array( 'shiftId' => $pdo->lastInsertId() ) );
+	echo json_encode( array( 'shiftId' => $pdo->lastInsertId(), 'discountsValues' => getDiscountsValues()) );
 }
 
 
