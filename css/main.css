@@ -1,17 +1,18 @@
-@charset "utf-8";
+@charset 'utf-8';
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
-html, body {
+html,
+body {
 	height: 100%;
 }
 
 html {
-	font-size: 16px;
 	min-width: 320px;
+	font-size: 16px;
 }
 
 body {
-	overflow-y:scroll;
+	overflow-y: scroll;
 }
 
 h1 {
@@ -35,28 +36,29 @@ h5 {
 }
 
 a {
+	color: #000;
 	text-decoration: none;
-	color: #000000;
 }
 
 button {
-	background: none;
-	border: none;
 	padding: 0;
+	border: none;
+	border-radius: 5px;
+	background: none;
 	cursor: pointer;
-	border-radius: 5px;
 }
 
-input, select {
-	border: 1px solid #d2d6d7;
+input,
+select {
 	color: #333;
+	border: 1px solid #D2D6D7;
 	border-radius: 5px;
-	transition: border ease .4s;
+	transition: border ease 0.4s;
 }
 
-
-
-input:focus, select:focus, option:focus {
+input:focus,
+select:focus,
+option:focus {
 	border-color: #2E78E9;
 }
 
@@ -66,32 +68,33 @@ body {
 	line-height: 1.5;
 }
 
-.clearfix::after { 
-  content: ""; 
-  clear: both; 
-  display: block; 
+.clearfix::after {
+	display: block;
+	clear: both;
+	content: '';
 }
 
 .layout {
-	max-width: 1440px;
-	margin: auto;
-	background: #FFFFFF;
 	position: relative;
-	min-height: 100%;
 	overflow-x: hidden;
+	max-width: 1440px;
+	min-height: 100%;
+	margin: auto;
+	background: #FFF;
 }
 
 .layout__sidebar {
 	position: fixed;
 	width: 250px;
 	height: 120%;
+	font-size: 16px;
 	transition: 1s;
 }
 
-.layout__sidebar, .mobile-header {
-	background: rgb(72,60,88);
+.layout__sidebar,
+.mobile-header {
+	color: #FFF;
 	background: linear-gradient(0deg, rgba(72,60,88,1) 11%, rgba(72,60,88,1) 16%, rgba(72,60,88,1) 25%, rgba(60,69,88,1) 48%);
-	color: #FFFFFF;
 }
 
 .layout__body {
@@ -99,16 +102,14 @@ body {
 }
 
 .mobile-header {
-	height: 55px;
 	position: fixed;
-	width: 100%;
 	display: none;
+	width: 100%;
+	height: 55px;
 	line-height: 55px;
 }
 
-.mobile-header__text{
-	display: inline-block;
-	font-size: 24px;
+.mobile-header__text {
 	padding: 0 10px;
 }
 
@@ -121,19 +122,19 @@ nav {
 	box-sizing: border-box;
 	width: 100%;
 	height: 40px;
-	line-height: 40px;
 	padding: 0 20px;
 	font-weight: 600;
+	line-height: 40px;
 }
 
-.menu__link, 
+.menu__link,
 .btn-logout {
-	color: #a7b3cb;
+	color: #A7B3CB;
 }
 
-.menu__link:hover, 
-.btn-logout:hover  {
-	color: #FFFFFF;
+.menu__link:hover,
+.btn-logout:hover {
+	color: #FFF;
 }
 
 .menu__link i {
@@ -141,36 +142,40 @@ nav {
 }
 
 .menu__link.current {
-	color: #FFFFFF;
+	color: #FFF;
 }
 
 .logo-container {
 	height: 180px;
-	text-align: center;
 	padding: 0 20px;
 	padding-top: 20px;
+	text-align: center;
 }
 
-.logo-container__text, .mobile-header__text {
-	text-transform: uppercase;
+.logo-container__text {
+	font-size: 1.4em;
+}
+
+.logo-container__text,
+.mobile-header__text {
 	line-height: 1.2em;
+	text-transform: uppercase;
 }
 
 .logo-container__img {
 	display: inline-block;
-	height: 40%;
+	height: 50%;
 	margin-top: 1.2em;
 	margin-bottom: 0.4em;
 }
 
 
-
 .user-panel {
-	border: 1px solid #202737;
-	border-left: none;
-	border-right: none;
 	height: 60px;
 	padding: 0 15px;
+	border: 1px solid #202737;
+	border-right: none;
+	border-left: none;
 	line-height: 60px;
 }
 
@@ -180,9 +185,13 @@ nav {
 	vertical-align: middle;
 }
 
+.user-info__name {
+	font-size: 1em;
+}
+
 .user-info__status {
-	font-size: 0.7em;
 	color: #CACACA;
+	font-size: 0.7em;
 }
 
 .btn-logout {
@@ -193,57 +202,53 @@ nav {
 }
 
 .btn-sidebar-toggle {
-	height: 100%;
-	color: #a7b3cb;
 	width: 55px;
+	height: 100%;
+	color: #A7B3CB;
 	font-size: 24px;
 }
 
-.btn-sidebar-toggle:hover {
-	background: #64728c;
-}
-
-
+.btn-sidebar-toggle:hover,
 .layout__body.shifted .btn-sidebar-toggle {
-	background: #64728c;
+	background: #64728C;
 }
 
 
 .page {
 	padding: 40px 35px;
 	color: #333;
+	font-size: 1em;
 }
 
 .page__headline {
+	margin-bottom: 0.65rem;
 	padding-bottom: 0.05em;
-	border-bottom: 1.5px solid #dbdbdb;
-	margin-bottom: 10px;
+	border-bottom: 1.5px solid #DBDBDB;
 }
 
 .btn {
-	font-size: 0.8em;
 	padding: 0.6em;
-	font-weight: bold;
 	border-radius: 3px;
+	font-size: 0.8em;
+	font-weight: bold;
 	transition: 0.1s ease;
 }
 
 
 @media screen and (max-width: 1200px) {
-
 	.layout__sidebar {
 		left: -250px;
 	}
 
 	.mobile-header {
-		display: block;
 		z-index: 1;
+		display: block;
 	}
 
 	.layout__body {
-		margin-left: 0;
 		position: relative;
 		left: 0;
+		margin-left: 0;
 		transition: 1s;
 	}
 
@@ -254,12 +259,13 @@ nav {
 	.layout__sidebar.opened {
 		left: 0;
 	}
-	
-	.layout__body, .layout__sidebar  {
+
+	.layout__body,
+	.layout__sidebar {
 		transition: left 0.3s;
 	}
 
-	.mobile-header__text{
+	.mobile-header__text {
 		display: inline-block;
 		font-size: 18px;
 	}
@@ -267,14 +273,16 @@ nav {
 	.page {
 		padding-top: 55px;
 	}
-
 }
 
 
 @media screen and (max-width: 1000px) {
+	html {
+		font-size: 15px;
+	}
+
 	.page {
-		padding-left: 10px;
 		padding-right: 10px;
+		padding-left: 10px;
 	}
 }
-	

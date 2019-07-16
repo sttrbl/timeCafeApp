@@ -127,7 +127,7 @@ function createVisitsPanel({shiftId, visits: visitsList, discountsValues: discou
 	});
 
 
-	const addButtonElem = helper.create('button', 'btn btn-add-visit', 'Добавить +');
+	const addButtonElem = helper.create('button', 'btn btn-add-visit', 'Добавить');
 
 	addButtonElem.addEventListener('click', () => {
 		const visitsElems = visitsListElem.querySelectorAll('.visit');

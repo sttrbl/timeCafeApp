@@ -2,37 +2,32 @@
 mb_internal_encoding('UTF-8');
 session_start();
 require_once 'php/connection.php';
-
-if(!$_SESSION['user']){
- header("Location: authorization.php");
- exit;
+if (!$_SESSION['user']) {
+    header("Location: authorization.php");
+    exit;
 }
-
-if(isset($_GET['logout']) && $_GET['logout'] == true){
- unset($_SESSION['user']);
- session_destroy();
- header("Location: authorization.php");
+if (isset($_GET['logout']) && $_GET['logout'] == true) {
+    unset($_SESSION['user']);
+    session_destroy();
+    header("Location: authorization.php");
 }
-
 $orgName = $pdo->query("SELECT value from settings WHERE name = 'org_name'")->fetchColumn();
-
 $stmt = $pdo->prepare("SELECT users.name, users.surname, users.position AS 'position', positions.name 
-					   AS 'position_name' FROM users LEFT JOIN positions ON users.position = positions.id WHERE users.id = :id");
+					   AS 'position_name' FROM users LEFT JOIN positions ON users.position = positions.id 
+					   WHERE users.id = :id");
 $stmt->execute(array('id' => $_SESSION['user']['id']));
 $usersInfo = $stmt->fetch();
-
-$_SESSION['user']['position'] = $usersInfo['position']; 
+$_SESSION['user']['position'] = $usersInfo['position'];
 $_SESSION['user']['surname'] = $usersInfo['surname'];
 $_SESSION['user']['name'] = $usersInfo['name'];
-$userFullName = $usersInfo['surname'].' '.mb_substr($usersInfo['name'], 0,1).'.';
-
+$userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1) . '.';
 ?>
 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 	<meta charset="UTF-8">
-	<title>Приложение</title>
+	<title>Time-cafe app</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="css/resetCSS.css">

@@ -1,74 +1,68 @@
 .today-info {
-	margin:10px 0;
-	border-bottom: 2px solid #3c4558;
-	padding-bottom: 10px;
+	margin-bottom: 0.6em;
+	padding-bottom: 0.66em;
+	border-bottom: 2px solid #3C4558;
 }
 
 .today-info__date {
 	display: inline-block;
-	margin-top: 0.25em; 
+	margin-top: 0.25em;
 }
 
 
 .btn-day-controller {
-	color: #FFFFFF;
-	background: #3c4558;
 	float: right;
-	width: 146px;
-	padding: 8px 0;
+	width: 11.4em;
+	padding: 0.65em 0;
+	color: #FFF;
+	background: #3C4558;
 }
 
 .btn-day-controller:hover {
-	color: #FFFFFF;
+	color: #FFF;
 	background: #202737;
-	float: right;
-	width: 146px;
-	padding: 8px 0;
 }
 
 .btn-day-controller::after {
 	content: 'Начать смену';
-	display: inline;
 }
-
 
 .btn-day-controller.active::after {
 	content: 'Завершить смену';
-	display: inline;
 }
 
 .visits-list__item {
 	position: relative;
-	background: #f8f7f7;
-	border-radius: 3px;
+	margin: 1.31em 0;
 	padding: 0.5em 0;
-	margin: 1.25rem 0;
+	border-radius: 3px;
+	background: #F8F7F7;
+	-webkit-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
+	   -moz-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
+	        box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
 	font-size: 0.95em;
-	-webkit-box-shadow: 0px 3px 9px 0px rgba(0,0,0,0.58);
-	-moz-box-shadow: 0px 3px 9px 0px rgba(0,0,0,0.58);
-	box-shadow: 0px 3px 9px 0px rgba(0,0,0,0.58);
 }
 
 .visits-list__item.completed::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    border-radius: 3px;
- }
-
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 3px;
+	background: rgba(0,0,0,0.4);
+	content: '';
+}
 
 .visit {
 	display: flex;
 }
 
 .visit-info-item {
+	height: 2em;
+	padding: 0 0.65em;
 	border-right: 2px solid #DFDFDF;
 	line-height: 1em;
-	padding: 0 10px;
-	min-height: 2em; 
+
 	flex-grow: 0;
 }
 
@@ -101,83 +95,77 @@
 }
 
 .visit-info-item:last-child {
-	flex-basis: 2em;
 	border: none;
 
+	flex-basis: 2em;
 }
-
 
 .btn-visit-controller {
 	box-sizing: border-box;
-	border: 1px solid;
 	width: 100%;
+	border: 1px solid;
 }
 
 .visits-list__item.new .btn-visit-controller {
-	border-color:  #61B74A;
 	color: #61B74A;
+	border-color: #61B74A;
 }
 
 .visits-list__item.new .btn-visit-controller::after {
-    content: 'Начать';
-    display: inline;
-  }
+	content: 'Начать';
+}
 
 .visits-list__item.new .btn-visit-controller:hover {
+	color: #FFF;
 	background: #61B74A;
-	color: #FFFFFF; 
 }
 
 .visits-list__item.active .btn-visit-controller {
+	color: #0078FF;
 	border-color: #0078FF;
-	color: #0078FF; 
 }
 
 .visits-list__item.active .btn-visit-controller::after {
-    content: 'Рассчитать';
-    display: inline;
-  }
+	content: 'Рассчитать';
+}
 
 .visits-list__item.active .btn-visit-controller:hover {
+	color: #FFF;
 	background: #0078FF;
-	color: #FFFFFF; 
 }
 
 .visits-list__item.calculated .btn-visit-controller {
+	color: #F73F14;
 	border-color: #F73F14;
-	color: #F73F14; 
 }
 
 .visits-list__item.calculated .btn-visit-controller::after {
-    content: 'Завершить';
-    display: inline;
-  }
+	content: 'Завершить';
+}
 
 .visits-list__item.calculated .btn-visit-controller:hover {
+	color: #FFF;
 	background: #F73F14;
-	color: #FFFFFF; 
 }
 
 .visits-list__item.completed .btn-visit-controller {
-	background: transparent;
 	color: #333;
 	border-color: transparent;
-	cursor:	default; 
+	background: transparent;
+	cursor: default;
 }
 
 .visits-list__item.completed .btn-visit-controller::after {
-    content: 'Завершено';
-    display: inline;
-  }
-
+	content: 'Завершено';
+}
 
 .btn-remove-visit {
-	height: 1.43em;
-	font-size: 1.4em;
-	color: #3c4558; 
-	z-index: 1;
 	position: relative;
+	z-index: 1;
 	width: 100%;
+	height: 100%;
+	color: #3C4558;
+	font-size: 1.4em;
 }
 
 .btn-remove-visit:hover {
@@ -189,11 +177,10 @@
 }
 
 
-
 .btn-add-visit {
+	width: 12em;
+	color: #FFF;
 	background: #0078FF;
-	color: #FFFFFF;
-	width: 150px;
 }
 
 
@@ -204,124 +191,155 @@
 
 .visit-info-item input,
 .visit-info-item select {
+	box-sizing: border-box;
 	width: 100%;
 	height: 1.4em;
-	box-sizing: border-box;
-	border-radius: 4px;
-	border:1px solid #C0C0C0;
-	padding-left: 5px;
-	vertical-align: top;
 	margin-top: -0.2em;
+	padding-left: 5px;
+	border-radius: 4px;
+	vertical-align: top;
 }
 
 .visit-info-item select {
-	padding-left: 0px;
+	padding-left: 0;
 }
 
-@media screen and (max-width: 1000px) {
 
+@media screen and (max-width: 1000px) {
 	.visit {
+		padding: 0 0.65em;
+
 		flex-wrap: wrap;
 	}
 
 	.btn-remove-visit {
-		border: 1px solid #3c4558;
+		border: 1px solid #3C4558;
 		border-radius: 3px;
+		font-size: 1em;
 	}
 
 	.btn-remove-visit:hover {
-		background:  #3c4558;
-		color: #FFFFFF;
+		color: #FFF;
+		background: #3C4558;
 	}
 
-	.visits-list__item.new .btn-visit-controller,
-	.visits-list__item.new .btn-remove-visit {
-		margin-top: 4px;
-	}
-
-
-	.visit-info-item:nth-child(4) {
-		order: 1;
-		flex-basis: 50%;
-	}
-
-	.visit-info-item:nth-child(-n+8) {
-		padding-bottom: 0.45em;
-		border-bottom: 2px solid #DFDFDF;
-	}
-
-	.visit-info-item:nth-child(n+1) {
-		flex-grow: 1;
-	}
-
-	.visit-info-item:nth-child(4), 
-	.visit-info-item:nth-child(9),
-	.visit-info-item:last-child {
-		padding-top: 0.45em;
-		padding-bottom: 0;
-		border-bottom:none;
-	}
-
-	.visit-info-item:nth-child(8) {
-		border-right: none;
-	}
-
-	.visit-info-item:nth-child(9),
-	.visit-info-item:last-child {
-		flex-basis: 15%;
-	}
-
-	.visit-info-item:nth-child(9) {
-		border-right: none;
-	}
-
-	.visit-info-item:last-child {
+	/*Номер и комментарий*/
+	.visit-info-item:first-child,
+	.visit-info-item:nth-child(3) {
 		padding-left: 0;
 	}
 
+	/*Итого и кнопка "Удалить"*/
+	.visit-info-item:nth-child(7),
+	.visit-info-item:last-child {
+		padding-right: 0;
+	}
+
+	/*Все, кроме кнопок*/
+	.visit-info-item:nth-child(-n+7) {
+		padding-bottom: 0.5em;
+		border-bottom: 2px solid #DFDFDF;
+	}
+
+	/*Все, кроме номера*/
+	.visit-info-item:nth-child(n+2) {
+		flex-basis: 4.5em;
+		flex-grow: 1;
+	}
+
+	/*Комментарий*/
+	.visit-info-item:nth-child(3) {
+		margin-bottom: 0;
+		padding-top: 0.5em;
+		padding-bottom: 0;
+		border: none;
+
+		order: 1;
+		flex-basis: 60%;
+		flex-grow: 2;
+	}
+
+	/*Комментарий (новое посещение)*/
+	.new .visit-info-item:nth-child(3) {
+		border-right: 2px solid #DFDFDF;;
+	}
+
+	/*Кнопки*/
+	.visit-info-item:nth-child(n+8) {
+		padding-top: 0.5em;
+		padding-right: 0;
+		border: none;
+
+		order: 1;
+		flex-basis: 15%;
+	}
+
+	/*Итого*/
+	.visit-info-item:nth-child(7) {
+		border-right: none;
+	}
 }
 
 
 @media screen and (max-width: 550px) {
-
-	.visits-list {
-		font-size: 0.9em;
-	}
-
-	.visit-info-item:nth-child(1),
-	.visit-info-item:nth-child(2),
-	.visit-info-item:nth-child(3),
-	.visit-info-item:nth-child(7) {
-		flex:1 1 15%;
-	}
-
-
-	.visit-info-item:nth-child(4) {
-		flex-basis: 100%;
+	.visit-info-item {
+		padding: 0.5em 0.4em;
 		border-right: none;
-		border-bottom: 2px solid #DFDFDF;
-	}
 
-	.visit-info-item:nth-child(7) {
-		border-right: none;
-	}
-
-
-	.visit-info-item:nth-child(4){
-		padding-bottom: 0.45em;
-	}
-
-	.visit-info-item:nth-child(5), 
-	.visit-info-item:nth-child(6),
-	.visit-info-item:nth-child(8) {
 		order: 1;
-		flex-basis: 25%;
-		padding-top: 0.45em;
-	} 
+	}
+
+	/*Комментарий (новое посещение)*/
+	.new .visit-info-item:nth-child(3) {
+		border-right: none;
+	}
+
+
+	/*Все, кроме кнопок*/
+	.visit-info-item:nth-child(-n+7) {
+		padding-bottom: 0.5em;
+		border-bottom: 2px solid #DFDFDF;
+
+		flex-basis: 14.5%;
+	}
+
+	/*Номер и комментарий*/
+	.visit-info-item:first-child,
+	.visit-info-item:nth-child(3) {
+		padding-right: 0;
+		border-right: none;
+
+		order: 0;
+		flex-basis: 100%;
+	}
+
+
+	/*Номер*/
+	.visit-info-item:first-child {
+		padding-top: 0;
+
+		flex-basis: 100%;
+	}
+
+
+	/*Номерок и кнопка контроля*/
+	.visit-info-item:nth-child(2),
+	.visit-info-item:nth-child(8) {
+		padding-left: 0;
+	}
+
+	/*Кнопка контроля*/
+	.visit-info-item:nth-child(8) {
+		padding-right: 0.4em;
+	}
+
+	/*Кнопки*/
+	.visit-info-item:nth-child(n+8) {
+		padding-bottom: 0;
+	}
 
 	.btn-add-visit {
 		width: 100%;
-		padding: 1em;
+		height: 3em;
 	}
-
 }

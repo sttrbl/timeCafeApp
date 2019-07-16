@@ -9,6 +9,7 @@ const settingsPage = ( () => {
 		settingsPanel.appendChild( createCommonSettingsPanel(commonSettings) )
 		settingsPanel.appendChild( createUsersSettingsPanel(usersSettings) );
 		content.appendChild(settingsPanel);
+
 		return content;
 	}
 
@@ -23,8 +24,10 @@ const settingsPage = ( () => {
 		settingsList.appendChild( createDiscountEditor(discountsSettings) );
 
 		elem.append(headline, settingsList);
+
 		return elem;
 	}
+
 
 	function createLogoUploader() {
 		const elem = helper.create('div', 'logo-uploader');
@@ -46,6 +49,7 @@ const settingsPage = ( () => {
 		});
 
 		elem.append(img, info, upadateButton, hiddenImgInput);
+
 		return elem;
 	}
 
@@ -61,8 +65,8 @@ const settingsPage = ( () => {
 		const elem = helper.create('form', 'main-settings')
 		const fieldList = helper.create('div','field-list');
 		const saveButton = helper.create('button', 'btn btn-save-main');
+
 		elem.id = 'main-settings';
-		
 		
 		optionsNames.forEach((optionName, i) => {
 			const fieldElem = helper.create('li','field-list__item');
@@ -99,6 +103,7 @@ const settingsPage = ( () => {
 
 			updateMain(newSettings).then(result => {
 				const newOrgName = fields['org_name'].value;
+
 				document.querySelector('.logo-container__text').textContent = newOrgName;
 				saveButton.style.display = '';	
 			});
@@ -108,6 +113,7 @@ const settingsPage = ( () => {
 
 
 		elem.append(fieldList, saveButton);
+
 		return elem; 
 	}
 
@@ -122,6 +128,7 @@ const settingsPage = ( () => {
 		const th1 = helper.create('th', null, 'ID');
 		const th2 = helper.create('th', null, 'Название');
 		const th3 = helper.create('th', null, 'Размер (%)');
+
 		theadRow.append(th1,th2,th3);
 		tableHead.appendChild(theadRow);
 
@@ -130,6 +137,7 @@ const settingsPage = ( () => {
 			const id = helper.create('td','discount-info__id', key);
 			const name = helper.create('td', 'discount-info__name', discountSettings[key]['name']);
 			const value = helper.create('td', 'discount-info__value', discountSettings[key]['value']);
+
 			row.append(id, name, value);
 			tableBody.appendChild(row);
 		}
@@ -164,13 +172,13 @@ const settingsPage = ( () => {
 				newSettings[id]['value'] = value;
 			});
 
-
 			if ( Object.keys(newSettings).length == 0 ) {
 				newSettings = 'truncate';
 			}
 
 			updateDiscounts(newSettings).then(result => {
 				const valuesList = tableBody.querySelectorAll('.discount-info__id');
+
 				addButton.style = '';
 				tableBody.setAttribute('contentEditable', false);
 
@@ -183,14 +191,14 @@ const settingsPage = ( () => {
 
 				self.classList.remove('active');
 			});
-			
 		});
 
-		addButton.addEventListener('click', function(e) {
+		addButton.addEventListener('click', e => {
 			const row = helper.create('tr','discount-info');
 			const id = helper.create('td','discount-info__id');
 			const name = helper.create('td', 'discount-info__name');
 			const value = helper.create('td','discount-info__value');
+
 			row.append(id, name, value);
 			tableBody.appendChild(row);
 		});
@@ -220,30 +228,32 @@ const settingsPage = ( () => {
 		const saveButton = helper.create('button', 'btn btn-save-users-changes', 'Сохранить изменения');
 		const addUserButton = helper.create('button', 'btn btn btn-add-user', 'Добавить');
 
-		
 		usersInfo.forEach((userInfo) => {
 			usersList.appendChild( createUserListRow(userInfo) );
 		});
 
-		elem.addEventListener('input', function(e) {
+		elem.addEventListener('input', e => {
+
 			if (saveButton.style == '') return;
+
 			saveButton.style = 'display:inline-block';
 		});
 
-		saveButton.addEventListener('click', function(e) {
+		saveButton.addEventListener('click', e => {
 			const newSettings = [];
 			const usersRows = usersList.querySelectorAll('.user');
 
-			for (var i = 0; i < usersRows.length; i++) {
+			usersList.querySelectorAll('.user').forEach((row, i) => {
 				const userInfo = {};
-				userInfo.id = usersRows[i].id;
-				userInfo.name = usersRows[i].querySelector('[name="name"]').value;
-				userInfo.surname = usersRows[i].querySelector('[name="surname"]').value;
-				userInfo.login = usersRows[i].querySelector('[name="login"]').value;
-				userInfo.password = usersRows[i].querySelector('[name="password"]').value;
-				userInfo.position = usersRows[i].querySelector('[name="position"]').value;
+
+				userInfo.id = row.id;
+				userInfo.name = row.querySelector('[name="name"]').value;
+				userInfo.surname = row.querySelector('[name="surname"]').value;
+				userInfo.login = row.querySelector('[name="login"]').value;
+				userInfo.password = row.querySelector('[name="password"]').value;
+				userInfo.position = row.querySelector('[name="position"]').value;
 				newSettings.push(userInfo);
-			}
+			});
 
 			updateUsers(newSettings).then(result => {
 				saveButton.style = '';
@@ -252,13 +262,15 @@ const settingsPage = ( () => {
 			e.preventDefault();
 		});
 
-		addUserButton.addEventListener('click', function(e) {
+		addUserButton.addEventListener('click', e => {
 			usersList.appendChild( createUserListRow() );
 			e.preventDefault();
 		});
 
-		usersList.addEventListener('click', function(e) {
+		usersList.addEventListener('click', e => {
+
 			if (!e.target.closest('.btn-remove-user')) return;
+
 			const userRow = e.target.closest('.user');
 			//мб промис? 
 			removeUser(userRow);
@@ -266,6 +278,7 @@ const settingsPage = ( () => {
 		});
 		
 		elem.append(usersList,addUserButton, saveButton);
+
 		return elem;
 	}
 
@@ -298,10 +311,11 @@ const settingsPage = ( () => {
 					break;
 			}
 
+			field.name = itemName[1];
+
 			if (userInfo) {
 				field.value = userInfo[ itemName[1] ];
 			}
-
 
 			item.append(label, field);
 			elem.appendChild(item);
@@ -318,7 +332,6 @@ const settingsPage = ( () => {
 
 
 //******************** Сервер *************************//
-
 	function getSettings() {
 		return new Promise((resolve, reject) => {
 			$.ajax({
@@ -326,9 +339,12 @@ const settingsPage = ( () => {
 			    url: "php/settingsPage.php",
 			    data: {action:'getSettings'},
 			    success: resp => {
+
 			    	try {
 			    		resp = JSON.parse(resp);
+
 			    		if (resp.error) return helper.showError(resp.error);
+
 			    	} catch(e) {
 			    		helper.showError("Ошибка чтения данных!");
 			    		throw e;
@@ -343,6 +359,7 @@ const settingsPage = ( () => {
 		});
 	}
 
+
 	function updateLogo(file) {
 		const formData = new FormData();
 		formData.append('file', file);
@@ -354,9 +371,12 @@ const settingsPage = ( () => {
             processData: false,
             contentType: false,
             success: resp => {
+
             	try {
 		    		resp = JSON.parse(resp);
+
 		    		if (resp.error) return helper.showError(resp.error);
+
 		    	} catch(e) {
 		    		helper.showError("Ошибка чтения данных!");
 		    		throw e;
@@ -372,6 +392,7 @@ const settingsPage = ( () => {
 
 	}
 
+
 	function updateMain(newSettings) {
 		return new Promise((resolve, reject) => {
 			$.ajax({
@@ -379,9 +400,12 @@ const settingsPage = ( () => {
 			    url: "php/settingsPage.php",
 			    data: {action:'updateMain', newSettings:newSettings},
 			    success: resp => {
+
 			    	try {
 			    		resp = JSON.parse(resp);
+
 			    		if (resp.error) return helper.showError(resp.error);
+
 			    	} catch(e) {
 			    		helper.showError("Ошибка чтения данных!");
 			    		throw e;
@@ -397,6 +421,7 @@ const settingsPage = ( () => {
 		});
 	}
 
+
 	function updateDiscounts(newSettings) {
 		return new Promise((resolve, reject) => {
 			$.ajax({
@@ -404,6 +429,7 @@ const settingsPage = ( () => {
 			    url: "php/settingsPage.php",
 			    data: {action:'updateDiscounts', newSettings:newSettings},
 			    success: resp => {
+
 			    	try {
 			    		resp = JSON.parse(resp);
 
@@ -424,12 +450,14 @@ const settingsPage = ( () => {
 		});
 	}
 
+
 	function removeUser(userElem) {
 		$.ajax({
 		    type: "POST",
 		    url: "php/settingsPage.php",
 		    data: {action:'removeUser', userId:userElem.id},
 		    success: resp => {
+
 		    	try {
 		    		resp = JSON.parse(resp);
 
@@ -456,8 +484,19 @@ const settingsPage = ( () => {
 			    type: "POST",
 			    url: "php/settingsPage.php",
 			    data: {action:'updateUsers', newSettings:newSettings},
-			    success: function(resp) {
-			    	resp = JSON.parse(resp);
+			    success: resp => {
+
+			    	try {
+			    		resp = JSON.parse(resp);
+
+			    		if (resp.error) return helper.showError(resp.error);
+
+			    	} catch(e) {
+			    		helper.showError("Ошибка чтения данных!");
+			    		throw e;
+			    	}
+			    	
+					helper.showSuccess('Настройки обновлены.');
 	       			resolve(resp);
 		        },
 		        error: () => {
@@ -467,8 +506,10 @@ const settingsPage = ( () => {
 		});
 	}
 
+
 	return {
 		getSettings: getSettings, 
 		getElem: createSettingsPage
 	}
+
 })(); 

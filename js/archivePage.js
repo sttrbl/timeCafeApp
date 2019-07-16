@@ -1,13 +1,17 @@
-const archivePage = (function () {
+//********* Модуль для подготовки компонентов раздела "Архив" **********//
+
+const archivePage = (() => {
 
 	function createArchivePage(period) {
 		const content = helper.create('section', 'page__content');
-		content.appendChild( createOutpusController(period) );
+
+		content.appendChild( createOutputController(period) );
+
 		return content;
 	}
 
 
-	function createOutpusController(period) {
+	function createOutputController(period) {
 		const elem = helper.create('form', 'output-controll');
 		const fromContainer = helper.create('div', 'output-controll__date');
 		const toContainer = helper.create('div', 'output-controll__date');
@@ -19,7 +23,6 @@ const archivePage = (function () {
 
 		fromInput.type = 'date';
 		toInput.type = 'date';
-
 		fromInput.min = period.from;
 		fromInput.max = period.to;
 		toInput.min = period.from;
@@ -28,17 +31,19 @@ const archivePage = (function () {
 		toInput.setAttribute('required', true);
 
 
-		elem.addEventListener('submit', function(e) {
-			getPeriodInfo(fromInput.value, toInput.value).then(result => {
+		elem.addEventListener('submit', e => {
+
+			getPeriodInfo(fromInput.value, toInput.value).then(({statistics, shifts}) => {
 				let statisticsElement = elem.parentElement.querySelector('.period-statistics');
 				let shiftsElement = elem.parentElement.querySelector('.period-shifts');
 
 				if (statisticsElement) {
-					elem.parentElement.replaceChild( createStatistics(result.statistics), statisticsElement);
-					elem.parentElement.replaceChild( createPeriodShifts(result.shifts), shiftsElement);
+					elem.parentElement.replaceChild( createStatistics(statistics), statisticsElement);
+					elem.parentElement.replaceChild( createPeriodShifts(shifts), shiftsElement);
 					return;
 				}
-				elem.parentElement.append( createStatistics(result.statistics), createPeriodShifts(result.shifts) );
+
+				elem.parentElement.append( createStatistics(statistics), createPeriodShifts(shifts) );
 			});
 
 			e.preventDefault();
@@ -47,8 +52,10 @@ const archivePage = (function () {
 		fromContainer.append(fromLabel, fromInput);
 		toContainer.append(toLabel, toInput);
 		elem.append(fromContainer, toContainer, sendButton);
+
 		return elem;
 	}
+
 
 	function createStatistics(statistics) {
 		const itemsNames = [
@@ -62,53 +69,54 @@ const archivePage = (function () {
 
 		const elem = helper.create('ul', 'period-statistics');
 
-		for (let i = 0; i < itemsNames.length; i++) {
+		itemsNames.forEach((itemName, i) => {
 			const item = helper.create('li', 'period-statistics__item');
-			const itemLabel = helper.create('span', 'item__label',  itemsNames[i][1]);
+			const itemLabel = helper.create('span', 'item__label',  itemName[1]);
 			const itemValue = helper.create('span', 'item__value');
-			itemValue.textContent = statistics[ itemsNames[i][0] ] + ' ' + itemsNames[i][2];
-			item.append(itemLabel, itemValue);
 
+			itemValue.textContent = `${statistics[ itemName[0] ]} ${itemName[2]}`;
+			
+			item.append(itemLabel, itemValue);
 			elem.appendChild(item);
-		}
+		});
 
 		return elem;
 	}
 
+
 	function createPeriodShifts(shifts) {
 		const elem = helper.create('ul', 'period-shifts');
 
-		for (let i = 0; i < shifts.length; i++) {
+		shifts.forEach(({id, date, start_time:start, end_time:end}, i) => {
 			const item = helper.create('li', 'period-shifts__item shift');
-			const shiftDate =  parseShiftDate(shifts[i].date);
+			const shiftDate =  parseShiftDate(date);
 			const itemDay = helper.create('h1', 'shift__day', shiftDate.day );
 			let itemMonth = helper.create('h2', 'shift__month', shiftDate.month);
+			let itemTime = helper.create('span', 'shift__time', `${start} - ${end}`);
 
-			let itemTime =  shifts[i].start_time + ' - ' + shifts[i].end_time;
-			itemTime = helper.create('span', 'shift__time', itemTime);
-
-			item.id = shifts[i].id;
-			item.setAttribute('date', shifts[i].date);
+			item.id = id;
+			item.setAttribute('date', date);
 
 			item.append(itemDay, itemMonth, itemTime);
 			elem.appendChild(item);
-		}
+		});
 
+		elem.addEventListener('click', e => {
+			const shiftElem = e.target.closest('.shift');
 
-		elem.addEventListener('click', function(e) {
-			if (!e.target.closest('.shift')) return false;
-
-			const target = e.target.closest('.shift');
+			if (!shiftElem) return false;
+			
 			const pageContent = document.querySelector('.page__content');
+			const pageElements = Array.prototype.slice.call(pageContent.children);
 
-			for (var i = 0; i < pageContent.children.length; i++) {
-				pageContent.children[i].style = 'display:none;';
-			}
-
-			getShiftVisits(target.id).then(result => {
+			pageElements.forEach( (element, i) => {
+				element.style = "display: none";
+			});
+				
+			getShiftVisits(shiftElem.id).then(result => {
 				const shiftDate = {
-					date: target.getAttribute('date'),
-					period: target.querySelector('.shift__time').textContent
+					date: shiftElem.getAttribute('date'),
+					period: shiftElem.querySelector('.shift__time').textContent
 				};
 
 				pageContent.appendChild( createShiftOutput(result, shiftDate) );
@@ -123,30 +131,30 @@ const archivePage = (function () {
 	function createShiftOutput(visits, date) {
 		const elem = document.createDocumentFragment();
 		const shiftHeader = helper.create('header', 'shift-header');
-		const shiftHeadline = helper.create('h4', 'shift-headline', 'Обзор смены за ' 
-											+ date.date + ' (' +  date.period + ')');
+		const shifHeadlineText = `Обзор смены за ${date.date} ( ${date.period} )`;
+		const shiftHeadline = helper.create('h4', 'shift-headline', shifHeadlineText);
 		const backButton = helper.create('button', 'btn-return', 'Назад');
-		shiftHeader.append(backButton, shiftHeadline);
-
 		const shiftVisitsList = helper.create('ul', 'shift-visits');
 
-		for (let i = 0; i < visits.length; i++) {
-			shiftVisitsList.appendChild( createVisitRow(visits[i], i+1) ); 
-		}
+		visits.forEach((visit, i) => {
+			shiftVisitsList.appendChild( createVisitRow(visit, i+1) ); 
+		});
 
+		backButton.addEventListener('click', e => {
+			const pageContent = document.querySelector('.page__content');
+			const pageElements = Array.prototype.slice.call(pageContent.children);
 
-		backButton.addEventListener('click', function(e) {
 			shiftHeader.remove();
 			shiftVisitsList.remove();
 
-			const pageContent = document.querySelector('.page__content');
-
-			for (var i = 0; i < pageContent.children.length; i++) {
-				pageContent.children[i].style = '';
-			}
+			pageElements.forEach( (element, i) => {
+				element.style = '';
+			});
 		});
 
+		shiftHeader.append(backButton, shiftHeadline);
 		elem.append(shiftHeader, shiftVisitsList);
+
 		return elem;
 	}
 
@@ -165,35 +173,35 @@ const archivePage = (function () {
 
 		const elem = helper.create('li','shift-visits__item visit');
 
-		for (var i = 0; i < itemsNames.length; i++) {
+		itemsNames.forEach((name, i) => {
 			const item = helper.create('div', 'visit__item');
-			const itemLabel = helper.create('label', 'visit__item__label', itemsNames[i][1]);
+			const itemLabel = helper.create('label', 'visit__item__label', name[1]);
 			const itemValue = helper.create('span', 'visit__item__value');
+
+			itemValue.textContent = (i > 0) ? visit[name[0]] : num;
+
 			item.append(itemLabel, itemValue);
 			elem.appendChild(item);
+		});
 
-			if (i == 0) {
-				itemValue.textContent = num; 
-				continue;
-			}
-
-			itemValue.textContent = visit[ itemsNames[i][0] ] ;
-		}
-		
 		return elem;
 	}
 
 
-	//*****************Сервер*****************//
-
 	function parseShiftDate(string) {
 		const shiftDate =  new Date(string);
 		const dateElems = {};
+
 		dateElems.day = shiftDate.getDate();
 		dateElems.month = shiftDate.toLocaleString('ru-RU', {month: 'long'});
 		dateElems.month = dateElems.month[0].toUpperCase() + dateElems.month.slice(1);
+
 		return dateElems;
 	}
+
+
+
+//********************Сервер ********************//
 
 	function getDatePeriod() {
 		return new Promise((resolve, reject) => {
@@ -201,13 +209,20 @@ const archivePage = (function () {
 			    type: "POST",
 			    url: "php/archivePage.php",
 			    data: {action:'getDatePeriod'},
-			    success: function(resp) {
-			    	resp = JSON.parse(resp);
-					if (resp.error) return alert(resp.error);
+			    success: resp => {
+
+			    	try {
+			    		resp = JSON.parse(resp);
+			    		if (resp.error) return helper.showError(resp.error);
+			    	} catch(e) {
+			    		helper.showError("Ошибка чтения данных!");
+			    		throw e;
+			    	}
+			    
 	       			resolve(resp);
 		        },
-		        error: function() {
-		        	reject()
+		        error: () => {
+		        	helper.showError("Ошибка соединения с сервером!");
 		        }
 			});
 		});
@@ -219,16 +234,20 @@ const archivePage = (function () {
 			    type: "POST",
 			    url: "php/archivePage.php",
 			    data: {action:'getPeriodInfo',from:from,to:to},
-			    success: function(resp) {
-			    	resp = JSON.parse(resp);
-					if (resp.error) return alert(resp.error);
+			    success: resp => {
 
-					console.log(resp);
-					console.log( parseShiftDate('"2019-05-04"') );
+			    	try {
+			    		resp = JSON.parse(resp);
+			    		if (resp.error) return helper.showError(resp.error);
+			    	} catch(e) {
+			    		helper.showError("Ошибка чтения данных!");
+			    		throw e;
+			    	}
+	
 	       			resolve(resp);
 		        },
-		        error: function() {
-		        	reject()
+		        error: () => {
+		        	helper.showError("Ошибка соединения с сервером!");
 		        }
 			});
 		});
@@ -241,13 +260,20 @@ const archivePage = (function () {
 			    type: "POST",
 			    url: "php/archivePage.php",
 			    data: {action:'getShiftVisits', shiftId:shiftId},
-			    success: function(resp) {
-			    	resp = JSON.parse(resp);
-					if (resp.error) return alert(resp.error);
+			    success: resp => {
+			    	
+			    	try {
+			    		resp = JSON.parse(resp);
+			    		if (resp.error) return helper.showError(resp.error);
+			    	} catch(e) {
+			    		helper.showError("Ошибка чтения данных!");
+			    		throw e;
+			    	}
+			 
 	       			resolve(resp);
 		        },
-		        error: function() {
-		        	reject()
+		        error: () => {
+		        	helper.showError("Ошибка соединения с сервером!");
 		        }
 			});
 		});
