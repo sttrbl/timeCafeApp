@@ -62,9 +62,9 @@ const archivePage = (() => {
 			['total_shifts', 'Всего смен : ', ''],
 			['total_visitors', 'Всего посетителей : ' , 'чел.'],
 			['average_check', 'Средний чек : ', 'руб.'],
-			['average_profit', 'Средняя прибыль за смену : ', 'руб.'],
+			['average_profit', 'Средняя выручка за смену : ', 'руб.'],
 			['average_duration','Средняя длит. посещения : ', 'мин.'],
-			['total_profit', 'Общая прибыль : ', 'руб.']
+			['total_profit', 'Общая выручка : ', 'руб.']
 		];
 
 		const elem = helper.create('ul', 'period-statistics');
@@ -131,7 +131,7 @@ const archivePage = (() => {
 	function createShiftOutput(visits, date) {
 		const elem = document.createDocumentFragment();
 		const shiftHeader = helper.create('header', 'shift-header');
-		const shifHeadlineText = `Обзор смены за ${date.date} ( ${date.period} )`;
+		const shifHeadlineText = `Смена ${date.date} ( ${date.period} )`;
 		const shiftHeadline = helper.create('h4', 'shift-headline', shifHeadlineText);
 		const backButton = helper.create('button', 'btn-return', 'Назад');
 		const shiftVisitsList = helper.create('ul', 'shift-visits');

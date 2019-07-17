@@ -1,15 +1,13 @@
 .output-controll {
-	margin-top: 0.3em;
 	margin-bottom: 1em;
-	border-bottom: 2px solid #3c4558;
 	padding-bottom: 1em;
+	border-bottom: 2px solid #3C4558;
 }
 
 .output-controll__label {
 	display: block;
-	font-weight: bold;
 	font-size: 0.8em;
-
+	font-weight: bold;
 }
 
 .output-controll__date {
@@ -18,43 +16,43 @@
 }
 
 .btn-apply-dates {
+	margin-bottom: 1px;
+	padding: 0.56em 3.5em;
+	color: #1567E1;
 	border: 1px solid #1567E1;
 	vertical-align: bottom;
-	color: #1567E1;
-	padding: 0.56em 3.5em;
-	margin-bottom: 1px;
-
 }
 
 .btn-apply-dates:hover {
+	color: #FFF;
 	background: #1567E1;
-	color: #FFFFFF;
 }
 
-[type="date"] {
+[type='date'] {
 	padding: 0.25em 0.5em;
 	font-size: 0.95em;
 }
 
 .period-statistics {
 	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-around;
 	padding-top: 0.5em;
 	padding-bottom: 0.6em;
 	color: #333;
+	border-radius: 5px;
 	background: #FAFAFA;
 	box-shadow: 0 2px 4px 0 rgba(0,0,0,0.4);
-	border-radius: 5px;
+
+	flex-wrap: wrap;
+	justify-content: space-around;
 }
 
 .period-statistics__item {
-	text-align: center;
-	flex-basis: 30%;
-	font-weight: bold;
 	font-size: 0.9em;
-}
+	font-weight: bold;
+	text-align: center;
 
+	flex-basis: 30%;
+}
 
 
 .period-statistics__item .item__value {
@@ -64,37 +62,33 @@
 
 .period-shifts {
 	display: flex;
+	margin-top: 1em;
+	padding: 1em 0;
+	border-top: 2px solid #3C4558;
+
 	flex-wrap: wrap;
 	justify-content: space-between;
-	padding: 1em 0;
-    margin-top: 1em;
-    border-top: 2px solid #3c4558;
-}
-
-.period-shifts::after {
-  content: "";
-  flex: auto;
 }
 
 .period-shifts__item {
+	margin-bottom: 1em;
 	padding: 1em 0;
-	flex-basis: 9em;
+	border: 1px solid  #F8F7F7;
 	border-radius: 10px;
-	text-align: center;
-	background: #FFFFFF;
-	border: 1px solid  #f8f7f7;
+	background: #FFF;
 	box-shadow: 0 2px 4px 0 rgba(0,0,0,0.4);
 	line-height: 1.5em;
 	cursor: pointer;
-	margin-bottom: 1em;
-	margin-right: 1em;
+	text-align: center;
+
+	flex-basis: 9em;
 }
 
 .period-shifts__item:hover {
+	-webkit-box-shadow: 0 0 10px 0 rgba(0,0,0,0.63);
+	   -moz-box-shadow: 0 0 10px 0 rgba(0,0,0,0.63);
+	        box-shadow: 0 0 10px 0 rgba(0,0,0,0.63);
 	transition: 0.1s ease;
-	-webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.63);
-	-moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.63);
-	box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.63);
 }
 
 
@@ -117,22 +111,24 @@
 
 .shift-visits__item {
 	display: flex;
+	margin: 1.25rem 0;
+	padding: 0.5em 0;
+	border-radius: 3px;
+	background: #F8F7F7;
+	-webkit-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
+	   -moz-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
+	        box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
+	font-size: 0.95em;
+
 	flex-wrap: nowrap;
-	background: #f8f7f7;
-    border-radius: 3px;
-    padding: 0.5em 0;
-    margin: 1.25rem 0;
-    font-size: 0.95em;
-    -webkit-box-shadow: 0px 3px 9px 0px rgba(0,0,0,0.58);
-	-moz-box-shadow: 0px 3px 9px 0px rgba(0,0,0,0.58);
-	box-shadow: 0px 3px 9px 0px rgba(0,0,0,0.58);
 }
 
 .visit__item {
 	padding: 0 0.5em;
-	flex-grow: 0;
-	line-height: 1.2em;
 	border-right: 2px solid #DFDFDF;
+	line-height: 1.2em;
+
+	flex-grow: 0;
 }
 
 
@@ -158,32 +154,85 @@
 
 .visit__item:last-child {
 	border: none;
+
 	flex-grow: 1;
 }
 
 
-
 .visit__item__label {
 	display: block;
-	font-size:0.7rem;
+	font-size: 0.7rem;
 	font-weight: bold;
 }
 
 .shift-header {
-    border-bottom: 2px solid #3c4558;
-    padding-top:0.2em;
-    padding-bottom:0.5em;
+	padding-top: 0.2em;
+	padding-bottom: 0.5em;
+	border-bottom: 2px solid #3C4558;
 }
 
 .btn-return {
-	color: #1983E5;
-	font-size: 1em;
-	border-radius: 0;
-	border-right: 1px solid black;
 	padding-right: 0.8em;
+	color: #1983E5;
+	border-right: 1px solid black;
+	border-radius: 0;
+	font-size: 1em;
 }
 
 .shift-header h4 {
 	display: inline-block;
 	margin-left: 0.8em;
+}
+
+
+@media screen and (max-width: 800px) {
+	.period-statistics {
+		display: block;
+		padding: 1em;
+	}
+
+	.period-statistics__item {
+		display: inline-block;
+		box-sizing: border-box;
+		text-align: left;
+		width: 49%;
+	}
+
+}
+
+
+@media screen and (max-width: 540px) {
+
+	.output-controll {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.btn-apply-dates {
+		width: 100%;
+		margin-top: 1em;
+		height: 3em;
+	}
+
+	.output-controll__date {
+		flex-grow: 1;
+		margin-right: 1em;
+	}
+
+	.output-controll__date:nth-child(2) {
+		margin-right: 0;
+	}
+
+
+	[type='date'] {
+		min-width: 9.5em;
+		box-sizing: border-box;
+		width: 100%;
+	}
+
+	.period-statistics__item {
+		display: block;
+		width: 100%;
+	}
+
 }
