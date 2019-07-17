@@ -1,15 +1,13 @@
 
 .settings {
 	display: flex;
-	justify-content: space-between;
-	align-items: stretch;
-
 }
 
-.settings input,  select {
+.settings input,
+.settings select {
+	padding-left: 0.5em;
 	border-radius: 5px;
-	padding-left: 0.5em;		
-} 
+}
 
 .settings label {
 	display: block;
@@ -18,46 +16,48 @@
 }
 
 .settings .btn {
-	border: 1px solid;
-	font-weight: bold;
-	font-size: 0.7em;
-	padding-left: 2em;
 	padding-right: 2em;
-	border-color: #61B74A;
+	padding-left: 2em;
 	color: #61B74A;
+	border: 1px solid;
+	border-color: #61B74A;
+	font-size: 0.7em;
+	font-weight: bold;
 }
 
 .settings .btn:hover {
-	background:#61B74A;
-	color: #FFFFFF;
+	color: #FFF;
+	background: #61B74A;
 }
 
+
 .settings__common {
-	flex-grow: 1;
+	flex-shrink: 0;
+	flex-basis: 390px;
 }
 
 .settings__users {
-	flex-grow: 2;
+	flex-grow: 1;
 	margin-left: 20px;
 }
 
 .settings-list {
-	background: #fff;
-	border: 1px solid #c6c7cc;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.3);
-    border-radius: 4px;
 	padding: 1em;
+	border: 1px solid #C6C7CC;
+	border-radius: 4px;
+	background: #FFF;
+	box-shadow: 0 2px 4px 0 rgba(0,0,0,0.3);
 }
 
 .settings-category {
-	font-size: 1em;
 	color: #333;
+	font-size: 1em;
 }
 
 .logo-uploader {
-	text-align: center;
 	padding: 1.5em 0;
 	border-bottom: 1px solid #C5C5C5;
+	text-align: center;
 }
 
 .logo-uploader__img {
@@ -65,16 +65,16 @@
 	width: 80px;
 	height: 80px;
 	border-radius: 50%;
-	background: #3c4558 url(../img/logo.png) no-repeat;
-	background-size: contain;
+	background: #3C4558 url(../img/logo.png) no-repeat;
 	background-position: center;
+	background-size: contain;
 }
 
 .logo-uploader__info {
-	color: #9099a3;
+	margin-bottom: 0.5em;
+	color: #9099A3;
 	font-size: 0.8em;
 	line-height: 1.2em;
-	margin-bottom: 0.5em;
 }
 
 .hidden-input {
@@ -88,9 +88,10 @@
 
 .field-list {
 	display: flex;
+	
+
 	justify-content: space-between;
 	flex-wrap: wrap;
-	margin-bottom: 0.4em;
 }
 
 .field-list__item {
@@ -105,17 +106,18 @@
 
 
 .field__input {
-	font-size: 1em;
 	width: 2.5em;
+	font-size: 1em;
 }
 
 .field-list__item:first-child  .field__input {
-	width: 100%;
 	box-sizing: border-box;
+	width: 100%;
 }
 
 .btn-save-main {
 	display: none;
+	margin-top: 1.25em;
 }
 
 .btn-save-main::after {
@@ -132,16 +134,16 @@
 
 .discounts-editor__table {
 	width: 100%;
+	margin-bottom: 1em;
 	border-collapse: separate;
 	font-size: 0.9em;
-	margin-bottom: 1em;
 	text-align: center;
 }
 
 
 .table-header {
-	background: linear-gradient(0deg, rgba(72,60,88,1) 11%, rgba(72,60,88,1) 16%, rgba(72,60,88,1) 25%, rgba(60,69,88,1) 48%);
 	color: #CACACA;
+	background: linear-gradient(0deg, rgba(72,60,88,1) 11%, rgba(72,60,88,1) 16%, rgba(72,60,88,1) 25%, rgba(60,69,88,1) 48%);
 	font-size: 0.9em;
 }
 
@@ -150,34 +152,34 @@
 }
 
 
-.table-header :first-child{
-	width: 15%;
+.table-header :first-child {
+	width: 4em;
+	border-right: 1px solid #F8F7F7;
 	border-top-left-radius: 5px;
-	border-right: 1px solid #f8f7f7;
 }
 
 
-.table-header :last-child{
-	width: 22%;
+.table-header :last-child {
+	width: 6.5em;
+	border-left: 1px solid #F8F7F7;
 	border-top-right-radius: 5px;
-	border-left: 1px solid #f8f7f7;
 }
 
 .discounts-editor__table td {
-	border-left: 1px solid #3c4558;
-	border-bottom: 1px solid #3c4558;
 	padding: 0.2em 0;
+	border-bottom: 1px solid #3C4558;
+	border-left: 1px solid #3C4558;
 }
 
 .discounts-editor__table td:last-child {
-	border-right: 1px solid #3c4558;
+	border-right: 1px solid #3C4558;
 }
 
-.discount-info:last-child :last-child{
+.discount-info:last-child :last-child {
 	border-bottom-right-radius: 5px;
 }
 
-.discount-info:last-child :first-child{
+.discount-info:last-child :first-child {
 	border-bottom-left-radius: 5px;
 }
 
@@ -197,20 +199,20 @@
 }
 
 .btn-add-discount {
-	margin-left: 0.8em;
 	display: none;
+	margin-left: 0.8em;
 }
 
-.settings .btn-add-discount, 
+.settings .btn-add-discount,
 .settings .btn-add-user {
-	border-color: #21A1DC;
 	color: #21A1DC;
+	border-color: #21A1DC;
 }
 
-.settings .btn-add-discount:hover, 
+.settings .btn-add-discount:hover,
 .settings .btn-add-user:hover {
-	background:#21A1DC;;
-	color: #FFFFFF;
+	color: #FFF;
+	background: #21A1DC;;
 }
 
 .users-list__item {
@@ -220,20 +222,25 @@
 }
 
 .user__info {
+	margin-right: 0.5em;
 	line-height: 1em;
-	margin-right:0.5em;
 }
 
-.user__info input{
+.user__info input {
 	width: 100%;
 }
 
 .user__info select,
 .user__info input {
 	box-sizing: border-box;
-	font-size: 0.9em;
 	padding-top: 0.2em;
 	padding-bottom: 0.2em;
+	font-size: 0.9em;
+}
+
+.user__info select {
+	font-size: 0.86em;
+	padding-top: 0.19em;
 }
 
 .settings .info-label {
@@ -242,10 +249,10 @@
 
 .btn-remove-user {
 	display: flex;
-  	flex-direction: column;
+	flex-direction: column;
+	width: 2em;
 	color: #CC1414;
 	font-size: 1.1em;
-	width: 2em;
 }
 
 .btn-remove-user i {
@@ -254,7 +261,7 @@
 }
 
 .btn-add-user {
-	margin:0px;
+	margin: 0;
 	margin-top: 0.3em;
 }
 
@@ -265,4 +272,44 @@
 .btn-save-users-changes {
 	display: none;
 	margin-left: 0.8em;
+}
+
+
+@media screen and (max-width: 1000px) {
+	.settings__common {
+		flex-shrink: 0.4;
+	}
+}
+
+@media screen and (max-width: 760px) {
+
+	.settings {
+		flex-wrap: wrap;
+	}
+
+	.settings__common {
+		flex-shrink: 0;
+		flex-grow: 1;
+	}
+
+	.settings__users {
+		margin-left:0;
+		margin-top: 1.5em;
+	}
+
+	.field__input {
+	    width: 4.5em;
+	}
+}
+
+@media screen and (max-width: 450px) {
+
+	.settings__common {
+		flex-shrink: 1;
+		font-size: 0.9em;
+	}
+
+	.field__input {
+	    width: 2.5em;
+	}
 }

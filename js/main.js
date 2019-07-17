@@ -27,14 +27,23 @@ class Page {
 
 const sidebarToggleBtn = document.querySelector('.btn-sidebar-toggle');
 const navMenu = document.querySelector('.menu');
+const layoutBody = document.querySelector('.layout__body');
+const sidebar = document.querySelector('.layout__sidebar');
 const page = new Page( document.querySelector('.page') );
 
-//Обработчик нажатия кнопки для тоггла меню на сайдбаре
-sidebarToggleBtn.addEventListener('click', (e) => {
-	const layoutBody = document.querySelector('.layout__body');
-	const sidebar = document.querySelector('.layout__sidebar');
+const toggleSidebar = e => {
 	layoutBody.classList.toggle('shifted'); 
 	sidebar.classList.toggle('opened'); 
+}
+
+//Обработчики для тоггла сайдбара
+sidebarToggleBtn.addEventListener('click', toggleSidebar);
+
+layoutBody.addEventListener('click', e => {
+	if ( sidebar.matches('.opened') && !e.target.closest('.mobile-header') ) {
+		toggleSidebar();
+		e.preventDefault();
+	}
 });
 
 
@@ -47,6 +56,7 @@ navMenu.addEventListener('click', (e) => {
 
 	if ( menuLink.matches('.current') ) return e.preventDefault();
 
+	if ( sidebar.matches('.opened') ) toggleSidebar();
 
 	switch ( menuLink.getAttribute('href') ) {
 
@@ -85,6 +95,8 @@ navMenu.addEventListener('click', (e) => {
 visitsPage.getShiftInfo().then(result => {
 	page.renderContent( visitsPage.getContent(result), 'Посещения' );
 });
+
+
 
 
 
