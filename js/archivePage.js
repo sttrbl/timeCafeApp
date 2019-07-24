@@ -282,5 +282,5 @@ const archivePage = (() => {
 	return {
 		getElem: createArchivePage,
 		getDatePeriod: getDatePeriod
-	}
+	};
 })(); 
