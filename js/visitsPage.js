@@ -247,80 +247,32 @@ const visitsPage = (() => {
 	//************** Функции для работы с сервером ***************//
 
 	function getShiftInfo() {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/visitsPage.php",
-				data: {
-					action: 'getShiftInfo'
-				},
-				success: resp => {
-					try {
-						resp = JSON.parse(resp);
-						if (resp.error) return helper.showError(resp.error);
-						resolve(resp);
-					} catch (e) {
-						helper.showError("Ошибка чтения данных!");
-						throw e;
-					}
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
+		return new Promise(resolve => {
+			helper.request('php/visitsPage.php', {action:'getShiftInfo'}).then(shiftInfo => {
+				resolve(shiftInfo);
 			});
 		});
 	}
 
 
 	function startShift() {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/visitsPage.php",
-				data: {
-					action: 'startShift'
-				},
-				success: resp => {
-					try {
-						resp = JSON.parse(resp);
-						if (resp.error) return helper.showError(resp.error);
-						resolve(resp);
-					} catch (e) {
-						helper.showError(`Ошибка чтения данных : ${e.name}`);
-						throw e;
-					}
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
+		return new Promise(resolve => {
+			helper.request('php/visitsPage.php', {action:'startShift'}).then(result => {
+				resolve(result);
 			});
 		});
 	}
 
 
 	function endShift(id) {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/visitsPage.php",
-				data: {
-					action: 'endShift',
-					shiftId: id
-				},
-				success: resp => {
-					try {
-						resp = JSON.parse(resp);
-						if (resp.error) return helper.showError(resp.error);
-						resolve(resp);
-					} catch (e) {
-						helper.showError(`Ошибка чтения данных : ${e.name}`);
-						throw e;
-					}
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
+		const data = {
+			action: 'endShift',
+			shiftId: id
+		}
 
+		return new Promise(resolve => {
+			helper.request('php/visitsPage.php', data).then(result => {
+				resolve(result);
 			});
 		});
 	}
@@ -329,38 +281,22 @@ const visitsPage = (() => {
 	function removeVisit(node) {
 		if (!confirm('Удалить посещение?')) return false;
 
+
 		const data = {
-			id: node.getAttribute('real-id')
-		};
+			action: 'removeVisit',
+			visitId: node.getAttribute('real-id')
+		}
 
-		$.ajax({
-			type: "POST",
-			url: "php/visitsPage.php",
-			data: {
-				action: 'removeVisit',
-				data: data
-			},
-			success: resp => {
-				try {
-					resp = JSON.parse(resp);
+		return new Promise(() => {
+			helper.request('php/visitsPage.php', data).then(result => {
+				const visitsList = node.parentElement;
 
-					if (resp.error) return helper.showError(resp.error);
+				node.remove();
 
-					const visitsList = node.parentElement;
-					node.remove();
-
-					visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => {
-						numElem.textContent = i + 1;
-					});
-
-				} catch (e) {
-					helper.showError(`Ошибка чтения данных : ${e.name}`);
-					throw e;
-				}
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
-			}
+				visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => {
+					numElem.textContent = i + 1;
+				});
+			});
 		});
 	}
 
@@ -369,83 +305,51 @@ const visitsPage = (() => {
 
 		function validateInput(inputElem) {
 			//Дописать
-			if (!inputElem.matches('.visit__comment') && inputElem.value.trim() == '') {
-				return false;
-			}
+			if (!inputElem.matches('.visit__comment') && inputElem.value.trim() == '') return false;
+
 			return true;
 		}
 
-		let data = {};
+		const visitInfo = {};
 
-		node.querySelectorAll('input').forEach((inputElem) => {
-
+		node.querySelectorAll('input').forEach(inputElem => {
 			if (!validateInput(inputElem)) return helper.showError('Заполните все обязательные поля.');
 
 			const key = inputElem.className.replace('-', '_').replace('visit__', '');
-			data[key] = inputElem.value;
+			visitInfo[key] = inputElem.value;
 		});
 
+		const data = {
+			action: 'startNewVisit',
+			visitInfo
+		}
 
-		$.ajax({
-			type: "POST",
-			url: "php/visitsPage.php",
-			data: {
-				action: 'startNewVisit',
-				visitInfo: data
-			},
-			success: resp => {
-				try {
-					resp = JSON.parse(resp);
-
-					if (resp.error) return helper.showError(resp.error);
-				} catch (e) {
-					helper.showError(`Ошибка чтения данных : ${e.name}`);
-					throw e;
-				}
+		return new Promise(() => {
+			helper.request('php/visitsPage.php', data).then(resp=> {
+				const tagElem = node.querySelector('.visit__person-tag');
+				const newTagElem = helper.create('span', tagElem.className, tagElem.value);
 
 				node.classList.remove('new');
 				node.classList.add('active');
 				node.setAttribute('real-id', resp.visitId);
 				node.querySelector('.visit__start-time').textContent = resp.startTime;
-
-				const tagElem = node.querySelector('.visit__person-tag');
-				const newTagElem = helper.create('span', tagElem.className, tagElem.value);
 				tagElem.parentElement.replaceChild(newTagElem, tagElem);
 
 				//(ДОПИСАТЬ!): решить, что делать с комментарием к посещению
-
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
-			}
+			});
 		});
 
 	}
 
 
 	function calculateVisit(node) {
-		let data = {
+		const data = {
+			action: 'calculateVisit',
 			visitId: node.getAttribute('real-id')
 		};
 
-		$.ajax({
-			type: "POST",
-			url: "php/visitsPage.php",
-			data: {
-				action: 'calculateVisit',
-				data: data
-			},
-			success: resp => {
-
-				try {
-					resp = JSON.parse(resp);
-
-					if (resp.error) return helper.showError(resp.error);
-				} catch (e) {
-					helper.showError(`Ошибка чтения данных : ${e.name}`);
-					throw e;
-				}
-
+		return new Promise(() => {
+			helper.request('php/visitsPage.php', data).then(resp => {
 				const endTimeElem = node.querySelector('.visit__end-time');
 				const totalElem = node.querySelector('.visit__total');
 				const discountValue = node.querySelector('.visit__discount').value;
@@ -462,41 +366,24 @@ const visitsPage = (() => {
 
 				node.classList.remove('active');
 				node.classList.add('calculated');
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
-			}
+			});
 		});
 	}
 
 	function endVisit(node) {
-		let data = {
-			visitId: node.getAttribute('real-id'),
-			finalTotal: node.querySelector('.visit__total').textContent
-		};
-
 		const discountSelect = node.querySelector('.visit__discount');
 		const selectedElem = discountSelect.querySelector('[value ="' + discountSelect.value + '"]');
-		data.discount = selectedElem.textContent;
+		const data = {
+			action: 'endVisit',
+			visitInfo: {
+				visitId: node.getAttribute('real-id'),
+				finalTotal: node.querySelector('.visit__total').textContent,
+				discount: selectedElem.textContent
+			}
+		};
 
-		$.ajax({
-			type: "POST",
-			url: "php/visitsPage.php",
-			data: {
-				action: 'endVisit',
-				data: data
-			},
-			success: resp => {
-
-				try {
-					resp = JSON.parse(resp);
-
-					if (resp.error) return helper.showError(resp.error);
-				} catch (e) {
-					helper.showError(`Ошибка чтения данных : ${e.name}`);
-					throw e;
-				}
-
+		return new Promise(() => {
+			helper.request('php/visitsPage.php', data).then(resp => {
 				const commentElem = node.querySelector('.visit__comment');
 				const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
 				commentElem.parentElement.replaceChild(newCommentElem, commentElem);
@@ -507,10 +394,7 @@ const visitsPage = (() => {
 
 				node.classList.remove('calculated');
 				node.classList.add('completed');
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
-			}
+			});
 		});
 	}
 
