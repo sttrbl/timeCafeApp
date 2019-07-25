@@ -32,9 +32,9 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="css/resetCSS.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
-	<link rel="stylesheet" type="text/css" href="css/visits.css">
-	<link rel="stylesheet" type="text/css" href="css/settings.css">
-	<link rel="stylesheet" type="text/css" href="css/archive.css">
+	<link rel="stylesheet" type="text/css" href="css/sections/visits.css">
+	<link rel="stylesheet" type="text/css" href="css/sections/settings.css">
+	<link rel="stylesheet" type="text/css" href="css/sections/archive.css">
 </head>
 
 <body>
@@ -102,9 +102,9 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 
 	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
 	<script src="js/helper.js"></script>
-	<script src="js/visitsPage.js"></script>
-	<script src="js/archivePage.js"></script>
-	<script src="js/settingsPage.js"></script>
+	<script src="js/sections/visitsPage.js"></script>
+	<script src="js/sections/archivePage.js"></script>
+	<script src="js/sections/settingsPage.js"></script>
 	<script src="js/main.js"></script>
 </body>
 </html>

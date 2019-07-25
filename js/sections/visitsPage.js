@@ -248,7 +248,7 @@ const visitsPage = (() => {
 
 	function getShiftInfo() {
 		return new Promise(resolve => {
-			helper.request('php/visitsPage.php', {action:'getShiftInfo'}).then(shiftInfo => {
+			helper.request('php/sections/visitsPage.php', {action:'getShiftInfo'}).then(shiftInfo => {
 				resolve(shiftInfo);
 			});
 		});
@@ -257,7 +257,7 @@ const visitsPage = (() => {
 
 	function startShift() {
 		return new Promise(resolve => {
-			helper.request('php/visitsPage.php', {action:'startShift'}).then(result => {
+			helper.request('php/sections/visitsPage.php', {action:'startShift'}).then(result => {
 				resolve(result);
 			});
 		});
@@ -271,7 +271,7 @@ const visitsPage = (() => {
 		}
 
 		return new Promise(resolve => {
-			helper.request('php/visitsPage.php', data).then(result => {
+			helper.request('php/sections/visitsPage.php', data).then(result => {
 				resolve(result);
 			});
 		});
@@ -288,7 +288,7 @@ const visitsPage = (() => {
 		}
 
 		return new Promise(() => {
-			helper.request('php/visitsPage.php', data).then(result => {
+			helper.request('php/sections/visitsPage.php', data).then(result => {
 				const visitsList = node.parentElement;
 
 				node.remove();
@@ -325,7 +325,7 @@ const visitsPage = (() => {
 		}
 
 		return new Promise(() => {
-			helper.request('php/visitsPage.php', data).then(resp=> {
+			helper.request('php/sections/visitsPage.php', data).then(resp=> {
 				const tagElem = node.querySelector('.visit__person-tag');
 				const newTagElem = helper.create('span', tagElem.className, tagElem.value);
 
@@ -349,7 +349,7 @@ const visitsPage = (() => {
 		};
 
 		return new Promise(() => {
-			helper.request('php/visitsPage.php', data).then(resp => {
+			helper.request('php/sections/visitsPage.php', data).then(resp => {
 				const endTimeElem = node.querySelector('.visit__end-time');
 				const totalElem = node.querySelector('.visit__total');
 				const discountValue = node.querySelector('.visit__discount').value;
@@ -383,7 +383,7 @@ const visitsPage = (() => {
 		};
 
 		return new Promise(() => {
-			helper.request('php/visitsPage.php', data).then(resp => {
+			helper.request('php/sections/visitsPage.php', data).then(resp => {
 				const commentElem = node.querySelector('.visit__comment');
 				const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
 				commentElem.parentElement.replaceChild(newCommentElem, commentElem);

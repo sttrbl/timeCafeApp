@@ -345,7 +345,7 @@ const settingsPage = (() => {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				type: "POST",
-				url: "php/settingsPage.php",
+				url: "php/sections/settingsPage.php",
 				data: {
 					action: 'getSettings'
 				},
@@ -376,7 +376,7 @@ const settingsPage = (() => {
 		formData.append('file', file);
 
 		$.ajax({
-			url: 'php/settingsPage.php?updateLogo',
+			url: 'php/sections/settingsPage.php?updateLogo',
 			type: 'POST',
 			data: formData,
 			processData: false,
@@ -408,7 +408,7 @@ const settingsPage = (() => {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				type: "POST",
-				url: "php/settingsPage.php",
+				url: "php/sections/settingsPage.php",
 				data: {
 					action: 'updateMain',
 					newSettings: newSettings
@@ -440,7 +440,7 @@ const settingsPage = (() => {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				type: "POST",
-				url: "php/settingsPage.php",
+				url: "php/sections/settingsPage.php",
 				data: {
 					action: 'updateDiscounts',
 					newSettings: newSettings
@@ -471,7 +471,7 @@ const settingsPage = (() => {
 	function removeUser(userElem) {
 		$.ajax({
 			type: "POST",
-			url: "php/settingsPage.php",
+			url: "php/sections/settingsPage.php",
 			data: {
 				action: 'removeUser',
 				userId: userElem.id
@@ -502,7 +502,7 @@ const settingsPage = (() => {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				type: "POST",
-				url: "php/settingsPage.php",
+				url: "php/sections/settingsPage.php",
 				data: {
 					action: 'updateUsers',
 					newSettings: newSettings

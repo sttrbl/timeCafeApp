@@ -207,7 +207,7 @@ const archivePage = (() => {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 			    type: "POST",
-			    url: "php/archivePage.php",
+			    url: "php/sections/archivePage.php",
 			    data: {action:'getDatePeriod'},
 			    success: resp => {
 
@@ -232,7 +232,7 @@ const archivePage = (() => {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 			    type: "POST",
-			    url: "php/archivePage.php",
+			    url: "php/sections/archivePage.php",
 			    data: {action:'getPeriodInfo',from:from,to:to},
 			    success: resp => {
 
@@ -258,7 +258,7 @@ const archivePage = (() => {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 			    type: "POST",
-			    url: "php/archivePage.php",
+			    url: "php/sections/archivePage.php",
 			    data: {action:'getShiftVisits', shiftId:shiftId},
 			    success: resp => {
 			    	
