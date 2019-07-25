@@ -77,7 +77,6 @@ navMenu.addEventListener('click', (e) => {
 					page.renderContent( settingsPage.getElem(result), 'Настройки' );
 				});
 			break;
-
 	}
 
 

@@ -201,7 +201,7 @@ const archivePage = (() => {
 
 
 
-//********************Сервер ********************//
+//******************** Сервер ********************//
 
 	function getDatePeriod() {
 		return new Promise((resolve, reject) => {
