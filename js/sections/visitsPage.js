@@ -248,7 +248,9 @@ const visitsPage = (() => {
 
 	function getShiftInfo() {
 		return new Promise(resolve => {
-			helper.request('php/sections/visitsPage.php', {action:'getShiftInfo'}).then(shiftInfo => {
+			helper.request('php/sections/visitsPage.php', {
+				action: 'getShiftInfo'
+			}).then(shiftInfo => {
 				resolve(shiftInfo);
 			});
 		});
@@ -257,7 +259,9 @@ const visitsPage = (() => {
 
 	function startShift() {
 		return new Promise(resolve => {
-			helper.request('php/sections/visitsPage.php', {action:'startShift'}).then(result => {
+			helper.request('php/sections/visitsPage.php', {
+				action: 'startShift'
+			}).then(result => {
 				resolve(result);
 			});
 		});
@@ -325,7 +329,7 @@ const visitsPage = (() => {
 		}
 
 		return new Promise(() => {
-			helper.request('php/sections/visitsPage.php', data).then(resp=> {
+			helper.request('php/sections/visitsPage.php', data).then(resp => {
 				const tagElem = node.querySelector('.visit__person-tag');
 				const newTagElem = helper.create('span', tagElem.className, tagElem.value);
 

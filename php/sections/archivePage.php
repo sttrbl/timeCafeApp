@@ -3,7 +3,10 @@ require_once '../connection.php';
 
 session_start();
 
-$action = $_POST['action'];
+$postData = file_get_contents('php://input');
+$data = json_decode($postData, true);
+
+$action = $data['action'];
 
 switch ($action) {
 
@@ -11,10 +14,10 @@ switch ($action) {
         getDatePeriod();
         break;
     case 'getPeriodInfo':
-        getPeriodInfo($_POST['from'], $_POST['to']);
+        getPeriodInfo($data['from'], $data['to']);
         break;
     case 'getShiftVisits':
-        getShiftVisits($_POST['shiftId']);
+        getShiftVisits($data['shiftId']);
         break;
 };
 
