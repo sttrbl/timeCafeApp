@@ -42,7 +42,7 @@ if(isset($_SESSION['user'])){
 
 		$.ajax({
 		    type: "POST",
-		    url: "php/sections/login.php",
+		    url: "php/login.php",
 		    data: {login:login, password:password},
 		    success: resp => {
 		    	try {

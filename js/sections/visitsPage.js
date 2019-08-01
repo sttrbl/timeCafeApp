@@ -13,8 +13,7 @@ const visitsPage = (() => {
 		return content;
 	}
 
-
-	//Аргумент - true/false
+	
 	function createDayPanel(active) {
 
 		function formatDate(date) {
@@ -81,7 +80,6 @@ const visitsPage = (() => {
 
 		visitsListElem.setAttribute('shift-id', shiftId);
 
-
 		//Описание функциональности кнопок в блоках посещений через делегирование
 		visitsListElem.addEventListener('click', e => {
 
@@ -113,7 +111,6 @@ const visitsPage = (() => {
 			}
 		});
 
-
 		//Обработчик изменения значения скидки в блоке (через делегирование)
 		visitsListElem.addEventListener('change', e => {
 
@@ -135,7 +132,6 @@ const visitsPage = (() => {
 			totalElem.textContent = totalValue;
 		});
 
-
 		const addButtonElem = helper.create('button', 'btn btn-add-visit', 'Добавить');
 
 		addButtonElem.addEventListener('click', () => {
@@ -143,7 +139,6 @@ const visitsPage = (() => {
 			const lastVisitNum = visitsElems.length + 1;
 			visitsListElem.appendChild(createVisit(lastVisitNum, discountsValuesList));
 		});
-
 
 		//visitsList - массив с информацией (из БД) о посещениях за текущую смену
 		if (visitsList) {
@@ -153,7 +148,6 @@ const visitsPage = (() => {
 			}
 
 		}
-
 
 		elem.append(visitsListElem, addButtonElem);
 		return elem;
@@ -246,66 +240,59 @@ const visitsPage = (() => {
 
 	//************** Функции для работы с сервером ***************//
 
-	function getShiftInfo() {
-		return new Promise(resolve => {
-			helper.request('php/sections/visitsPage.php', {
-				action: 'getShiftInfo'
-			}).then(shiftInfo => {
-				resolve(shiftInfo);
-			});
-		});
+	async function getShiftInfo() {
+		const data = {
+			action: 'getShiftInfo'
+		};
+
+		const shiftInfo = await helper.request('php/sections/visitsPage.php', data);
+		
+		if (shiftInfo) return shiftInfo;	
 	}
 
 
-	function startShift() {
-		return new Promise(resolve => {
-			helper.request('php/sections/visitsPage.php', {
-				action: 'startShift'
-			}).then(result => {
-				resolve(result);
-			});
-		});
+	async function startShift() {
+		const data = {
+			action: 'startShift'
+		};
+		
+		const shiftInfo = await helper.request('php/sections/visitsPage.php', data);
+		
+		if (shiftInfo) return shiftInfo;	
 	}
 
 
-	function endShift(id) {
+	async function endShift(id) {
 		const data = {
 			action: 'endShift',
 			shiftId: id
 		}
 
-		return new Promise(resolve => {
-			helper.request('php/sections/visitsPage.php', data).then(result => {
-				resolve(result);
-			});
-		});
+		return helper.request('php/sections/visitsPage.php', data);
 	}
 
 
 	function removeVisit(node) {
 		if (!confirm('Удалить посещение?')) return false;
 
-
 		const data = {
 			action: 'removeVisit',
 			visitId: node.getAttribute('real-id')
 		}
 
-		return new Promise(() => {
-			helper.request('php/sections/visitsPage.php', data).then(result => {
-				const visitsList = node.parentElement;
+		helper.request('php/sections/visitsPage.php', data).then(result => {
+			const visitsList = node.parentElement;
 
-				node.remove();
+			node.remove();
 
-				visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => {
-					numElem.textContent = i + 1;
-				});
+			visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => {
+				numElem.textContent = i + 1;
 			});
 		});
 	}
 
 
-	function startVisit(node) {
+	async function startVisit(node) {
 
 		function validateInput(inputElem) {
 			//Дописать
@@ -320,6 +307,7 @@ const visitsPage = (() => {
 			if (!validateInput(inputElem)) return helper.showError('Заполните все обязательные поля.');
 
 			const key = inputElem.className.replace('-', '_').replace('visit__', '');
+			
 			visitInfo[key] = inputElem.value;
 		});
 
@@ -328,21 +316,17 @@ const visitsPage = (() => {
 			visitInfo
 		}
 
-		return new Promise(() => {
-			helper.request('php/sections/visitsPage.php', data).then(resp => {
-				const tagElem = node.querySelector('.visit__person-tag');
-				const newTagElem = helper.create('span', tagElem.className, tagElem.value);
+		const resp = await helper.request('php/sections/visitsPage.php', data);
 
-				node.classList.remove('new');
-				node.classList.add('active');
-				node.setAttribute('real-id', resp.visitId);
-				node.querySelector('.visit__start-time').textContent = resp.startTime;
-				tagElem.parentElement.replaceChild(newTagElem, tagElem);
+		const tagElem = node.querySelector('.visit__person-tag');
+		const newTagElem = helper.create('span', tagElem.className, tagElem.value);
 
-				//(ДОПИСАТЬ!): решить, что делать с комментарием к посещению
-			});
-		});
-
+		node.classList.remove('new');
+		node.classList.add('active');
+		node.setAttribute('real-id', resp.visitId);
+		node.querySelector('.visit__start-time').textContent = resp.startTime;
+		tagElem.parentElement.replaceChild(newTagElem, tagElem);
+		//(ДОПИСАТЬ!): решить, что делать с комментарием к посещению
 	}
 
 
@@ -352,27 +336,26 @@ const visitsPage = (() => {
 			visitId: node.getAttribute('real-id')
 		};
 
-		return new Promise(() => {
-			helper.request('php/sections/visitsPage.php', data).then(resp => {
-				const endTimeElem = node.querySelector('.visit__end-time');
-				const totalElem = node.querySelector('.visit__total');
-				const discountValue = node.querySelector('.visit__discount').value;
+		helper.request('php/sections/visitsPage.php', data).then(resp => {
+			const endTimeElem = node.querySelector('.visit__end-time');
+			const totalElem = node.querySelector('.visit__total');
+			const discountValue = node.querySelector('.visit__discount').value;
 
-				endTimeElem.textContent = resp.endTime;
+			endTimeElem.textContent = resp.endTime;
 
-				totalElem.setAttribute('pure-total', resp.pureTotal);
+			totalElem.setAttribute('pure-total', resp.pureTotal);
 
-				if (discountValue != 0) {
-					totalElem.textContent = resp.pureTotal - (resp.pureTotal / 100 * discountValue);
-				} else {
-					totalElem.textContent = resp.pureTotal;
-				}
+			if (discountValue != 0) {
+				totalElem.textContent = resp.pureTotal - (resp.pureTotal / 100 * discountValue);
+			} else {
+				totalElem.textContent = resp.pureTotal;
+			}
 
-				node.classList.remove('active');
-				node.classList.add('calculated');
-			});
+			node.classList.remove('active');
+			node.classList.add('calculated');
 		});
 	}
+
 
 	function endVisit(node) {
 		const discountSelect = node.querySelector('.visit__discount');
@@ -386,22 +369,22 @@ const visitsPage = (() => {
 			}
 		};
 
-		return new Promise(() => {
-			helper.request('php/sections/visitsPage.php', data).then(resp => {
-				const commentElem = node.querySelector('.visit__comment');
-				const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
-				commentElem.parentElement.replaceChild(newCommentElem, commentElem);
+	
+		helper.request('php/sections/visitsPage.php', data).then(resp => {
+			const commentElem = node.querySelector('.visit__comment');
+			const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
+			commentElem.parentElement.replaceChild(newCommentElem, commentElem);
 
-				const discountElem = node.querySelector('.visit__discount');
-				const newDiscountElem = helper.create('span', discountElem.className, data.discount);
-				discountElem.parentElement.replaceChild(newDiscountElem, discountElem);
+			const discountElem = node.querySelector('.visit__discount');
+			const newDiscountElem = helper.create('span', discountElem.className, data.discount);
+			discountElem.parentElement.replaceChild(newDiscountElem, discountElem);
 
-				node.classList.remove('calculated');
-				node.classList.add('completed');
-			});
+			node.classList.remove('calculated');
+			node.classList.add('completed');
 		});
 	}
 
+	
 	return {
 		getContent: createVisitsPage,
 		getShiftInfo: getShiftInfo

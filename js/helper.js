@@ -18,7 +18,7 @@ const helper = (function () {
 	}
 
 	function showSuccess(text) {
-		// Здесь можно сделать кастомный вариант вывода ошибки
+		// Здесь можно сделать кастомный вариант вывода сообщения
 		alert(text);
 	}
 
@@ -27,7 +27,7 @@ const helper = (function () {
 		xhr.open("POST", URL, true);
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-		return new Promise((resolve, reject) => {
+		return new Promise(resolve => {
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState != 4) return;
 	
