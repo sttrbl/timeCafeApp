@@ -13,7 +13,7 @@ const visitsPage = (() => {
 		return content;
 	}
 
-	
+
 	function createDayPanel(active) {
 
 		function formatDate(date) {
@@ -80,7 +80,7 @@ const visitsPage = (() => {
 
 		visitsListElem.setAttribute('shift-id', shiftId);
 
-		//Описание функциональности кнопок в блоках посещений через делегирование
+
 		visitsListElem.addEventListener('click', e => {
 
 			const button = e.target.closest('button');
@@ -111,7 +111,6 @@ const visitsPage = (() => {
 			}
 		});
 
-		//Обработчик изменения значения скидки в блоке (через делегирование)
 		visitsListElem.addEventListener('change', e => {
 
 			if (!e.target.closest('.visit__discount')) return;
@@ -240,29 +239,21 @@ const visitsPage = (() => {
 
 	//************** Функции для работы с сервером ***************//
 
-	async function getShiftInfo() {
-		const data = {
+	function getShiftInfo() {
+		return helper.request('php/sections/visitsPage.php', {
 			action: 'getShiftInfo'
-		};
-
-		const shiftInfo = await helper.request('php/sections/visitsPage.php', data);
-		
-		if (shiftInfo) return shiftInfo;	
+		});
 	}
 
 
-	async function startShift() {
-		const data = {
+	function startShift() {
+		return helper.request('php/sections/visitsPage.php', {
 			action: 'startShift'
-		};
-		
-		const shiftInfo = await helper.request('php/sections/visitsPage.php', data);
-		
-		if (shiftInfo) return shiftInfo;	
+		});
 	}
 
 
-	async function endShift(id) {
+	function endShift(id) {
 		const data = {
 			action: 'endShift',
 			shiftId: id
@@ -307,7 +298,7 @@ const visitsPage = (() => {
 			if (!validateInput(inputElem)) return helper.showError('Заполните все обязательные поля.');
 
 			const key = inputElem.className.replace('-', '_').replace('visit__', '');
-			
+
 			visitInfo[key] = inputElem.value;
 		});
 
@@ -357,7 +348,7 @@ const visitsPage = (() => {
 	}
 
 
-	function endVisit(node) {
+	async function endVisit(node) {
 		const discountSelect = node.querySelector('.visit__discount');
 		const selectedElem = discountSelect.querySelector('[value ="' + discountSelect.value + '"]');
 		const data = {
@@ -369,22 +360,21 @@ const visitsPage = (() => {
 			}
 		};
 
-	
-		helper.request('php/sections/visitsPage.php', data).then(resp => {
-			const commentElem = node.querySelector('.visit__comment');
-			const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
-			commentElem.parentElement.replaceChild(newCommentElem, commentElem);
+		if (await !helper.request('php/sections/visitsPage.php', data)) return;
 
-			const discountElem = node.querySelector('.visit__discount');
-			const newDiscountElem = helper.create('span', discountElem.className, data.discount);
-			discountElem.parentElement.replaceChild(newDiscountElem, discountElem);
+		const commentElem = node.querySelector('.visit__comment');
+		const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
+		commentElem.parentElement.replaceChild(newCommentElem, commentElem);
 
-			node.classList.remove('calculated');
-			node.classList.add('completed');
-		});
+		const discountElem = node.querySelector('.visit__discount');
+		const newDiscountElem = helper.create('span', discountElem.className, data.discount);
+		discountElem.parentElement.replaceChild(newDiscountElem, discountElem);
+
+		node.classList.remove('calculated');
+		node.classList.add('completed');
 	}
 
-	
+
 	return {
 		getContent: createVisitsPage,
 		getShiftInfo: getShiftInfo

@@ -209,17 +209,14 @@ const archivePage = (() => {
 
 
 
-	//********************Сервер ********************//
+	//******************** Сервер ********************//
 
 	function getDatePeriod() {
-		return new Promise(resolve => {
-			helper.request('php/sections/archivePage.php', {
-				action: 'getDatePeriod'
-			}).then(resp => {
-				resolve(resp);
-			});
+		return helper.request('php/sections/archivePage.php', {
+			action: 'getDatePeriod'
 		});
 	}
+
 
 	function getPeriodInfo(from, to) {
 		const data = {
@@ -228,11 +225,7 @@ const archivePage = (() => {
 			to
 		};
 
-		return new Promise(resolve => {
-			helper.request('php/sections/archivePage.php', data).then(resp => {
-				resolve(resp);
-			});
-		});
+		return helper.request('php/sections/archivePage.php', data);
 	}
 
 
@@ -242,11 +235,7 @@ const archivePage = (() => {
 			shiftId
 		};
 
-		return new Promise(resolve => {
-			helper.request('php/sections/archivePage.php', data).then(resp => {
-				resolve(resp);
-			});
-		});
+		return helper.request('php/sections/archivePage.php', data);
 	}
 
 	return {
