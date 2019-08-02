@@ -45,9 +45,7 @@ const settingsPage = (() => {
 		info.innerHTML = '<span>Размер загружаемого файла <br> не должен превышать 2 Мб.<br> Формат файла - PNG. </span>';
 		hiddenImgInput.type = 'file';
 
-		upadateButton.addEventListener('click', argument => {
-			hiddenImgInput.click();
-		});
+		upadateButton.addEventListener('click', argument => hiddenImgInput.click());
 
 		hiddenImgInput.addEventListener('change', e => {
 			const file = e.currentTarget.files[0];
@@ -94,9 +92,7 @@ const settingsPage = (() => {
 		});
 
 
-		fieldList.addEventListener('input', e => {
-			saveButton.style = 'display: inline-block';
-		});
+		fieldList.addEventListener('input', e => saveButton.style = 'display: inline-block');
 
 
 		saveButton.addEventListener('click', e => {
@@ -234,9 +230,7 @@ const settingsPage = (() => {
 		const saveButton = helper.create('button', 'btn btn-save-users-changes', 'Сохранить изменения');
 		const addUserButton = helper.create('button', 'btn btn btn-add-user', 'Добавить');
 
-		usersInfo.forEach((userInfo) => {
-			usersList.appendChild(createUserListRow(userInfo));
-		});
+		usersInfo.forEach((userInfo) => usersList.appendChild(createUserListRow(userInfo)));
 
 		elem.addEventListener('input', e => {
 
@@ -261,9 +255,7 @@ const settingsPage = (() => {
 				newSettings.push(userInfo);
 			});
 
-			updateUsers(newSettings).then(result => {
-				saveButton.style = '';
-			});
+			updateUsers(newSettings).then(result => saveButton.style = '');
 
 			e.preventDefault();
 		});

@@ -44,7 +44,7 @@ layoutBody.addEventListener('click', e => {
 	}
 });
 
-navMenu.addEventListener('click', (e) => {
+navMenu.addEventListener('click', e => {
 	const menuLink = e.target.closest('.menu__link');
 
 	if ( menuLink.matches('.current') ) return e.preventDefault();

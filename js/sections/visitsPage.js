@@ -33,10 +33,7 @@ const visitsPage = (() => {
 		const dateElem = helper.create('h4', 'today-info__date', formatDate(new Date()));
 		const shiftContollButton = helper.create('button', 'btn btn-day-controller');
 
-		if (active) {
-			shiftContollButton.classList.add('active');
-		}
-
+		if (active) shiftContollButton.classList.add('active');
 
 		shiftContollButton.addEventListener('click', e => {
 			const self = e.currentTarget;
@@ -276,9 +273,7 @@ const visitsPage = (() => {
 
 			node.remove();
 
-			visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => {
-				numElem.textContent = i + 1;
-			});
+			visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => numElem.textContent = i + 1);
 		});
 	}
 

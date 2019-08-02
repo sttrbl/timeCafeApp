@@ -153,9 +153,7 @@ const archivePage = (() => {
 			shiftHeader.remove();
 			shiftVisitsList.remove();
 
-			pageElements.forEach((element, i) => {
-				element.style = '';
-			});
+			pageElements.forEach((element, i) => element.style = '');
 		});
 
 		shiftHeader.append(backButton, shiftHeadline);
