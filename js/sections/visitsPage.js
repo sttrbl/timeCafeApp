@@ -14,7 +14,6 @@ const visitsPage = (() => {
 	}
 
 
-	//Аргумент - true/false
 	function createDayPanel(active) {
 
 		function formatDate(date) {
@@ -82,7 +81,6 @@ const visitsPage = (() => {
 		visitsListElem.setAttribute('shift-id', shiftId);
 
 
-		//Описание функциональности кнопок в блоках посещений через делегирование
 		visitsListElem.addEventListener('click', e => {
 
 			const button = e.target.closest('button');
@@ -113,8 +111,6 @@ const visitsPage = (() => {
 			}
 		});
 
-
-		//Обработчик изменения значения скидки в блоке (через делегирование)
 		visitsListElem.addEventListener('change', e => {
 
 			if (!e.target.closest('.visit__discount')) return;
@@ -135,7 +131,6 @@ const visitsPage = (() => {
 			totalElem.textContent = totalValue;
 		});
 
-
 		const addButtonElem = helper.create('button', 'btn btn-add-visit', 'Добавить');
 
 		addButtonElem.addEventListener('click', () => {
@@ -143,7 +138,6 @@ const visitsPage = (() => {
 			const lastVisitNum = visitsElems.length + 1;
 			visitsListElem.appendChild(createVisit(lastVisitNum, discountsValuesList));
 		});
-
 
 		//visitsList - массив с информацией (из БД) о посещениях за текущую смену
 		if (visitsList) {
@@ -153,7 +147,6 @@ const visitsPage = (() => {
 			}
 
 		}
-
 
 		elem.append(visitsListElem, addButtonElem);
 		return elem;
@@ -247,82 +240,26 @@ const visitsPage = (() => {
 	//************** Функции для работы с сервером ***************//
 
 	function getShiftInfo() {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/visitsPage.php",
-				data: {
-					action: 'getShiftInfo'
-				},
-				success: resp => {
-					try {
-						resp = JSON.parse(resp);
-						if (resp.error) return helper.showError(resp.error);
-						resolve(resp);
-					} catch (e) {
-						helper.showError("Ошибка чтения данных!");
-						throw e;
-					}
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
-			});
+		return helper.request('php/sections/visitsPage.php', {
+			action: 'getShiftInfo'
 		});
 	}
 
 
 	function startShift() {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/visitsPage.php",
-				data: {
-					action: 'startShift'
-				},
-				success: resp => {
-					try {
-						resp = JSON.parse(resp);
-						if (resp.error) return helper.showError(resp.error);
-						resolve(resp);
-					} catch (e) {
-						helper.showError(`Ошибка чтения данных : ${e.name}`);
-						throw e;
-					}
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
-			});
+		return helper.request('php/sections/visitsPage.php', {
+			action: 'startShift'
 		});
 	}
 
 
 	function endShift(id) {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/visitsPage.php",
-				data: {
-					action: 'endShift',
-					shiftId: id
-				},
-				success: resp => {
-					try {
-						resp = JSON.parse(resp);
-						if (resp.error) return helper.showError(resp.error);
-						resolve(resp);
-					} catch (e) {
-						helper.showError(`Ошибка чтения данных : ${e.name}`);
-						throw e;
-					}
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
+		const data = {
+			action: 'endShift',
+			shiftId: id
+		}
 
-			});
-		});
+		return helper.request('php/sections/visitsPage.php', data);
 	}
 
 
@@ -330,189 +267,113 @@ const visitsPage = (() => {
 		if (!confirm('Удалить посещение?')) return false;
 
 		const data = {
-			id: node.getAttribute('real-id')
-		};
+			action: 'removeVisit',
+			visitId: node.getAttribute('real-id')
+		}
 
-		$.ajax({
-			type: "POST",
-			url: "php/visitsPage.php",
-			data: {
-				action: 'removeVisit',
-				data: data
-			},
-			success: resp => {
-				try {
-					resp = JSON.parse(resp);
+		helper.request('php/sections/visitsPage.php', data).then(result => {
+			const visitsList = node.parentElement;
 
-					if (resp.error) return helper.showError(resp.error);
+			node.remove();
 
-					const visitsList = node.parentElement;
-					node.remove();
-
-					visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => {
-						numElem.textContent = i + 1;
-					});
-
-				} catch (e) {
-					helper.showError(`Ошибка чтения данных : ${e.name}`);
-					throw e;
-				}
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
-			}
+			visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => {
+				numElem.textContent = i + 1;
+			});
 		});
 	}
 
 
-	function startVisit(node) {
+	async function startVisit(node) {
 
 		function validateInput(inputElem) {
 			//Дописать
-			if (!inputElem.matches('.visit__comment') && inputElem.value.trim() == '') {
-				return false;
-			}
+			if (!inputElem.matches('.visit__comment') && inputElem.value.trim() == '') return false;
+
 			return true;
 		}
 
-		let data = {};
+		const visitInfo = {};
 
-		node.querySelectorAll('input').forEach((inputElem) => {
-
+		node.querySelectorAll('input').forEach(inputElem => {
 			if (!validateInput(inputElem)) return helper.showError('Заполните все обязательные поля.');
 
 			const key = inputElem.className.replace('-', '_').replace('visit__', '');
-			data[key] = inputElem.value;
+
+			visitInfo[key] = inputElem.value;
 		});
 
+		const data = {
+			action: 'startNewVisit',
+			visitInfo
+		}
 
-		$.ajax({
-			type: "POST",
-			url: "php/visitsPage.php",
-			data: {
-				action: 'startNewVisit',
-				visitInfo: data
-			},
-			success: resp => {
-				try {
-					resp = JSON.parse(resp);
+		const resp = await helper.request('php/sections/visitsPage.php', data);
 
-					if (resp.error) return helper.showError(resp.error);
-				} catch (e) {
-					helper.showError(`Ошибка чтения данных : ${e.name}`);
-					throw e;
-				}
+		const tagElem = node.querySelector('.visit__person-tag');
+		const newTagElem = helper.create('span', tagElem.className, tagElem.value);
 
-				node.classList.remove('new');
-				node.classList.add('active');
-				node.setAttribute('real-id', resp.visitId);
-				node.querySelector('.visit__start-time').textContent = resp.startTime;
-
-				const tagElem = node.querySelector('.visit__person-tag');
-				const newTagElem = helper.create('span', tagElem.className, tagElem.value);
-				tagElem.parentElement.replaceChild(newTagElem, tagElem);
-
-				//(ДОПИСАТЬ!): решить, что делать с комментарием к посещению
-
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
-			}
-		});
-
+		node.classList.remove('new');
+		node.classList.add('active');
+		node.setAttribute('real-id', resp.visitId);
+		node.querySelector('.visit__start-time').textContent = resp.startTime;
+		tagElem.parentElement.replaceChild(newTagElem, tagElem);
+		//(ДОПИСАТЬ!): решить, что делать с комментарием к посещению
 	}
 
 
 	function calculateVisit(node) {
-		let data = {
+		const data = {
+			action: 'calculateVisit',
 			visitId: node.getAttribute('real-id')
 		};
 
-		$.ajax({
-			type: "POST",
-			url: "php/visitsPage.php",
-			data: {
-				action: 'calculateVisit',
-				data: data
-			},
-			success: resp => {
+		helper.request('php/sections/visitsPage.php', data).then(resp => {
+			const endTimeElem = node.querySelector('.visit__end-time');
+			const totalElem = node.querySelector('.visit__total');
+			const discountValue = node.querySelector('.visit__discount').value;
 
-				try {
-					resp = JSON.parse(resp);
+			endTimeElem.textContent = resp.endTime;
 
-					if (resp.error) return helper.showError(resp.error);
-				} catch (e) {
-					helper.showError(`Ошибка чтения данных : ${e.name}`);
-					throw e;
-				}
+			totalElem.setAttribute('pure-total', resp.pureTotal);
 
-				const endTimeElem = node.querySelector('.visit__end-time');
-				const totalElem = node.querySelector('.visit__total');
-				const discountValue = node.querySelector('.visit__discount').value;
-
-				endTimeElem.textContent = resp.endTime;
-
-				totalElem.setAttribute('pure-total', resp.pureTotal);
-
-				if (discountValue != 0) {
-					totalElem.textContent = resp.pureTotal - (resp.pureTotal / 100 * discountValue);
-				} else {
-					totalElem.textContent = resp.pureTotal;
-				}
-
-				node.classList.remove('active');
-				node.classList.add('calculated');
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
+			if (discountValue != 0) {
+				totalElem.textContent = resp.pureTotal - (resp.pureTotal / 100 * discountValue);
+			} else {
+				totalElem.textContent = resp.pureTotal;
 			}
+
+			node.classList.remove('active');
+			node.classList.add('calculated');
 		});
 	}
 
-	function endVisit(node) {
-		let data = {
-			visitId: node.getAttribute('real-id'),
-			finalTotal: node.querySelector('.visit__total').textContent
-		};
 
+	async function endVisit(node) {
 		const discountSelect = node.querySelector('.visit__discount');
 		const selectedElem = discountSelect.querySelector('[value ="' + discountSelect.value + '"]');
-		data.discount = selectedElem.textContent;
-
-		$.ajax({
-			type: "POST",
-			url: "php/visitsPage.php",
-			data: {
-				action: 'endVisit',
-				data: data
-			},
-			success: resp => {
-
-				try {
-					resp = JSON.parse(resp);
-
-					if (resp.error) return helper.showError(resp.error);
-				} catch (e) {
-					helper.showError(`Ошибка чтения данных : ${e.name}`);
-					throw e;
-				}
-
-				const commentElem = node.querySelector('.visit__comment');
-				const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
-				commentElem.parentElement.replaceChild(newCommentElem, commentElem);
-
-				const discountElem = node.querySelector('.visit__discount');
-				const newDiscountElem = helper.create('span', discountElem.className, data.discount);
-				discountElem.parentElement.replaceChild(newDiscountElem, discountElem);
-
-				node.classList.remove('calculated');
-				node.classList.add('completed');
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
+		const data = {
+			action: 'endVisit',
+			visitInfo: {
+				visitId: node.getAttribute('real-id'),
+				finalTotal: node.querySelector('.visit__total').textContent,
+				discount: selectedElem.textContent
 			}
-		});
+		};
+
+		if (await !helper.request('php/sections/visitsPage.php', data)) return;
+
+		const commentElem = node.querySelector('.visit__comment');
+		const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
+		commentElem.parentElement.replaceChild(newCommentElem, commentElem);
+
+		const discountElem = node.querySelector('.visit__discount');
+		const newDiscountElem = helper.create('span', discountElem.className, data.discount);
+		discountElem.parentElement.replaceChild(newDiscountElem, discountElem);
+
+		node.classList.remove('calculated');
+		node.classList.add('completed');
 	}
+
 
 	return {
 		getContent: createVisitsPage,

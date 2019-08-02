@@ -24,7 +24,6 @@ class Page {
 
 };
 
-
 const sidebarToggleBtn = document.querySelector('.btn-sidebar-toggle');
 const navMenu = document.querySelector('.menu');
 const layoutBody = document.querySelector('.layout__body');
@@ -36,7 +35,6 @@ const toggleSidebar = e => {
 	sidebar.classList.toggle('opened'); 
 }
 
-//Обработчики для тоггла сайдбара
 sidebarToggleBtn.addEventListener('click', toggleSidebar);
 
 layoutBody.addEventListener('click', e => {
@@ -46,11 +44,6 @@ layoutBody.addEventListener('click', e => {
 	}
 });
 
-
-/* 
-Обработчик рендерит контент выбранного раздела, когда
-соответствующий модуль загрузит все данные с сервера
-*/
 navMenu.addEventListener('click', (e) => {
 	const menuLink = e.target.closest('.menu__link');
 
@@ -79,9 +72,8 @@ navMenu.addEventListener('click', (e) => {
 			break;
 	}
 
-
-//Выбранный пункт превращается в "текущий"
 	const current = e.currentTarget.querySelector('.current');
+
 	current.classList.remove('current');
 	menuLink.classList.add('current');
 
@@ -89,8 +81,6 @@ navMenu.addEventListener('click', (e) => {
 }); 
 
 
-
-//Автоматический рендер раздела "Посещения" при загрузке приложения
 visitsPage.getShiftInfo().then(result => {
 	page.renderContent( visitsPage.getContent(result), 'Посещения' );
 });

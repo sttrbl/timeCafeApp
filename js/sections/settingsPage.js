@@ -342,41 +342,19 @@ const settingsPage = (() => {
 
 	//******************** Сервер *************************//
 	function getSettings() {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/settingsPage.php",
-				data: {
-					action: 'getSettings'
-				},
-				success: resp => {
-
-					try {
-						resp = JSON.parse(resp);
-
-						if (resp.error) return helper.showError(resp.error);
-
-					} catch (e) {
-						helper.showError("Ошибка чтения данных!");
-						throw e;
-					}
-
-					resolve(resp);
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
-			});
+		return helper.request('php/sections/settingsPage.php', {
+			action: 'getSettings'
 		});
 	}
 
 
+	//(!!!!!) Нужно переписать нативно
 	function updateLogo(file) {
 		const formData = new FormData();
 		formData.append('file', file);
 
 		$.ajax({
-			url: 'php/settingsPage.php?updateLogo',
+			url: 'php/sections/settingsPage.php?updateLogo',
 			type: 'POST',
 			data: formData,
 			processData: false,
@@ -405,128 +383,44 @@ const settingsPage = (() => {
 
 
 	function updateMain(newSettings) {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/settingsPage.php",
-				data: {
-					action: 'updateMain',
-					newSettings: newSettings
-				},
-				success: resp => {
+		const data = {
+			action: 'updateMain',
+			newSettings: newSettings
+		}
 
-					try {
-						resp = JSON.parse(resp);
-
-						if (resp.error) return helper.showError(resp.error);
-
-					} catch (e) {
-						helper.showError("Ошибка чтения данных!");
-						throw e;
-					}
-
-					helper.showSuccess('Настройки обновлены.');
-					resolve(resp);
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
-			});
-		});
+		return helper.request('php/sections/settingsPage.php', data);
 	}
 
 
 	function updateDiscounts(newSettings) {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/settingsPage.php",
-				data: {
-					action: 'updateDiscounts',
-					newSettings: newSettings
-				},
-				success: resp => {
+		const data = {
+			action: 'updateDiscounts',
+			newSettings: newSettings
+		}
 
-					try {
-						resp = JSON.parse(resp);
-
-						if (resp.error) return helper.showError(resp.error);
-
-					} catch (e) {
-						helper.showError("Ошибка чтения данных!");
-						throw e;
-					}
-
-					helper.showSuccess('Настройки обновлены.');
-					resolve(resp);
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
-			});
-		});
+		return helper.request('php/sections/settingsPage.php', data);
 	}
 
 
-	function removeUser(userElem) {
-		$.ajax({
-			type: "POST",
-			url: "php/settingsPage.php",
-			data: {
-				action: 'removeUser',
-				userId: userElem.id
-			},
-			success: resp => {
+	async function removeUser(userElem) {
+		const data = {
+			action: 'removeUser',
+			userId: userElem.id
+		}
 
-				try {
-					resp = JSON.parse(resp);
+		if (await !helper.request('php/sections/settingsPage.php', data)) return;
 
-					if (resp.error) return helper.showError(resp.error);
-
-				} catch (e) {
-					helper.showError("Ошибка чтения данных!");
-					throw e;
-				}
-
-				userElem.remove();
-				helper.showSuccess('Пользователь удален.');
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
-			}
-		});
+		userElem.remove();
 	}
 
 
 	function updateUsers(newSettings) {
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				type: "POST",
-				url: "php/settingsPage.php",
-				data: {
-					action: 'updateUsers',
-					newSettings: newSettings
-				},
-				success: resp => {
+		const data = {
+			action: 'updateUsers',
+			newSettings: newSettings
+		}
 
-					try {
-						resp = JSON.parse(resp);
-
-						if (resp.error) return helper.showError(resp.error);
-
-					} catch (e) {
-						helper.showError("Ошибка чтения данных!");
-						throw e;
-					}
-
-					helper.showSuccess('Настройки обновлены.');
-					resolve(resp);
-				},
-				error: () => {
-					helper.showError("Ошибка соединения с сервером!");
-				}
-			});
-		});
+		return helper.request('php/sections/settingsPage.php', data);
 	}
 
 

@@ -1,7 +1,11 @@
 <?php
-require_once 'connection.php';
+require_once '../connection.php';
 session_start();
-$action = $_POST['action'];
+
+$postData = file_get_contents('php://input');
+$data = json_decode($postData, true);
+
+$action = $data['action'];
 
 
 switch ($action) {
@@ -9,7 +13,7 @@ switch ($action) {
         startShift();
         break;
     case 'endShift':
-        endShift($_POST['shiftId']);
+        endShift($data['shiftId']);
         break;
     case 'getShiftInfo':
         getshiftInfo();
@@ -18,16 +22,16 @@ switch ($action) {
         getDiscountsValues();
         break;
     case 'startNewVisit':
-        startNewVisit($_POST['visitInfo']);
+        startNewVisit($data['visitInfo']);
         break;
     case 'removeVisit':
-        removeVisit($_POST['data']['id']);
+        removeVisit($data['visitId']);
         break;
     case 'calculateVisit':
-        calculateVisit($_POST['data']['visitId']);
+        calculateVisit($data['visitId']);
         break;
     case 'endVisit':
-        endVisit($_POST['data']);
+        endVisit($data['visitInfo']);
         break;
 }
 

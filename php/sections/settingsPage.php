@@ -1,5 +1,5 @@
 <?php
-require_once 'connection.php';
+require_once '../connection.php';
 
 session_start();
 
@@ -7,11 +7,13 @@ if ($_SESSION['user']['position'] != 'adm') {
 	exit(json_encode( array('error' => 'Ошибка доступа!') ));
 }
 
-
 if ( isset( $_GET['updateLogo'] ) ) {
 	$action = 'updateLogo';
 } else {
-	$action = $_POST['action'];
+	$postData = file_get_contents('php://input');
+	$data = json_decode($postData, true);
+
+	$action = $data['action'];
 }
 
 
@@ -24,16 +26,16 @@ switch ($action) {
         updateLogo();
         break;
     case 'updateMain':
-        updateMain($_POST['newSettings']);
+        updateMain($data['newSettings']);
         break;
     case 'updateDiscounts':
-        updateDiscounts($_POST['newSettings']);
+        updateDiscounts($data['newSettings']);
         break;
     case 'removeUser':
-        removeUser($_POST['userId']);
+        removeUser($data['userId']);
         break;
     case 'updateUsers':
-        updateUsers($_POST['newSettings']);
+        updateUsers($data['newSettings']);
         break;
 };
 
