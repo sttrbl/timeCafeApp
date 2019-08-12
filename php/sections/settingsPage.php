@@ -52,11 +52,11 @@ function getSettings() {
 }
 
 function updateLogo() {
-	$filename = '../img/logo.png';
+	$filename = '../../img/logo.png';
 	unlink($filename); 
 	
-	move_uploaded_file($_FILES['file']['tmp_name'], '../img/logo.png');
- 	echo json_encode( array('success' => $_FILES['file']['tmp_name']) );
+	move_uploaded_file($_FILES['file']['tmp_name'], '../../img/logo.png');
+ 	echo json_encode( array('success' => 'тест') );
 }
 
 
