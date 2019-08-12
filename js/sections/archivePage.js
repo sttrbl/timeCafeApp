@@ -72,7 +72,7 @@ const archivePage = (() => {
 
 		const elem = helper.create('ul', 'period-statistics');
 
-		itemsNames.forEach((itemName, i) => {
+		itemsNames.forEach(itemName => {
 			const item = helper.create('li', 'period-statistics__item');
 			const itemLabel = helper.create('span', 'item__label', itemName[1]);
 			const itemValue = helper.create('span', 'item__value');
@@ -95,7 +95,7 @@ const archivePage = (() => {
 			date,
 			start_time: start,
 			end_time: end
-		}, i) => {
+		}) => {
 			const item = helper.create('li', 'period-shifts__item shift');
 			const shiftDate = parseShiftDate(date);
 			const itemDay = helper.create('h1', 'shift__day', shiftDate.day);
@@ -117,7 +117,7 @@ const archivePage = (() => {
 			const pageContent = document.querySelector('.page__content');
 			const pageElements = Array.prototype.slice.call(pageContent.children);
 
-			pageElements.forEach((element, i) => {
+			pageElements.forEach(element => {
 				element.style = "display: none";
 			});
 
@@ -153,7 +153,7 @@ const archivePage = (() => {
 			shiftHeader.remove();
 			shiftVisitsList.remove();
 
-			pageElements.forEach((element, i) => element.style = '');
+			pageElements.forEach(element => element.style = '');
 		});
 
 		shiftHeader.append(backButton, shiftHeadline);
@@ -216,27 +216,23 @@ const archivePage = (() => {
 
 
 	function getPeriodInfo(from, to) {
-		const data = {
+		return helper.request('php/sections/archivePage.php', {
 			action: 'getPeriodInfo',
 			from,
 			to
-		};
-
-		return helper.request('php/sections/archivePage.php', data);
+		});
 	}
 
 
 	function getShiftVisits(shiftId) {
-		const data = {
+		return helper.request('php/sections/archivePage.php', {
 			action: 'getShiftVisits',
 			shiftId
-		};
-
-		return helper.request('php/sections/archivePage.php', data);
+		});
 	}
 
 	return {
-		getElem: createArchivePage,
+		getContent: createArchivePage,
 		getDatePeriod: getDatePeriod
 	};
 })();

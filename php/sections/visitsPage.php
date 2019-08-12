@@ -120,6 +120,7 @@ function startNewVisit($inputs) {
 
 		$stmt = $pdo->prepare("SELECT COUNT(*) FROM current_shift WHERE person_tag = :tag AND status != 'completed'");
 		$stmt->execute( array('tag' => $inputs['person_tag']) );
+		
 		if ( $stmt->fetchColumn() != 0) return false;
 
 		return true;

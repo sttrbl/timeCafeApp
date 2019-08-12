@@ -150,7 +150,6 @@ const visitsPage = (() => {
 	}
 
 
-
 	function createVisit(visitNum, discountsValues, visitInfo) {
 		const visitItemsNames = [
 			['№', 'num'],
@@ -233,7 +232,6 @@ const visitsPage = (() => {
 	}
 
 
-
 	//************** Функции для работы с сервером ***************//
 
 	function getShiftInfo() {
@@ -251,30 +249,25 @@ const visitsPage = (() => {
 
 
 	function endShift(id) {
-		const data = {
+		return helper.request('php/sections/visitsPage.php', {
 			action: 'endShift',
 			shiftId: id
-		}
-
-		return helper.request('php/sections/visitsPage.php', data);
+		});
 	}
 
 
-	function removeVisit(node) {
+	async function removeVisit(node) {
 		if (!confirm('Удалить посещение?')) return false;
 
-		const data = {
+		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'removeVisit',
 			visitId: node.getAttribute('real-id')
-		}
-
-		helper.request('php/sections/visitsPage.php', data).then(result => {
-			const visitsList = node.parentElement;
-
-			node.remove();
-
-			visitsList.querySelectorAll('.visit__num').forEach((numElem, i) => numElem.textContent = i + 1);
 		});
+		
+		if (!resp) return;
+
+		node.parentElement.querySelectorAll('.visit__num').forEach((numElem, i) => numElem.textContent = i + 1);
+		node.remove();
 	}
 
 
@@ -288,83 +281,74 @@ const visitsPage = (() => {
 		}
 
 		const visitInfo = {};
+		const allNodeInputs = node.querySelectorAll('input');
 
-		node.querySelectorAll('input').forEach(inputElem => {
+		for (let inputElem of allNodeInputs) {
 			if (!validateInput(inputElem)) return helper.showError('Заполните все обязательные поля.');
 
 			const key = inputElem.className.replace('-', '_').replace('visit__', '');
 
 			visitInfo[key] = inputElem.value;
-		});
-
-		const data = {
-			action: 'startNewVisit',
-			visitInfo
 		}
 
-		const resp = await helper.request('php/sections/visitsPage.php', data);
+		const resp = await helper.request('php/sections/visitsPage.php', {
+			action: 'startNewVisit',
+			visitInfo
+		});
 
-		const tagElem = node.querySelector('.visit__person-tag');
-		const newTagElem = helper.create('span', tagElem.className, tagElem.value);
+		if (!resp) return;
 
 		node.classList.remove('new');
 		node.classList.add('active');
 		node.setAttribute('real-id', resp.visitId);
 		node.querySelector('.visit__start-time').textContent = resp.startTime;
-		tagElem.parentElement.replaceChild(newTagElem, tagElem);
-		//(ДОПИСАТЬ!): решить, что делать с комментарием к посещению
+
+		allNodeInputs.forEach(inputElem => {
+			inputElem.parentElement.replaceChild(helper.create('span', inputElem.className, inputElem.value), inputElem);
+		});
+
 	}
 
 
-	function calculateVisit(node) {
-		const data = {
+	async function calculateVisit(node) {
+
+		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'calculateVisit',
 			visitId: node.getAttribute('real-id')
-		};
-
-		helper.request('php/sections/visitsPage.php', data).then(resp => {
-			const endTimeElem = node.querySelector('.visit__end-time');
-			const totalElem = node.querySelector('.visit__total');
-			const discountValue = node.querySelector('.visit__discount').value;
-
-			endTimeElem.textContent = resp.endTime;
-
-			totalElem.setAttribute('pure-total', resp.pureTotal);
-
-			if (discountValue != 0) {
-				totalElem.textContent = resp.pureTotal - (resp.pureTotal / 100 * discountValue);
-			} else {
-				totalElem.textContent = resp.pureTotal;
-			}
-
-			node.classList.remove('active');
-			node.classList.add('calculated');
 		});
+
+		if (!resp) return;
+
+		const endTimeElem = node.querySelector('.visit__end-time');
+		const totalElem = node.querySelector('.visit__total');
+		const discountValue = node.querySelector('.visit__discount').value;
+
+		endTimeElem.textContent = resp.endTime;
+		totalElem.setAttribute('pure-total', resp.pureTotal);
+
+		totalElem.textContent = discountValue ? resp.pureTotal - (resp.pureTotal / 100 * discountValue) : resp.pureTotal;
+
+		node.classList.remove('active');
+		node.classList.add('calculated');
 	}
 
 
 	async function endVisit(node) {
 		const discountSelect = node.querySelector('.visit__discount');
 		const selectedElem = discountSelect.querySelector('[value ="' + discountSelect.value + '"]');
-		const data = {
+
+		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'endVisit',
 			visitInfo: {
 				visitId: node.getAttribute('real-id'),
 				finalTotal: node.querySelector('.visit__total').textContent,
 				discount: selectedElem.textContent
 			}
-		};
+		});
 
-		if (await !helper.request('php/sections/visitsPage.php', data)) return;
+		if (!resp) return;
 
-		const commentElem = node.querySelector('.visit__comment');
-		const newCommentElem = helper.create('span', commentElem.className, commentElem.value);
-		commentElem.parentElement.replaceChild(newCommentElem, commentElem);
-
-		const discountElem = node.querySelector('.visit__discount');
-		const newDiscountElem = helper.create('span', discountElem.className, data.discount);
-		discountElem.parentElement.replaceChild(newDiscountElem, discountElem);
-
+		discountSelect.parentElement.replaceChild(helper.create('span', discountSelect.className, selectedElem.textContent), discountSelect);
 		node.classList.remove('calculated');
 		node.classList.add('completed');
 	}

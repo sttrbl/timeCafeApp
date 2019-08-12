@@ -22,18 +22,18 @@ const helper = (function () {
 		alert(text);
 	}
 
-	async function request(URL, data) {
+	function request(URL, data) {
 		const xhr = new XMLHttpRequest();
 		xhr.open("POST", URL, true);
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-		return new Promise(resolve => {
+		return new Promise((resolve, reject) => {
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState != 4) return;
 
 				if (xhr.status != 200) {
 					showError("Ошибка соединения с сервером!");
-					return false;
+					reject();
 				}
 
 				try {
@@ -41,13 +41,13 @@ const helper = (function () {
 
 					if (resp.error) {
 						showError(resp.error);
-						return false;
+						resolve(false);
 					}
 
 					resolve(resp);
 				} catch (e) {
 					showError("Ошибка чтения данных!");
-					throw e;
+					reject(e); 
 				}
 			};
 

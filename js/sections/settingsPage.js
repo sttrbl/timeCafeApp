@@ -243,7 +243,7 @@ const settingsPage = (() => {
 			const newSettings = [];
 			const usersRows = usersList.querySelectorAll('.user');
 
-			usersList.querySelectorAll('.user').forEach((row, i) => {
+			usersList.querySelectorAll('.user').forEach(row => {
 				const userInfo = {};
 
 				userInfo.id = row.id;
@@ -296,7 +296,7 @@ const settingsPage = (() => {
 			elem.id = userInfo.id;
 		}
 
-		itemsNames.forEach((itemName, i) => {
+		itemsNames.forEach(itemName => {
 			const item = helper.create('div', 'user__info');
 			const label = helper.create('label', 'info-label', itemName[0]);
 			let field;
@@ -375,50 +375,44 @@ const settingsPage = (() => {
 
 
 	function updateMain(newSettings) {
-		const data = {
+		return helper.request('php/sections/settingsPage.php', {
 			action: 'updateMain',
 			newSettings: newSettings
-		}
-
-		return helper.request('php/sections/settingsPage.php', data);
+		});
 	}
 
 
 	function updateDiscounts(newSettings) {
-		const data = {
+		return helper.request('php/sections/settingsPage.php', {
 			action: 'updateDiscounts',
 			newSettings: newSettings
-		}
-
-		return helper.request('php/sections/settingsPage.php', data);
+		});
 	}
 
 
 	async function removeUser(userElem) {
-		const data = {
+		const resp = await helper.request('php/sections/settingsPage.php', {
 			action: 'removeUser',
 			userId: userElem.id
-		}
+		});
 
-		if (await !helper.request('php/sections/settingsPage.php', data)) return;
+		if (!resp) return;
 
 		userElem.remove();
 	}
 
 
 	function updateUsers(newSettings) {
-		const data = {
+		return helper.request('php/sections/settingsPage.php', {
 			action: 'updateUsers',
 			newSettings: newSettings
-		}
-
-		return helper.request('php/sections/settingsPage.php', data);
+		});
 	}
 
 
 	return {
 		getSettings: getSettings,
-		getElem: createSettingsPage
+		getContent: createSettingsPage
 	};
 
 })();

@@ -54,20 +54,20 @@ navMenu.addEventListener('click', e => {
 	switch ( menuLink.getAttribute('href') ) {
 
 		case '/visits':
-			visitsPage.getShiftInfo().then(result => {
-				page.renderContent( visitsPage.getContent(result), 'Посещения' );
+			visitsPage.getShiftInfo().then(shiftInfo => {
+				page.renderContent( visitsPage.getContent(shiftInfo), 'Посещения' );
 			});
 			break;
 
 		case '/archive':
-			archivePage.getDatePeriod().then(result => {
-				page.renderContent( archivePage.getElem(result), 'Архив' );
+			archivePage.getDatePeriod().then(datePeriod => {
+				page.renderContent( archivePage.getContent(datePeriod), 'Архив' );
 			});
 			break;
 
 		case '/settings':
-				settingsPage.getSettings().then(result => {
-					page.renderContent( settingsPage.getElem(result), 'Настройки' );
+				settingsPage.getSettings().then(settings => {
+					page.renderContent( settingsPage.getContent(settings), 'Настройки' );
 				});
 			break;
 	}
