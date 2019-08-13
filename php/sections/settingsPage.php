@@ -4,7 +4,7 @@ require_once '../connection.php';
 session_start();
 
 if ($_SESSION['user']['position'] != 'adm') {
-	exit(json_encode( array('error' => 'Ошибка доступа!') ));
+	exit(json_encode( array('errorMsg' => 'Ошибка доступа!') ));
 }
 
 if ( isset( $_GET['updateLogo'] ) ) {
@@ -56,7 +56,7 @@ function updateLogo() {
 	unlink($filename); 
 	
 	move_uploaded_file($_FILES['file']['tmp_name'], '../../img/logo.png');
- 	echo json_encode( array('success' => 'тест') );
+ 	echo json_encode( array('successMsg' => 'тест') );
 }
 
 
@@ -73,13 +73,13 @@ function updateMain($newSettings) {
 	global $pdo;
 
 	if (!validate($newSettings)) {
-		exit(json_encode( array('error' => 'Ошибка ввода!') ) );
+		exit(json_encode( array('errorMsg' => 'Ошибка ввода!') ) );
 	}
 
 	$stmt = $pdo->prepare("INSERT INTO settings (name, value) VALUES ('first_cost',:first_cost), ('next_cost',:next_cost), ('org_name',:org_name), ('stop_check',:stop_check) ON DUPLICATE KEY UPDATE value = VALUES(value)");
 	$stmt->execute($newSettings);		
 	
-	exit(json_encode( array('success' => 'Настройки обновлены') ) );
+	exit(json_encode( array('successMsg' => 'Настройки обновлены') ) );
 }
 
 
@@ -110,20 +110,20 @@ function updateDiscounts($newSettings) {
 		$pdo->query($sql);
 	}
 
-	exit(json_encode( array('success' => 'Настройки обновлены') ) );
+	exit(json_encode( array('successMsg' => 'Настройки обновлены') ) );
 }
 
 function removeUser($userId) {
 	global $pdo;
 
 	if ($userId == $_SESSION['user']['id']) {
-		exit(json_encode( array('error' => 'Этим пользователем являетесь вы!') ) );
+		exit(json_encode( array('errorMsg' => 'Этим пользователем являетесь вы!') ) );
 	}
 
 	$stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
 	$stmt->execute(array($userId));	
 
-	exit(json_encode( array('success' => 'Пользователь удален.') ) );
+	exit(json_encode( array('successMsg' => 'Пользователь удален.') ) );
 }
 
 function updateUsers($newSettings) {
@@ -156,7 +156,7 @@ function updateUsers($newSettings) {
 			UPDATE surname= VALUES(surname),name= VALUES(name),login= VALUES(login),
 			password= VALUES(password),position= VALUES(position)");
 
-	exit(json_encode( array('success' => 'Настройки обновлены') ) );
+	exit(json_encode( array('successMsg' => 'Настройки обновлены') ) );
 }
 
 ?>

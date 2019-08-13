@@ -39,11 +39,12 @@ const helper = (function () {
 				try {
 					const resp = JSON.parse(xhr.responseText);
 
-					if (resp.error) {
-						showError(resp.error);
+					if (resp.errorMsg) {
+						showError(resp.errorMsg);
 						resolve(false);
 					}
 
+					if (resp.successMsg) showSuccess(resp.successMsg);
 					resolve(resp);
 				} catch (e) {
 					showError("Ошибка чтения данных!");
