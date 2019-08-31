@@ -3,89 +3,117 @@ class Page {
 
 	constructor(rootElem) {
 		this._rootElem = rootElem;
-		this._headlineElem = rootElem.querySelector('.page__headline');
+		this._cache = {};
+
+		this._modules = {
+			visits: visitsPageModule,
+			arhive: visitsPageModule,
+			settings: settingsPageModule
+		};
+
+		this._headlineElem =  document.createElement('h1'); 
+		this._headlineElem.className = 'page__headline';
+
+		this._contentContainer =  document.createElement('section'); 
+		this._contentContainer.className = 'page__content';
+
+		this._rootElem.append(this._headlineElem, this._contentContainer);
 	}
 
-	setHeadline(value) {
-		this._headlineElem.textContent = value;
-		document.title = value;
+	set headline(text) {
+		this._headlineElem.textContent = text;
+		document.title = text;
 	}
 
-	removeContent() {
-		const pageContent = this._rootElem.querySelector('.page__content');
-		if (pageContent) pageContent.remove();
+	set content(contentElems) {
+		this._contentContainer.innerHTML = '';
+		this._contentContainer.append(...contentElems);
 	}
 
-	renderContent(content, pageHeadline) {
-		this.removeContent();
-		this.setHeadline(pageHeadline);
-		this._rootElem.appendChild(content); 
+	render(pageName) {
+		const pagesRussianNames = {
+			visits: 'Посещения',
+			archive: 'Архив',
+			settings: 'Настройки'
+		}
+			
+		if (this._cache[pageName]) {
+			this.headline = pagesRussianNames[pageName];
+			this.content = this._cache[pageName]; 
+			return;
+		} 
+		
+		this._modules[pageName].getPageContent()
+			.then(pageContent => {
+				this.headline = pagesRussianNames[pageName];
+				this.content = pageContent; 
+				this._cache[pageName] = pageContent;
+			})
+			.catch(error => {
+				console.log(`Ошибка загрузки раздела: ${error.message}`);
+			});
 	}
-
 };
 
-const sidebarToggleBtn = document.querySelector('.btn-sidebar-toggle');
 const navMenu = document.querySelector('.menu');
 const layoutBody = document.querySelector('.layout__body');
 const sidebar = document.querySelector('.layout__sidebar');
+const sidebarToggleBtn = document.querySelector('.btn-sidebar-toggle');
+const alert = document.querySelector('.alert');
 const page = new Page( document.querySelector('.page') );
 
-const toggleSidebar = e => {
+alert.style.width = `${layoutBody.offsetWidth}px`;
+
+
+window.addEventListener(`resize`, e => {
+	alert.style.width = `${layoutBody.offsetWidth}px`;
+});
+
+document.addEventListener('input', e => {
+	if ( !e.target.matches('[type = "text"]') ) return;   
+	
+	e.target.value = e.target.value.replace(/^\s*(.*)$/, '$1');
+});
+
+
+document.addEventListener('change', e => {
+	if ( !e.target.matches('[type = "text"]') ) return;   
+		
+	e.target.value = e.target.value.trim().replace(/\s+/g, ' ');
+});
+
+
+sidebarToggleBtn.addEventListener('click', e => {
 	layoutBody.classList.toggle('shifted'); 
 	sidebar.classList.toggle('opened'); 
-}
+});
 
-sidebarToggleBtn.addEventListener('click', toggleSidebar);
 
 layoutBody.addEventListener('click', e => {
 	if ( sidebar.matches('.opened') && !e.target.closest('.mobile-header') ) {
 		toggleSidebar();
-		e.preventDefault();
 	}
 });
 
-navMenu.addEventListener('click', e => {
-	const menuLink = e.target.closest('.menu__link');
 
-	if ( menuLink.matches('.current') ) return e.preventDefault();
+navMenu.addEventListener('click', e => {
+	e.preventDefault();
+	
+	const menuLinkElem = e.target.closest('.menu__link');
+	const activeMenuLinkElem = e.currentTarget.querySelector('.current');
+
+	if ( !menuLinkElem || (menuLinkElem == activeMenuLinkElem) ) return;
 
 	if ( sidebar.matches('.opened') ) toggleSidebar();
 
-	switch ( menuLink.getAttribute('href') ) {
+	page.render( menuLinkElem.getAttribute('href') );
 
-		case '/visits':
-			visitsPage.getShiftInfo().then(shiftInfo => {
-				page.renderContent( visitsPage.getContent(shiftInfo), 'Посещения' );
-			});
-			break;
-
-		case '/archive':
-			archivePage.getDatePeriod().then(datePeriod => {
-				page.renderContent( archivePage.getContent(datePeriod), 'Архив' );
-			});
-			break;
-
-		case '/settings':
-				settingsPage.getSettings().then(settings => {
-					page.renderContent( settingsPage.getContent(settings), 'Настройки' );
-				});
-			break;
-	}
-
-	const current = e.currentTarget.querySelector('.current');
-
-	current.classList.remove('current');
-	menuLink.classList.add('current');
-
-	e.preventDefault();
+	activeMenuLinkElem.classList.remove('current');
+	menuLinkElem.classList.add('current');
 }); 
 
 
-visitsPage.getShiftInfo().then(result => {
-	page.renderContent( visitsPage.getContent(result), 'Посещения' );
-});
-
-
+page.render('visits');
 
 
 

@@ -106,7 +106,7 @@
 
 
 .field__input {
-	width: 2.5em;
+	width: 2.75em;
 	font-size: 1em;
 }
 
@@ -116,7 +116,6 @@
 }
 
 .btn-save-main {
-	display: none;
 	margin-top: 1.25em;
 }
 
@@ -184,9 +183,7 @@
 }
 
 
-
-
-.discounts-editor__table tbody[contenteditable = 'true'] {
+.discounts-editor__table td[contenteditable = 'true'] {
 	background-color: rgb(255, 235, 153);
 }
 
@@ -199,7 +196,6 @@
 }
 
 .btn-add-discount {
-	display: none;
 	margin-left: 0.8em;
 }
 
@@ -270,7 +266,6 @@
 }
 
 .btn-save-users-changes {
-	display: none;
 	margin-left: 0.8em;
 }
 

@@ -1,6 +1,7 @@
 const helper = (function () {
+	const alertElem = document.querySelector('.alert');
 
-	function createCustomElement(tag, className, textContent = '') {
+	function createCustomElement(tag, className, textContent) {
 
 		const elem = document.createElement(tag);
 
@@ -8,60 +9,78 @@ const helper = (function () {
 			elem.className = className;
 		}
 
-		elem.textContent = textContent;
+		if (textContent) {
+			elem.textContent = textContent;
+		}
+
 		return elem;
 	}
 
 	function showError(text) {
-		// Здесь можно сделать кастомный вариант вывода ошибки
-		alert(text);
+		alertElem.classList.remove('success');
+		alertElem.classList.add('error');
+		alertElem.textContent = text;
+		alertElem.style.opacity = 100;
+
+		setTimeout(() => {
+			alertElem.style.opacity = 0;
+		}, 3000);
 	}
 
 	function showSuccess(text) {
-		// Здесь можно сделать кастомный вариант вывода сообщения
-		alert(text);
+		alertElem.classList.remove('error');
+		alertElem.classList.add('success');
+		alertElem.textContent = text;
+		alertElem.style.opacity = 100;
+
+		setTimeout(() => {
+			alertElem.style.opacity = 0;
+		}, 3000);
 	}
 
-	function request(URL, data) {
-		const xhr = new XMLHttpRequest();
-		xhr.open("POST", URL, true);
-		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-		return new Promise((resolve, reject) => {
-			xhr.onreadystatechange = function () {
-				if (xhr.readyState != 4) return;
+	//Любой запрос возвращает тело ответа в случае успеха и null в случае ошибки
+	async function request(URL, data) {
+		let resp, respBody;
 
-				if (xhr.status != 200) {
-					showError("Ошибка соединения с сервером!");
-					reject();
-				}
+		try {
+			resp = await fetch(URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json;charset=utf-8'
+				},
+				body: JSON.stringify(data)
+			});
 
-				try {
-					const resp = JSON.parse(xhr.responseText);
+			if (!resp.ok) throw new Error(resp.status);
+	
+			respBody = await resp.json();
 
-					if (resp.errorMsg) {
-						showError(resp.errorMsg);
-						resolve(false);
-					}
+		} catch(e) {
+			showError("Серверная ошибка!");
 
-					if (resp.successMsg) showSuccess(resp.successMsg);
-					resolve(resp);
-				} catch (e) {
-					showError("Ошибка чтения данных!");
-					reject(e); 
-				}
-			};
+			if (e instanceof SyntaxError) {
+				console.log(`Ошибка чтения данных: ${e.message}`);
+			}
+			else {
+				console.log(`Ошибка соединения с сервером: ${e.message}`);
+			}
 
-			xhr.send(JSON.stringify(data));
-		});
+			return null;
+		}
 
+		if (respBody.errorMsg) showError(respBody.errorMsg);
+		if (respBody.successMsg) showSuccess(respBody.successMsg);
+
+		return respBody;
 	}
+
 
 	return {
 		create: createCustomElement,
-		showError: showError,
-		showSuccess: showSuccess,
-		request: request
+		showError,
+		showSuccess,
+		request
 	}
 
 })();

@@ -4,7 +4,12 @@ require_once '../connection.php';
 session_start();
 
 if ($_SESSION['user']['position'] != 'adm') {
-	exit(json_encode( array('errorMsg' => 'Ошибка доступа!') ));
+	$resp = array(
+		'done' => false,
+		'errorMsg' => 'Ошибка доступа!'
+	);
+
+	exit( json_encode($resp) );
 }
 
 if ( isset( $_GET['updateLogo'] ) ) {
@@ -39,6 +44,7 @@ switch ($action) {
         break;
 };
 
+
 function getSettings() {
 	global $pdo;
 
@@ -48,7 +54,15 @@ function getSettings() {
 
 	$common = array('main' => $main, 'discounts' => $discounts);
 
-	echo json_encode( array('common' => $common, 'users' => $users) );
+	$resp = array(
+		'done' => true,
+		'data' => array(
+			'common' => $common, 
+			'users' => $users
+		)
+	);
+
+	echo json_encode($resp);
 }
 
 function updateLogo() {
@@ -56,39 +70,60 @@ function updateLogo() {
 	unlink($filename); 
 	
 	move_uploaded_file($_FILES['file']['tmp_name'], '../../img/logo.png');
- 	echo json_encode( array('successMsg' => 'тест') );
+
+	$resp = array(
+		'done' => true,
+		'successMsg' => 'Логотип обновлен.'
+	);
+
+ 	echo json_encode($resp);
 }
 
 
 
 function updateMain($newSettings) {
-
+	//Дописать
 	function validate($values) {
 		foreach ($values as $key => $value) {
-			if ( $key != 'org_name' && !is_numeric($value) ) return false;
+			if ( $key != 'org_name' && ( !is_numeric($value) || $value <= 0) ) {
+				$resp = array(
+					'done' => false,
+					'errorMsg' => 'Некорректное значения числового поля!'
+				);
+		
+				exit( json_encode($resp) );
+			} 
+
+			if ($key == 'org_name' && ($value == '' || strlen($value) > 20) ) {
+				$resp = array(
+					'done' => false,
+					'errorMsg' => 'Некорректное название заведения!'
+				);
+		
+				exit( json_encode($resp) );
+			}
 		}
-		return true;
 	}
 
 	global $pdo;
 
-	if (!validate($newSettings)) {
-		exit(json_encode( array('errorMsg' => 'Ошибка ввода!') ) );
-	}
+	$newSettings['org_name'] = trim($newSettings['org_name']);
+
+	validate($newSettings);
 
 	$stmt = $pdo->prepare("INSERT INTO settings (name, value) VALUES ('first_cost',:first_cost), ('next_cost',:next_cost), ('org_name',:org_name), ('stop_check',:stop_check) ON DUPLICATE KEY UPDATE value = VALUES(value)");
 	$stmt->execute($newSettings);		
-	
-	exit(json_encode( array('successMsg' => 'Настройки обновлены') ) );
+
+	$resp = array(
+		'done' => true,
+		'successMsg' => 'Общие настройки обновлены.'
+	);
+
+ 	echo json_encode($resp);
 }
 
 
 function updateDiscounts($newSettings) {
-
-	function validate($values) {
-		return true;
-	}
-
 	function prepareSqlString($values) {
 		$sql = '';
 
@@ -99,52 +134,75 @@ function updateDiscounts($newSettings) {
 		return rtrim($sql, ",");
 	}
 
+	//Дописать
+	function validate($values) {
+		
+	}
+
 	global $pdo;
 
 	$pdo->query('SET FOREIGN_KEY_CHECKS = 0');
 	$pdo->query('TRUNCATE TABLE discounts');
 	$pdo->query('SET FOREIGN_KEY_CHECKS = 1');
 
-	if ($newSettings != 'truncate') {
+	if ($newSettings) {
 		$sql = "INSERT INTO discounts (id, name, value) VALUES".prepareSqlString($newSettings);
 		$pdo->query($sql);
 	}
 
-	exit(json_encode( array('successMsg' => 'Настройки обновлены') ) );
+	$resp = array(
+		'done' => true,
+		'successMsg' => 'Информация о скидках обновлена.'
+	);
+
+ 	echo json_encode($resp);
+
 }
+
 
 function removeUser($userId) {
 	global $pdo;
+	
 
 	if ($userId == $_SESSION['user']['id']) {
-		exit(json_encode( array('errorMsg' => 'Этим пользователем являетесь вы!') ) );
+		$resp = array(
+			'done' => false,
+			'errorMsg' => 'Этим пользователем являетесь вы!'
+		);
+		exit(json_encode($resp) );
 	}
 
 	$stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
 	$stmt->execute(array($userId));	
 
-	exit(json_encode( array('successMsg' => 'Пользователь удален.') ) );
+	$resp = array(
+		'done' => true,
+		'successMsg' => 'Пользователь удален.'
+	);
+
+ 	echo json_encode($resp);
 }
+
 
 function updateUsers($newSettings) {
 	global $pdo;
 
+	//Дописать
 	function validate(){
-		return true;
+		
 	}
 
 	function prepareSqlString($users) {
 		$sql = '';
 
-		foreach ($users as &$value) {
-
-			$id = trim($value['id']);
-
-			if ( $id == '') {
-				$id = 'NULL';
+		foreach ($users as &$user) {
+			$userId = $user['id'];
+			
+			if ( $userId == null) {
+				$userId = 'NULL';
 			} 
 
-			$sql.= "(".$id.",'".$value['surname']."','".$value['name']."','".$value['login']."','".$value['password']."','".$value['position']."'),";
+			$sql.= "(".$userId.",'".$user['surname']."','".$user['name']."','".$user['login']."','".$user['password']."','".$user['position']."'),";
 		}
 
 		return rtrim($sql, ",");
@@ -156,7 +214,12 @@ function updateUsers($newSettings) {
 			UPDATE surname= VALUES(surname),name= VALUES(name),login= VALUES(login),
 			password= VALUES(password),position= VALUES(position)");
 
-	exit(json_encode( array('successMsg' => 'Настройки обновлены') ) );
+	$resp = array(
+		'done' => true,
+		'successMsg' => 'Информация о пользователях обновлена.'
+	);
+
+	echo json_encode($resp);
 }
 
 ?>

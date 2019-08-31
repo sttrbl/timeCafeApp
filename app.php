@@ -60,19 +60,19 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 			<nav>
 				<ul class="menu">
 					<li class="menu__item">
-						<a class="menu__link current" href="/visits">
+						<a class="menu__link current" href="visits">
 							<i class="fa fa-gamepad" aria-hidden="true"></i>
 							<span>Посещения</span>
 						</a>
 					</li>
 					<li class="menu__item">
-						<a class="menu__link" href="/archive">
+						<a class="menu__link" href="archive">
 							<i class="fa fa-clone" aria-hidden="true"></i>
 							<span>Архив</span>
 						</a>
 					</li>
 					<li class="menu__item">
-						<a class="menu__link" href="/settings">
+						<a class="menu__link" href="settings">
 							<i class="fa fa-cog" aria-hidden="true"></i>
 							<span>Настройки</span>
 						</a>
@@ -83,7 +83,6 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 
 
 		<div class="layout__body">
-
 			<header class="mobile-header">
 				<button class="btn-sidebar-toggle">
 					<i class="fa fa-bars" aria-hidden="true"></i>
@@ -91,11 +90,10 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 
 				<h1 class="mobile-header__text"><?php echo $orgName; ?></h1>
 			</header>
-
-
-			<main class="page">
-				<h1 class="page__headline"></h1>
-			</main>
+			
+			<div class="alert">ооо круто</div>	
+						
+			<main class="page"></main>
 		</div>
 	</div>
 	

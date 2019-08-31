@@ -8,18 +8,53 @@ $data = json_decode($postData, true);
 $action = $data['action'];
 
 
+
 switch ($action) {
+	case 'endShift':
+    case 'startNewVisit':
+    case 'removeVisit':
+    case 'calculateVisit':
+	case 'endVisit':
+		if ( !shiftIsActive() ) {
+			$resp = array(
+				'done' => false,
+				'errorMsg' => 'Смена уже завершена, перезагрузите страницу.'
+			);
+
+			exit( json_encode($resp) );
+		}
+		break;
+}
+
+
+switch ($action) {
+    case 'removeVisit':
+    case 'calculateVisit':
+	//Придумать что нибудь с case 'endVisit':
+		if ( !isExist($data['visitId']) ) {
+			$resp = array(
+				'done' => false,
+				'errorMsg' => 'Запись уже удалена, обновите страницу.'
+			);
+
+			exit( json_encode($resp) );
+		}
+		break;
+
+}
+
+switch ($action) {
+	case 'getShiftInfo':
+        getshiftInfo();
+        break;
+    case 'getDiscountsValues':
+        getDiscountsValues();
+        break;
     case 'startShift':
         startShift();
         break;
     case 'endShift':
         endShift($data['shiftId']);
-        break;
-    case 'getShiftInfo':
-        getshiftInfo();
-        break;
-    case 'getDiscountsValues':
-        getDiscountsValues();
         break;
     case 'startNewVisit':
         startNewVisit($data['visitInfo']);
@@ -61,7 +96,14 @@ function getDiscountsValues() {
 function getShiftInfo() {
 	global $pdo;
 
-	if ( !shiftIsActive() ) exit( json_encode(false) ) ;
+	if ( !shiftIsActive() ) {
+		$resp = array(
+			'done' => true,
+			'data' => NULL
+		);
+
+		exit( json_encode($resp) );
+	}
 
 	$stmt = $pdo->query('SELECT id FROM shifts WHERE end_time IS NULL');
 	$stmt = $stmt->fetch(PDO::FETCH_LAZY);
@@ -70,30 +112,50 @@ function getShiftInfo() {
 						 AS start_time, date_format(end_time,'%H:%i') AS end_time, discount, 
 						 total, status FROM current_shift");
 	$visits = $stmt->fetchAll();
-	echo json_encode( array('shiftId' => $shiftId, 'visits' => $visits, 'discountsValues' => getDiscountsValues() ) );
-}
 
+	$resp = array(
+		'done' => true,
+		'data' => array(
+			'shiftId' => $shiftId, 
+			'visits' => $visits, 
+			'discounts' => getDiscountsValues() 
+		)
+	);
+
+	echo json_encode($resp);
+}
 
 
 function startShift() {
 	global $pdo;
 
 	if ( shiftIsActive() ) {
-		exit ( json_encode( array('errorMsg' => 'Смена уже начата, перезагрузите страницу.') ) );
+		$resp = array(
+			'done' => false,
+			'errorMsg' => 'Смена уже начата, перезагрузите страницу.'
+		);
+
+		exit( json_encode($resp) );
 	}
 
 	$stmt = $pdo->prepare("INSERT INTO shifts(start_user) VALUES (:user_id)");
 	$stmt->execute(array('user_id' => $_SESSION['user']['id']));
-	echo json_encode( array( 'shiftId' => $pdo->lastInsertId(), 'discountsValues' => getDiscountsValues()) );
+
+	$resp = array(
+		'done' => true,
+		'data' => array(
+			'shiftId' => $pdo->lastInsertId(), 
+			'discounts' => getDiscountsValues() 
+		)
+	);
+
+	echo json_encode($resp);
+
 }
 
 
 function endShift($shiftId) {
 	global $pdo;
-
-	if ( !shiftIsActive() ) {
-		exit ( json_encode( array('errorMsg' => 'Смена уже завершена, перезагрузите страницу.') ) );
-	}
 
 	$stmt = $pdo->prepare("UPDATE shifts SET end_time = NOW(), end_user = :user_id WHERE id = :shift_id");
 	$stmt->execute(array('user_id' => $_SESSION['user']['id'], 'shift_id' => $shiftId));
@@ -108,37 +170,42 @@ function endShift($shiftId) {
 	$stmt->execute(array('shift_id' => $shiftId));
 	$pdo->query('TRUNCATE TABLE current_shift');
 	$pdo->query('ALTER TABLE current_shift AUTO_INCREMENT = 1');
-	echo json_encode(true);
+
+	$resp = array('done' => true);
+	echo( json_encode($resp) );
 }
 
 
 function startNewVisit($inputs) {
 
-	function validateInputs($inputs) {
+	function validateUserInfo($inputs) {
 		global $pdo;
-		if ($inputs['person_tag'] < 1) return false;
+
+		if ($inputs['person_tag'] <= 0) {
+			$resp = array(
+				'done' => false,
+				'errorMsg' => 'Некорректное значение поля "Номерок"!'
+			);
+	
+			exit( json_encode($resp) );
+		}
 
 		$stmt = $pdo->prepare("SELECT COUNT(*) FROM current_shift WHERE person_tag = :tag AND status != 'completed'");
 		$stmt->execute( array('tag' => $inputs['person_tag']) );
 		
-		if ( $stmt->fetchColumn() != 0) return false;
-
-		return true;
+		if ( $stmt->fetchColumn() != 0) {
+			$resp = array(
+				'done' => false,
+				'errorMsg' => 'Посещение по данному номерку уже активно!'
+			);
+	
+			exit( json_encode($resp) );
+		}
 	}
 
 	global $pdo;
 
-	if ( !validateInputs($inputs) ) {
-		exit( json_encode( array('errorMsg' => 'Ошибка в заполнении данных!') ) );
-	}
-
-	if ( !shiftIsActive() ) {
-		exit ( json_encode( array('errorMsg' => 'Смена уже завершена, перезагрузите страницу.') ) );
-	}
-
-	if ( trim($inputs['comment']) == '') {
-		$inputs['comment'] = NULL;
-	}
+	validateUserInfo($inputs);
 
 	$stmt = $pdo->prepare("INSERT INTO current_shift SET person_tag = :tag, comment = :comment, status = 'active'");
 	$stmt->execute(array('tag' => $inputs['person_tag'],'comment' => $inputs['comment']));
@@ -147,34 +214,30 @@ function startNewVisit($inputs) {
 	$stmt = $pdo->prepare("SELECT date_format(start_time,'%H:%i') FROM current_shift WHERE id = :id");
 	$stmt->execute( array('id' => $visitId) );
 
-	echo json_encode( array( 'visitId' => $visitId, 'startTime' => $stmt->fetchColumn()) );
+	$resp = array(
+		'done' => true,
+		'data' => array(
+			'visitId' => $visitId, 
+			'startTime' => $stmt->fetchColumn() 
+		)
+	);
+
+	echo json_encode($resp);
 }
 
 
 function removeVisit($visitId) {
 	global $pdo;
-
-	if ( !shiftIsActive() ) {
-		exit ( json_encode( array('errorMsg' => 'Смена уже завершена, перезагрузите страницу.') ) );
-	}
-
-	if ( !isExist($visitId) ) exit;
 	$stmt = $pdo->prepare("DELETE FROM current_shift WHERE id = :id");
 	$stmt->execute(array('id' => $visitId));
-	echo json_encode(true);
+
+	$resp = array('done' => true);
+	echo( json_encode($resp) );
 }
 
 
 function calculateVisit($visitId) {
 	global $pdo;
-
-	if ( !shiftIsActive() ) {
-		exit ( json_encode( array('errorMsg' => 'Смена уже завершена, перезагрузите страницу.') ) );
-	}
-
-	if ( !isExist($visitId) ) {
-		exit ( json_encode( array('errorMsg' => 'Такой записи не существует, обновите страницу.') ) );
-	}
 
 	$stmt = $pdo->prepare("UPDATE current_shift SET end_time = NOW() WHERE id = :id");
 	$stmt->execute(array('id' => $visitId));
@@ -207,7 +270,15 @@ function calculateVisit($visitId) {
 	$stmt = $pdo->prepare("UPDATE current_shift SET status = 'calculated', total = :total WHERE id = :id");
 	$stmt->execute(array('id' => $visitId, 'total' => $pureTotal));
 
-	echo json_encode( array('pureTotal' => floor($pureTotal), 'endTime' => $endTime ) );
+	$resp = array(
+		'done' => true,
+		'data' => array(
+			'pureTotal' => floor($pureTotal), 
+			'endTime' => $endTime 
+		)
+	);
+
+	echo json_encode($resp);
 }
 
 
@@ -219,24 +290,16 @@ function endVisit($data) {
 	$finalTotal = $data['finalTotal'];
 	$discount = $data['discount'];
 
-	if ( !shiftIsActive() ) {
-		exit ( json_encode( array('errorMsg' => 'Смена уже завершена, перезагрузите страницу.') ) );
-	}
-
-	if ( !isExist($visitId) ) {
-		exit ( json_encode( array('errorMsg' => 'Такой записи не существует, обновите страницу.') ) );
-	}
-
-	if (trim($discount) == '') {
-		$discount = NULL;
-	}
-
 	$stmt = $pdo->prepare("UPDATE current_shift SET total = :total, discount = :discount, 
 						   end_user = :end_user, status = 'completed' WHERE id = :visit_id");
+
 	$stmt->execute(array('end_user' => $_SESSION['user']['id'], 'visit_id' => $visitId, 'total' => $finalTotal, 'discount' => $discount));
 
+	$resp = array(
+		'done' => true,
+	);
 	
-	echo json_encode(true);
+	echo json_encode($resp);
 }
 ?>
 

@@ -1,156 +1,163 @@
 //********* Модуль для подготовки компонентов раздела "Посещения" **********//
 
-const visitsPage = (() => {
+const visitsPageModule = (() => {
 
-	function createVisitsPage(shiftInfo) {
+	async function getPageContent() {
+		const pageContent = [];
+		const shiftInfo = await getShiftInfo();
 
-		const content = helper.create('section', 'page__content');
-
-		content.appendChild(createDayPanel(!!shiftInfo));
-
-		if (shiftInfo) content.appendChild(createVisitsPanel(shiftInfo));
-
-		return content;
-	}
-
-
-	function createDayPanel(active) {
-
-		function formatDate(date) {
-			return date.toLocaleString('ru-RU', {
-					month: 'long',
-					day: 'numeric'
-				}) + ', ' +
-				date.toLocaleString('ru-RU', {
-					weekday: 'long'
-				})[0].toUpperCase() +
-				date.toLocaleString('ru-RU', {
-					weekday: 'long'
-				}).slice(1);
+		if (shiftInfo === false) {
+			throw new Error('Не удалось загрузить информацию о смене.')
 		}
 
-		const elem = helper.create('div', 'today-info clearfix');
-		const dateElem = helper.create('h4', 'today-info__date', formatDate(new Date()));
-		const shiftContollButton = helper.create('button', 'btn btn-day-controller');
+		if (shiftInfo !== null) {
+			pageContent.push(createDayPanel(shiftInfo.shiftId));
+			pageContent.push(createVisitsPanel(shiftInfo));
+		} else {
+			pageContent.push(createDayPanel());
+		}
+	
+		return pageContent;
+	}
 
-		if (active) shiftContollButton.classList.add('active');
+	
+	function createDayPanel(shiftId) {
 
-		shiftContollButton.addEventListener('click', e => {
-			const self = e.currentTarget;
+		function formatDate(date) {
+			const currentDate = date.toLocaleString('ru-RU', {month: 'long', day: 'numeric'});
+			const weekday = date.toLocaleString('ru-RU', {weekday: 'long'});
 
-			if (!self.matches('.active')) {
+			return  `${currentDate}, ${weekday[0].toUpperCase() + weekday.slice(1)}`
+		}
+
+		const dayPanelContainer = helper.create('div', 'day-panel clearfix');
+		const dateElem = helper.create('h4', 'day-panel__date', formatDate(new Date()));
+		const shiftContollBtn = helper.create('button', 'btn btn-day-controller');
+
+		if (shiftId) {
+			shiftContollBtn.classList.add('active');
+			dayPanelContainer.dataset.shiftId = shiftId;
+		}
+
+		shiftContollBtn.addEventListener('click', async e => {
+			
+			if (!shiftContollBtn.matches('.active')) {
 
 				if (!confirm('Начать смену?')) return;
 
-				startShift().then(result => {
-					self.closest('.page__content').appendChild(createVisitsPanel(result));
-					self.classList.toggle('active');
-				});
+				const startedShiftInfo = await startShift();
+			
+				if (startedShiftInfo) {
+					dayPanelContainer.after(createVisitsPanel(startedShiftInfo));
+					dayPanelContainer.dataset.shiftId = startedShiftInfo.shiftId;
+					shiftContollBtn.classList.toggle('active');
+				}
 
 			} else {
 
 				if (!confirm('Завершить смену?')) return;
 
-				const visitsListElem = self.closest('.page__content').querySelector('.visits-list');
+				const visitsPanelElem = dayPanelContainer.nextElementSibling;
+				const operationResult =  await endShift(+dayPanelContainer.dataset.shiftId);
 
-				endShift(visitsListElem.getAttribute('shift-id')).then(result => {
-					const visitsPanelElem = self.closest('.page__content').querySelector('.visits-panel');
+				if (operationResult) {
 					visitsPanelElem.remove();
-					self.classList.toggle('active');
-				});
+					shiftContollBtn.classList.toggle('active');
+					dayPanelContainer.removeAttribute('data-shift-id');
+				};
 			}
 		});
 
-		elem.append(dateElem, shiftContollButton);
-		return elem;
+		dayPanelContainer.append(dateElem, shiftContollBtn);
+		return dayPanelContainer;
 	}
 
 
-	function createVisitsPanel({
-		shiftId,
-		visits: visitsList,
-		discountsValues: discountsValuesList
-	}) {
-
-		const elem = helper.create('div', 'visits-panel');
+	function createVisitsPanel({visits = null, discounts}) {
+		const visitsPanelContainer = helper.create('div', 'visits-panel');
 		const visitsListElem = helper.create('ul', 'visits-list');
+		const addBtn = helper.create('button', 'btn btn-add-visit', 'Добавить');
 
-		visitsListElem.setAttribute('shift-id', shiftId);
+		if (visits) {
 
+			for (const [i, visitInfo] of visits.entries()) {
+				const newVisitOptions = {
+					visitNum: i + 1,
+					discounts,
+					visitInfo
+				}
 
+				visitsListElem.append(createVisit(newVisitOptions));
+			}
+
+		}
+
+		
 		visitsListElem.addEventListener('click', e => {
+			const btn = e.target.closest('button');
+			const visitContainer = e.target.closest('.visits-list__item');
 
-			const button = e.target.closest('button');
-			const visitRootElem = e.target.closest('.visits-list__item');
+			if (!btn) return;
 
-			if (!button) return;
-
-
-			if (button.matches('.btn-remove-visit')) {
-
-				removeVisit(visitRootElem);
-
-			} else if (button.matches('.btn-visit-controller')) {
-
-				const visitStatus = visitRootElem.classList[1];
+			if (btn.matches('.btn-remove-visit') && confirm('Удалить посещение?') ) {
+				removeVisit(visitContainer);
+			} else if (btn.matches('.btn-visit-controller')) {
+				const visitStatus = visitContainer.classList[1];
 
 				switch (visitStatus) {
-					case 'new':
-						startVisit(visitRootElem);
+					case 'new':	
+						startVisit(visitContainer);	
 						break;
-					case 'active':
-						calculateVisit(visitRootElem);
+
+					case 'active':	
+						calculateVisit(visitContainer);
 						break;
-					case 'calculated':
-						endVisit(visitRootElem);
+
+					case 'calculated':	
+						endVisit(visitContainer);	
 						break;
 				}
 			}
 		});
 
-		visitsListElem.addEventListener('change', e => {
 
+		visitsListElem.addEventListener('change', e => {
 			if (!e.target.closest('.visit__discount')) return;
 
-			const discountElem = e.target;
-			const visitElem = discountElem.closest('.visit');
-			const totalElem = visitElem.querySelector('.visit__total');
+			const discountSelectElem = e.target;
+			const visitContainer = discountSelectElem.closest('.visits-list__item');
+			const totalCostElem = visitContainer.querySelector('.visit__total');
+			let totalCost = visitContainer.dataset.pureTotal
 
-			if (!totalElem.hasAttribute('pure-total')) return;
+			if (!totalCost) return;
 
-			const discountValue = +discountElem.value;
-			let totalValue = +totalElem.getAttribute('pure-total');
+			const discountValue = +discountSelectElem.value;
 
 			if (discountValue != 0) {
-				totalValue = Math.round(totalValue - ((totalValue / 100) * discountValue));
+				totalCost = Math.round(totalCost - ((totalCost / 100) * discountValue));
 			}
 
-			totalElem.textContent = totalValue;
+			totalCostElem.textContent = totalCost;
 		});
 
-		const addButtonElem = helper.create('button', 'btn btn-add-visit', 'Добавить');
 
-		addButtonElem.addEventListener('click', () => {
+		addBtn.addEventListener('click', e => {
 			const visitsElems = visitsListElem.querySelectorAll('.visit');
-			const lastVisitNum = visitsElems.length + 1;
-			visitsListElem.appendChild(createVisit(lastVisitNum, discountsValuesList));
+			const newVisitOptions = {
+				visitNum: visitsElems.length + 1,
+				discounts
+			};
+			
+			visitsListElem.append(createVisit(newVisitOptions));
 		});
 
-		//visitsList - массив с информацией (из БД) о посещениях за текущую смену
-		if (visitsList) {
 
-			for (let i = 0; i < visitsList.length; i++) {
-				visitsListElem.appendChild(createVisit(i + 1, discountsValuesList, visitsList[i]));
-			}
-
-		}
-
-		elem.append(visitsListElem, addButtonElem);
-		return elem;
+		visitsPanelContainer.append(visitsListElem, addBtn);
+		return visitsPanelContainer;
 	}
 
-
-	function createVisit(visitNum, discountsValues, visitInfo) {
+	//Хорошо бы это отрефакторить
+	function createVisit({visitNum, discounts, visitInfo}) {
 		const visitItemsNames = [
 			['№', 'num'],
 			['Номерок :', 'person-tag'],
@@ -161,72 +168,75 @@ const visitsPage = (() => {
 			['Итого :', 'total']
 		];
 
-		let visitStatus = 'new';
 		const visitContainer = helper.create('li', 'visits-list__item ');
-		const visitElem = helper.create('ul', 'visit');
-
+		const visitInnerContainer = helper.create('ul', 'visit');
+		let visitStatus = 'new';
+		
 		if (visitInfo) {
 			visitStatus = visitInfo.status;
-			visitContainer.setAttribute('real-id', visitInfo.id);
+			visitContainer.dataset.realId = visitInfo.id;
+
+			if (visitStatus == 'calculated') {
+				visitContainer.dataset.pureTotal = visitInfo.total;
+			}
 		}
 
 		visitContainer.classList.add(visitStatus);
-		visitContainer.appendChild(visitElem);
+		visitContainer.append(visitInnerContainer);
 
 		for (let i = 0; i < visitItemsNames.length + 2; i++) {
-			const item = helper.create('li', 'visit-info-item');
-			visitElem.appendChild(item);
+			const itemElem = helper.create('li', 'visit-info-item');
+			visitInnerContainer.append(itemElem);
 		}
 
-
 		visitItemsNames.forEach((itemName, i) => {
-
-			const itemHeadline = helper.create('h5', null, itemName[0]);
-			let itemContent;
+			const itemHeadlineElem = helper.create('h5', null, itemName[0]);
+			let itemContentElem;
 
 			if (visitStatus != 'completed' && itemName[1] == 'discount') {
-				itemContent = document.createElement('select');
+				itemContentElem = document.createElement('select');
+				itemContentElem.append(new Option('', 0));
 
-				itemContent.appendChild(new Option('', 0));
-
-				for (let i = 0; i < discountsValues.length; i++) {
-					itemContent.appendChild(new Option(discountsValues[i]['id'], discountsValues[i]['value']));
+				for (const discount of discounts) {
+					itemContentElem.append(new Option(discount['id'], discount['value']));
 				}
 
 			} else if (visitStatus == 'new' && i > 0) {
 
 				switch (itemName[1]) {
 					case 'person-tag':
-						itemContent = document.createElement('input');
-						itemContent.type = 'number';
+						itemContentElem = document.createElement('input');
+						itemContentElem.type = 'number';
+						itemContentElem.min = 1;
+						itemContentElem.required = true;
 						break;
 					case 'comment':
-						itemContent = document.createElement('input');
-						itemContent.type = 'text';
-						itemContent.setAttribute('maxlength', 40);
+						itemContentElem = document.createElement('input');
+						itemContentElem.type = 'text';
+						itemContentElem.maxLength = 40;
 						break;
 					default:
-						itemContent = document.createElement('span');
+						itemContentElem = document.createElement('span');
 						break;
 				}
 
 			} else {
-				itemContent = document.createElement('span');
+				itemContentElem = document.createElement('span');
 				const itemNameOnServer = itemName[1].replace('-', '_');
-				itemContent.textContent = (i > 0) ? visitInfo[itemNameOnServer] : visitNum;
+				itemContentElem.textContent = (i > 0) ? visitInfo[itemNameOnServer] : visitNum;
 			}
 
-			itemContent.classList.add('visit__' + itemName[1]);
+			itemContentElem.classList.add('visit__' + itemName[1]);
 
-			visitElem.children[i].append(itemHeadline, itemContent);
+			visitInnerContainer.children[i].append(itemHeadlineElem, itemContentElem);
 		});
 
-		const controllButton = helper.create('button', 'btn btn-visit-controller');
-		const removeButton = helper.create('button', 'btn-remove-visit');
+		const visitControllBtn = helper.create('button', 'btn btn-visit-controller');
+		const visitRemoveBtn = helper.create('button', 'btn-remove-visit');
 
-		removeButton.innerHTML = '<i class="far fa-trash-alt"></i>';
-		visitElem.children[visitItemsNames.length].append(controllButton);
-		visitElem.lastElementChild.append(removeButton);
+		visitRemoveBtn.innerHTML = '<i class="far fa-trash-alt"></i>';
+		visitInnerContainer.children[visitItemsNames.length].append(visitControllBtn);
+		visitInnerContainer.lastElementChild.append(visitRemoveBtn);
 
 		return visitContainer;
 	}
@@ -234,128 +244,136 @@ const visitsPage = (() => {
 
 	//************** Функции для работы с сервером ***************//
 
-	function getShiftInfo() {
-		return helper.request('php/sections/visitsPage.php', {
+	async function getShiftInfo() {
+		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'getShiftInfo'
 		});
+
+		return (resp !== null && resp.done) ? resp.data : false;
 	}
 
 
-	function startShift() {
-		return helper.request('php/sections/visitsPage.php', {
+	async function startShift() {
+		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'startShift'
 		});
+
+		return (resp !== null && resp.done) ? resp.data : false;
 	}
 
 
-	function endShift(id) {
-		return helper.request('php/sections/visitsPage.php', {
-			action: 'endShift',
-			shiftId: id
-		});
-	}
-
-
-	async function removeVisit(node) {
-		if (!confirm('Удалить посещение?')) return false;
-
+	async function endShift(shiftId) {
 		const resp = await helper.request('php/sections/visitsPage.php', {
-			action: 'removeVisit',
-			visitId: node.getAttribute('real-id')
+			action: 'endShift',
+			shiftId
 		});
-		
-		if (!resp) return;
 
-		node.parentElement.querySelectorAll('.visit__num').forEach((numElem, i) => numElem.textContent = i + 1);
-		node.remove();
+		return (resp !== null && resp.done) ? true : false;
 	}
 
 
-	async function startVisit(node) {
-
-		function validateInput(inputElem) {
-			//Дописать
-			if (!inputElem.matches('.visit__comment') && inputElem.value.trim() == '') return false;
-
-			return true;
-		}
-
+	async function startVisit(visitNode) {
 		const visitInfo = {};
-		const allNodeInputs = node.querySelectorAll('input');
+		const allNodeInputs = visitNode.querySelectorAll('input');
 
 		for (let inputElem of allNodeInputs) {
-			if (!validateInput(inputElem)) return helper.showError('Заполните все обязательные поля.');
+			const inputElemValue = inputElem.value.trim();
 
-			const key = inputElem.className.replace('-', '_').replace('visit__', '');
+			//Валидация поля "Номерок"
+			if (inputElem.matches('.visit__person-tag') && !inputElem.checkValidity()) return;
 
-			visitInfo[key] = inputElem.value;
+			const visitInfoKey = inputElem.className.replace('-', '_').replace('visit__', '');
+
+			visitInfo[visitInfoKey] = (inputElem.type == 'number') ? +inputElemValue : inputElemValue || null;
 		}
 
+		
 		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'startNewVisit',
 			visitInfo
 		});
+		
+		if (resp === null || !resp.done) return;
 
-		if (!resp) return;
-
-		node.classList.remove('new');
-		node.classList.add('active');
-		node.setAttribute('real-id', resp.visitId);
-		node.querySelector('.visit__start-time').textContent = resp.startTime;
+		visitNode.classList.remove('new');
+		visitNode.classList.add('active');
+		visitNode.dataset.realId = resp.data.visitId;
+		visitNode.querySelector('.visit__start-time').textContent = resp.data.startTime;
 
 		allNodeInputs.forEach(inputElem => {
-			inputElem.parentElement.replaceChild(helper.create('span', inputElem.className, inputElem.value), inputElem);
+			inputElem.replaceWith(helper.create('span', inputElem.className, inputElem.value));
 		});
 
 	}
 
 
-	async function calculateVisit(node) {
+	async function removeVisit(visitNode) {
+		const visitsListElem = visitNode.parentElement;
+		const visitsNumsElems = visitsListElem.parentElement.getElementsByClassName('visit__num');
+	
+		if (!visitNode.matches('.new')) {
+			const resp = await helper.request('php/sections/visitsPage.php', {
+				action: 'removeVisit',
+				visitId: +visitNode.dataset.realId
+			});
+	
+			if (resp === null || !resp.done) return;
+		}
 
+		visitNode.remove();
+		[].forEach.call(visitsNumsElems, (numElem, i) => numElem.textContent = i + 1);
+	}
+
+
+	async function calculateVisit(visitNode) {
+	
 		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'calculateVisit',
-			visitId: node.getAttribute('real-id')
+			visitId: +visitNode.dataset.realId
 		});
 
-		if (!resp) return;
+		if (resp === null || !resp.done) return;
 
-		const endTimeElem = node.querySelector('.visit__end-time');
-		const totalElem = node.querySelector('.visit__total');
-		const discountValue = node.querySelector('.visit__discount').value;
+		const pureTotalCost = resp.data.pureTotal;
+		const endTimeElem = visitNode.querySelector('.visit__end-time');
+		const totalCostElem = visitNode.querySelector('.visit__total');
+		const discountValue = +visitNode.querySelector('.visit__discount').value;
 
-		endTimeElem.textContent = resp.endTime;
-		totalElem.setAttribute('pure-total', resp.pureTotal);
+		endTimeElem.textContent = resp.data.endTime;
+		visitNode.dataset.pureTotal = pureTotalCost;
 
-		totalElem.textContent = discountValue ? resp.pureTotal - (resp.pureTotal / 100 * discountValue) : resp.pureTotal;
+		totalCostElem.textContent = discountValue ? pureTotalCost - (pureTotalCost / 100 * discountValue) : pureTotalCost;
 
-		node.classList.remove('active');
-		node.classList.add('calculated');
+		visitNode.classList.remove('active');
+		visitNode.classList.add('calculated');
 	}
 
 
-	async function endVisit(node) {
-		const discountSelect = node.querySelector('.visit__discount');
+	async function endVisit(visitNode) {
+		const discountSelect = visitNode.querySelector('.visit__discount');
 		const selectedElem = discountSelect.querySelector('[value ="' + discountSelect.value + '"]');
 
 		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'endVisit',
 			visitInfo: {
-				visitId: node.getAttribute('real-id'),
-				finalTotal: node.querySelector('.visit__total').textContent,
-				discount: selectedElem.textContent
+				visitId: +visitNode.dataset.realId,
+				finalTotal: +visitNode.querySelector('.visit__total').textContent,
+				discount: selectedElem.textContent || null
 			}
 		});
 
-		if (!resp) return;
+		if (resp === null || !resp.done) return;
 
-		discountSelect.parentElement.replaceChild(helper.create('span', discountSelect.className, selectedElem.textContent), discountSelect);
-		node.classList.remove('calculated');
-		node.classList.add('completed');
+		const discountValueSpan = helper.create('span', discountSelect.className, selectedElem.textContent);
+
+		discountSelect.replaceWith(discountValueSpan);
+		visitNode.removeAttribute("data-pure-total");
+		visitNode.classList.remove('calculated');
+		visitNode.classList.add('completed');
 	}
 
 
 	return {
-		getContent: createVisitsPage,
-		getShiftInfo: getShiftInfo
+		getPageContent
 	};
 })();

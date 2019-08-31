@@ -1,19 +1,21 @@
 //********* Модуль для подготовки компонентов раздела "Настройки" **********//
 
-const settingsPage = (() => {
+const settingsPageModule = (() => {
 
-	function createSettingsPage({
-		common: commonSettings,
-		users: usersSettings
-	}) {
-		const content = helper.create('section', 'page__content');
-		const settingsPanel = helper.create('div', 'settings');
+	async function getPageContent() {
+		const pageContent = [];
+		const settingsPanelElem = helper.create('div', 'settings');
+		const settings = await getSettings();
 
-		settingsPanel.appendChild(createCommonSettingsPanel(commonSettings));
-		settingsPanel.appendChild(createUsersSettingsPanel(usersSettings));
-		content.appendChild(settingsPanel);
+		if (settings === false) {
+			throw new Error('Не удалось загрузить информацию о настройках.')
+		}
 
-		return content;
+		settingsPanelElem.append(createCommonSettingsPanel(settings.common));
+		settingsPanelElem.append(createUsersSettingsPanel(settings.users));
+		pageContent.push(settingsPanelElem);
+		
+		return pageContent;
 	}
 
 
@@ -21,44 +23,44 @@ const settingsPage = (() => {
 		main: mainSettings,
 		discounts: discountsSettings
 	}) {
-		const elem = helper.create('div', 'settings__common');
-		const headline = helper.create('h3', 'settings-category', 'Общие настройки :');
-		const settingsList = helper.create('div', 'settings-list');
+		const commonSettingsContainer = helper.create('div', 'settings__common');
+		const headlineElem = helper.create('h3', 'settings-category', 'Общие настройки :');
+		const settingsListElem = helper.create('div', 'settings-list');
 
-		settingsList.appendChild(createLogoUploader());
-		settingsList.appendChild(createMainSettingsPanel(mainSettings));
-		settingsList.appendChild(createDiscountEditor(discountsSettings));
+		settingsListElem.append(createLogoUploader());
+		settingsListElem.append(createMainSettingsPanel(mainSettings));
+		settingsListElem.append(createDiscountEditor(discountsSettings));
 
-		elem.append(headline, settingsList);
+		commonSettingsContainer.append(headlineElem, settingsListElem);
 
-		return elem;
+		return commonSettingsContainer;
 	}
 
 
 	function createLogoUploader() {
-		const elem = helper.create('div', 'logo-uploader');
-		const img = helper.create('div', 'logo-uploader__img');
-		const info = helper.create('div', 'logo-uploader__info');
-		const upadateButton = helper.create('button', 'btn btn-update-logo', 'Изменить');
-		const hiddenImgInput = helper.create('input', 'hidden-input');
+		const logoUploaderElem = helper.create('div', 'logo-uploader');
+		const imgElem = helper.create('div', 'logo-uploader__img');
+		const infoElem = helper.create('div', 'logo-uploader__info');
+		const upadateBtn = helper.create('button', 'btn btn-update-logo', 'Изменить');
+		const hiddenFileInput = helper.create('input', 'hidden-input');
 
-		info.innerHTML = '<span>Размер загружаемого файла <br> не должен превышать 2 Мб.<br> Формат файла - PNG. </span>';
-		hiddenImgInput.type = 'file';
+		hiddenFileInput.type = 'file';
+		infoElem.innerHTML = '<span>Размер загружаемого файла <br> не должен превышать 2 Мб.<br> Формат файла - PNG. </span>';
+		
+		upadateBtn.addEventListener('click', e => hiddenFileInput.click());
 
-		upadateButton.addEventListener('click', argument => hiddenImgInput.click());
-
-		hiddenImgInput.addEventListener('change', e => {
+		hiddenFileInput.addEventListener('change', e => {
 			const file = e.currentTarget.files[0];
 			updateLogo(file);
 		});
 
-		elem.append(img, info, upadateButton, hiddenImgInput);
+		logoUploaderElem.append(imgElem, infoElem, upadateBtn, hiddenFileInput);
 
-		return elem;
+		return logoUploaderElem;
 	}
 
 
-	function createMainSettingsPanel(mainSettings) {
+	function createMainSettingsPanel(settings) {
 		const optionsNames = [
 			['Название заведения :', 'org_name'],
 			['Первый час :', 'first_cost', ' руб.'],
@@ -66,277 +68,346 @@ const settingsPage = (() => {
 			['Стоп-чек :', 'stop_check', ' руб.']
 		];
 
-		const elem = helper.create('form', 'main-settings');
-		const fieldList = helper.create('div', 'field-list');
-		const saveButton = helper.create('button', 'btn btn-save-main');
+		const mainSettingsForm = helper.create('form', 'main-settings');
+		const fieldListElem = helper.create('ul', 'field-list');
+		const saveBtn = helper.create('button', 'btn btn-save-main');
 
-		elem.id = 'main-settings';
+		saveBtn.hidden = true;
 
 		optionsNames.forEach((optionName, i) => {
-			const fieldElem = helper.create('li', 'field-list__item');
-			const label = helper.create('label', 'field__label', optionName[0]);
-			const input = helper.create('input', 'field__input');
+			const fieldListItemElem = helper.create('li', 'field-list__item');
+			const labelElem = helper.create('label', 'field__label', optionName[0]);
+			const inputElem = helper.create('input', 'field__input');
 
-			input.type = 'text';
-			input.name = optionName[1];
-			input.value = mainSettings[optionName[1]];
+			
+			inputElem.name = optionName[1];
+			inputElem.value = settings[optionName[1]];
+			inputElem.required = true;
 
-			if (i == 0) {
-				fieldElem.append(label, input);
+			if (optionName[1] == 'org_name') {
+				inputElem.type = 'text';
+				inputElem.maxLength = 20;
+				fieldListItemElem.append(labelElem, inputElem);
+				
 			} else {
-				unit = helper.create('span', 'field__unit', optionName[2]);
-				fieldElem.append(label, input, unit);
+				inputElem.type = 'number';
+				inputElem.min = 1;
+				unitElem = helper.create('span', 'field__unit', optionName[2]);
+				fieldListItemElem.append(labelElem, inputElem, unitElem);
 			}
 
-			fieldList.appendChild(fieldElem);
+			fieldListElem.append(fieldListItemElem);
 		});
 
 
-		fieldList.addEventListener('input', e => saveButton.style = 'display: inline-block');
+		mainSettingsForm.addEventListener('input', e => {
+			if (!saveBtn.hidden) return;
+			saveBtn.hidden = false;
+		});
 
 
-		saveButton.addEventListener('click', e => {
-			const fields = elem.elements;
+		mainSettingsForm.addEventListener('submit', async e => {
+			e.preventDefault();
+
+			const fieldsElems = e.currentTarget.querySelectorAll('[type = "text"], [type = "number"]');
 			const newSettings = {};
-
-			for (var i = 0; i < fields.length - 1; i++) {
-				newSettings[fields[i].name] = fields[i].value;
+			
+			for (const fieldElem of fieldsElems) {
+				const fieldElemValue = fieldElem.value.trim();
+				newSettings[fieldElem.name] = (fieldElem.type == 'number') ? +fieldElemValue : fieldElemValue;
 			}
 
-			updateMain(newSettings).then(result => {
-				const newOrgName = fields['org_name'].value;
+			const operationResult = await updateMain(newSettings);
+
+			if (operationResult) {
+				const newOrgName = newSettings['org_name'];
 
 				document.querySelector('.logo-container__text').textContent = newOrgName;
-				saveButton.style.display = '';
-			});
-
-			e.preventDefault();
+				document.querySelector('.mobile-header__text').textContent = newOrgName;
+				
+				saveBtn.hidden = true;
+			}
 		});
 
 
-		elem.append(fieldList, saveButton);
+		mainSettingsForm.append(fieldListElem, saveBtn);
 
-		return elem;
+		return mainSettingsForm;
 	}
 
 
-	function createDiscountEditor(discountSettings) {
-		const elem = helper.create('div', 'discounts-editor');
-		const label = helper.create('label', 'discounts-editor__label', 'Скидки :');
-		const editorTable = helper.create('table', 'discounts-editor__table');
-		const tableHead = document.createElement('thead');
-		const tableBody = document.createElement('tbody');
-		const theadRow = helper.create('tr', 'table-header');
-		const th1 = helper.create('th', null, 'ID');
-		const th2 = helper.create('th', null, 'Название');
-		const th3 = helper.create('th', null, 'Размер (%)');
+	function createDiscountEditor(settings) {
 
-		theadRow.append(th1, th2, th3);
-		tableHead.appendChild(theadRow);
+		function createDiscountRow(...options) {
+			const rowElem = helper.create('tr', 'discount-info');
 
-		for (let key in discountSettings) {
-			const row = helper.create('tr', 'discount-info');
-			const id = helper.create('td', 'discount-info__id', key);
-			const name = helper.create('td', 'discount-info__name', discountSettings[key]['name']);
-			const value = helper.create('td', 'discount-info__value', discountSettings[key]['value']);
+			for (let i = 0; i < 3; i++) {
+				const cellElem = helper.create('td', null, options[i] || null);
+				rowElem.append(cellElem);
 
-			row.append(id, name, value);
-			tableBody.appendChild(row);
+				if (!options.length) cellElem.contentEditable = "true";
+			}
+			
+			return rowElem;
 		}
 
-		const editButton = helper.create('button', 'btn btn-edit-discounts');
-		const addButton = helper.create('button', 'btn btn-add-discount', 'Добавить');
+		const discountEditorContainer = helper.create('div', 'discounts-editor');
+		const labelElem = helper.create('label', 'discounts-editor__label', 'Скидки :');
+		const tableElem = helper.create('table', 'discounts-editor__table');
+		const theadElem = document.createElement('thead');
+		const tbodyElem  = document.createElement('tbody');
+		const theadRowElem = helper.create('tr', 'table-header');
+		const editBtn = helper.create('button', 'btn btn-edit-discounts');
+		const addBtn = helper.create('button', 'btn btn-add-discount', 'Добавить');
+		const permissibleLengths = [6,20,3];
 
-		editButton.addEventListener('click', (e) => {
-			const self = e.currentTarget;
+		addBtn.hidden = true;
+		theadElem.append(theadRowElem);
 
-			if (!self.matches('.active')) {
-				addButton.style = 'display:inline-block';
-				tableBody.setAttribute('contentEditable', true);
-				self.classList.add('active');
-				return;
+		['ID', 'Название', 'Размер'].forEach(columnName => {
+			theadRowElem.append( helper.create('th', null, columnName))
+		});
+
+		for (const key in settings) {
+			tbodyElem.append( createDiscountRow(key, settings[key].name, settings[key].value) );
+		}
+
+		//Живая коллекция всех ячеек в tbody
+		const tdElems = tbodyElem.getElementsByTagName('td');
+
+
+		editBtn.addEventListener('click', e => {
+			if (e.currentTarget.matches('.active')) {
+				return tableElem.dispatchEvent(new CustomEvent('save-discounts'));
 			}
 
+			e.currentTarget.classList.add('active');
+			addBtn.hidden = false;
+
+			[...tdElems].forEach(cell => cell.contentEditable = "true");
+		});
+
+
+		addBtn.addEventListener('click', e => tbodyElem.append( createDiscountRow() ) );
+
+		//Лучше переписать
+		tbodyElem.addEventListener('keydown', e => {
+			const cell = e.target;
+			const cellIndex = cell.cellIndex;
+
+			if (e.code == 'Enter') {
+				e.preventDefault();
+				return tableElem.dispatchEvent(new CustomEvent('save-discounts'));
+			} 
+
+			if (document.getSelection().isCollapsed) {
+				if (cellIndex != 1 && e.code == 'Space' ||
+				    e.key.length == 1 && !e.ctrlKey  &&  cell.textContent.length == permissibleLengths[cellIndex]) {
+					e.preventDefault();
+				}
+			}
+		});
+
+
+		tbodyElem.addEventListener('input', e => {
+			const cellIndex = e.target.cellIndex;
+			let cellText = e.target.textContent;
+			
+			if (cellIndex != 1 )  {
+				cellText = cellText.replace(/\s+/g, '');
+			}
+
+			if (cellIndex == 2) {
+				cellText = cellText.replace(/[^0-9]/g, '');
+
+				if (cellText > 100) cellText = '100';
+			}
+
+			e.target.textContent = cellText.slice(0, permissibleLengths[cellIndex]);
+		});
+
+
+		tableElem.addEventListener('save-discounts', async e => {
 			let newSettings = {};
-			const editorRows = tableBody.querySelectorAll('.discount-info');
 
-			editorRows.forEach((row, i) => {
-				const id = row.children[0].textContent.trim();
+			for (const discountRowElem of [...tbodyElem.rows]) {
+				const discountId = discountRowElem.cells[0].textContent.trim();
+				const discountName = discountRowElem.cells[1].textContent.trim() || null;
+				let discountValue = +discountRowElem.cells[2].textContent.trim();
 
-				if (id == '') return;
+				if (discountId === '' || !discountValue) {
+					discountRowElem.remove();
+					continue;
+				} 
 
-				newSettings[id] = {};
-
-				const name = editorRows[i].children[1].textContent.trim();
-				const value = editorRows[i].children[2].textContent.trim();
-
-				newSettings[id]['name'] = name;
-				newSettings[id]['value'] = value;
-			});
-
-			if (Object.keys(newSettings).length == 0) {
-				newSettings = 'truncate';
-			}
-
-			updateDiscounts(newSettings).then(result => {
-				const valuesList = tableBody.querySelectorAll('.discount-info__id');
-
-				addButton.style = '';
-				tableBody.setAttribute('contentEditable', false);
-
-				for (let i = 0; i < valuesList.length; i++) {
-
-					if (valuesList[i].textContent.trim() != '') continue;
-
-					valuesList[i].closest('tr').remove();
+				if (discountValue > 100) {
+					discountValue = 100;
 				}
 
-				self.classList.remove('active');
-			});
+				newSettings[discountId] = {
+					name: discountName,
+					value: discountValue
+				};
+			}
+
+			const operationResult = await updateDiscounts(newSettings);
+
+			if (operationResult) {
+				editBtn.classList.remove('active');
+				addBtn.hidden = true;
+				Array.from(tdElems).forEach(cell => cell.contentEditable = "false");
+			}
 		});
 
-		addButton.addEventListener('click', e => {
-			const row = helper.create('tr', 'discount-info');
-			const id = helper.create('td', 'discount-info__id');
-			const name = helper.create('td', 'discount-info__name');
-			const value = helper.create('td', 'discount-info__value');
 
-			row.append(id, name, value);
-			tableBody.appendChild(row);
-		});
+		tableElem.append(theadElem, tbodyElem);
+		discountEditorContainer.append(labelElem, tableElem, editBtn, addBtn);
 
-		editorTable.append(tableHead, tableBody);
-		elem.append(label, editorTable, editButton, addButton);
-
-		return elem;
+		return discountEditorContainer;
 	}
 
 
 	function createUsersSettingsPanel(usersSettings) {
-		const elem = helper.create('div', 'settings__users');
-		const headline = helper.create('h3', 'settings-category', 'Пользователи :');
-		const settingsList = helper.create('div', 'settings-list');
+		const usersSettingsContainer = helper.create('div', 'settings__users');
+		const headlineElem = helper.create('h3', 'settings-category', 'Пользователи :');
+		const settingsListElem = helper.create('div', 'settings-list');
 
-		settingsList.appendChild(createUsersEditor(usersSettings));
-		elem.append(headline, settingsList);
+		settingsListElem.append( createUsersEditor(usersSettings) );
+		usersSettingsContainer.append(headlineElem, settingsListElem);
 
-		return elem;
+		return usersSettingsContainer;
 	}
 
 
 	function createUsersEditor(usersInfo) {
-		const elem = helper.create('form', 'users-editor');
-		const usersList = helper.create('ul', 'users-list');
-		const saveButton = helper.create('button', 'btn btn-save-users-changes', 'Сохранить изменения');
-		const addUserButton = helper.create('button', 'btn btn btn-add-user', 'Добавить');
+		const usersEditorForm = helper.create('form', 'users-editor');
+		const usersListElem = helper.create('ul', 'users-list');
+		const saveBtn = helper.create('button', 'btn btn-save-users-changes', 'Сохранить изменения');
+		const addUserBtn = helper.create('button', 'btn btn btn-add-user', 'Добавить');
 
-		usersInfo.forEach((userInfo) => usersList.appendChild(createUserListRow(userInfo)));
+		saveBtn.type = 'submit';
+		saveBtn.hidden = true;
 
-		elem.addEventListener('input', e => {
+		usersInfo.forEach(userInfo => usersListElem.append( createUserListRow(userInfo) ));
 
-			if (saveButton.style == '') return;
+		//Лучше переписать
+		usersListElem.addEventListener('input', e => {
+			if (!saveBtn.hidden) return;
 
-			saveButton.style = 'display:inline-block';
+			saveBtn.hidden = false;
 		});
 
-		saveButton.addEventListener('click', e => {
-			const newSettings = [];
-			const usersRows = usersList.querySelectorAll('.user');
 
-			usersList.querySelectorAll('.user').forEach(row => {
-				const userInfo = {};
+		addUserBtn.addEventListener('click', e => {
+			e.preventDefault();
+			usersListElem.append( createUserListRow() );
+		});
 
-				userInfo.id = row.id;
-				userInfo.name = row.querySelector('[name="name"]').value;
-				userInfo.surname = row.querySelector('[name="surname"]').value;
-				userInfo.login = row.querySelector('[name="login"]').value;
-				userInfo.password = row.querySelector('[name="password"]').value;
-				userInfo.position = row.querySelector('[name="position"]').value;
-				newSettings.push(userInfo);
-			});
 
-			updateUsers(newSettings).then(result => saveButton.style = '');
+		usersListElem.addEventListener('keydown', e => {
+			if (e.code != 'Enter' || e.target.tagName == 'BUTTON') return;
 
+			if (usersEditorForm.checkValidity()){
+				usersEditorForm.dispatchEvent(new Event('submit'));
+			} 
+		
 			e.preventDefault();
 		});
 
-		addUserButton.addEventListener('click', e => {
-			usersList.appendChild(createUserListRow());
+
+		usersListElem.addEventListener('click', async e => {
 			e.preventDefault();
-		});
-
-		usersList.addEventListener('click', e => {
-
+			
 			if (!e.target.closest('.btn-remove-user')) return;
 
-			const userRow = e.target.closest('.user');
-			//мб промис? 
-			removeUser(userRow);
-			e.preventDefault();
+			const userRowElem = e.target.closest('.user');
+			const userId = userRowElem.dataset.userId; 
+
+			if (userId) {
+				if (!confirm('Удалить пользователя?') || !(await removeUser(userId)) ) return;
+			}
+
+			userRowElem.remove();
 		});
 
-		elem.append(usersList, addUserButton, saveButton);
 
-		return elem;
+		usersEditorForm.addEventListener('submit', async e => {
+			e.preventDefault();
+
+			const newSettings = [];
+			
+			for (userRowElem  of usersListElem.children) {
+				const userInfo = {
+					id: userRowElem.dataset.userId || null,
+					name: userRowElem.querySelector('[name="name"]').value,
+					surname: userRowElem.querySelector('[name="surname"]').value,
+					login: userRowElem.querySelector('[name="login"]').value,
+					password: userRowElem.querySelector('[name="password"]').value,
+					position: userRowElem.querySelector('[name="position"]').value
+				};
+
+				newSettings.push(userInfo);
+			}
+
+			if ( await updateUsers(newSettings) ) saveBtn.hidden = true;
+		});
+
+		usersEditorForm.append(usersListElem, addUserBtn, saveBtn);
+
+		return usersEditorForm;
 	}
 
 
 	function createUserListRow(userInfo) {
 		const itemsNames = [
-			['Имя', 'name'],
-			['Фамилия', 'surname'],
-			['Логин', 'login'],
-			['Пароль', 'password'],
-			['Статус', 'position']
+			['Имя :', 'name'],
+			['Фамилия :', 'surname'],
+			['Логин :', 'login'],
+			['Пароль :', 'password'],
+			['Статус :', 'position']
 		];
 
-		const elem = helper.create('li', 'users-list__item user');
+		const userRowElem = helper.create('li', 'users-list__item user');
 
-		if (userInfo) {
-			elem.id = userInfo.id;
-		}
+		if (userInfo) userRowElem.dataset.userId = userInfo.id;
 
 		itemsNames.forEach(itemName => {
-			const item = helper.create('div', 'user__info');
-			const label = helper.create('label', 'info-label', itemName[0]);
-			let field;
+			const userRowItemElem = helper.create('div', 'user__info');
+			const labelElem = helper.create('label', 'info-label', itemName[0]);
+			let fieldElem;
 
-			switch (itemName[1]) {
-				case 'position':
-					field = document.createElement('select');
-					field.append(new Option('Адм.', "adm"), new Option("Сотр.", "emp"));
-					break;
-				default:
-					field = document.createElement('input');
-					field.type = 'text';
-					break;
+			if (itemName[1] == 'position') {
+				fieldElem = document.createElement('select');
+				fieldElem.append(new Option('Адм.', "adm"), new Option("Сотр.", "emp"));
+			} else {
+				fieldElem = document.createElement('input');
+				fieldElem.type = 'text';
 			}
 
-			field.name = itemName[1];
+			fieldElem.required = true;
+			fieldElem.value = (userInfo) ? userInfo[itemName[1]] : '';
+			fieldElem.name = itemName[1];
 
-			if (userInfo) {
-				field.value = userInfo[itemName[1]];
-			}
-
-			item.append(label, field);
-			elem.appendChild(item);
+			userRowItemElem.append(labelElem, fieldElem);
+			userRowElem.append(userRowItemElem);
 		});
 
+		const removeUserBtn = helper.create('button', 'btn-remove-user');
 
-		const removeUserButton = helper.create('button', 'btn-remove-user');
+		removeUserBtn.innerHTML = '<i class="fas fa-user-minus"></i>';
+		userRowElem.append(removeUserBtn);
 
-		removeUserButton.innerHTML = '<i class="fas fa-user-minus"></i>';
-		elem.appendChild(removeUserButton);
-
-		return elem;
+		return userRowElem;
 	}
 
 
 	//******************** Сервер *************************//
-	function getSettings() {
-		return helper.request('php/sections/settingsPage.php', {
+	async function getSettings() {
+		const resp = await helper.request('php/sections/settingsPage.php', {
 			action: 'getSettings'
 		});
+
+		return (resp !== null && resp.done) ? resp.data : false;
 	}
 
 
@@ -374,45 +445,48 @@ const settingsPage = (() => {
 	}
 
 
-	function updateMain(newSettings) {
-		return helper.request('php/sections/settingsPage.php', {
+	async function updateMain(newSettings) {
+		const resp = await helper.request('php/sections/settingsPage.php', {
 			action: 'updateMain',
-			newSettings: newSettings
+			newSettings
 		});
+
+		return (resp !== null && resp.done) ? true : false;
 	}
 
 
-	function updateDiscounts(newSettings) {
-		return helper.request('php/sections/settingsPage.php', {
+	async function updateDiscounts(newSettings) {
+		const resp = await helper.request('php/sections/settingsPage.php', {
 			action: 'updateDiscounts',
-			newSettings: newSettings
+			newSettings
 		});
+
+		return (resp !== null && resp.done) ? true : false;
 	}
 
 
-	async function removeUser(userElem) {
+	async function updateUsers(newSettings) {
+		const resp = await helper.request('php/sections/settingsPage.php', {
+			action: 'updateUsers',
+			newSettings
+		});
+
+		return (resp !== null && resp.done) ? true : false;
+	}
+	
+
+	async function removeUser(userId) {
 		const resp = await helper.request('php/sections/settingsPage.php', {
 			action: 'removeUser',
-			userId: userElem.id
+			userId
 		});
 
-		if (!resp) return;
-
-		userElem.remove();
-	}
-
-
-	function updateUsers(newSettings) {
-		return helper.request('php/sections/settingsPage.php', {
-			action: 'updateUsers',
-			newSettings: newSettings
-		});
+		return (resp !== null && resp.done) ? true : false;
 	}
 
 
 	return {
-		getSettings: getSettings,
-		getContent: createSettingsPage
+		getPageContent
 	};
 
 })();

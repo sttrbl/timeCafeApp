@@ -1,10 +1,10 @@
-.today-info {
+.day-panel{
 	margin-bottom: 0.6em;
 	padding-bottom: 0.66em;
 	border-bottom: 2px solid #3C4558;
 }
 
-.today-info__date {
+.day-panel__date {
 	display: inline-block;
 	margin-top: 0.25em;
 }
