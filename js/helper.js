@@ -36,7 +36,7 @@ const helper = (function () {
 		let heightValue = alertElem.offsetHeight;
 
 		timers.opacity =  setInterval(() => {
-			opacityValue += 0.06;
+			opacityValue += 0.1;
 			alertElem.style.opacity = opacityValue.toFixed(3);
 	
 			if (opacityValue >= 1) {
@@ -80,10 +80,7 @@ const helper = (function () {
 		try {
 			resp = await fetch(URL, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json;charset=utf-8'
-				},
-				body: JSON.stringify(data)
+				body: (data instanceof FormData) ? data : JSON.stringify(data)
 			});
 
 			if (!resp.ok) throw new Error(resp.status);

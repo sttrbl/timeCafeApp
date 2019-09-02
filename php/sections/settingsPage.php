@@ -12,8 +12,9 @@ if ($_SESSION['user']['position'] != 'adm') {
 	exit( json_encode($resp) );
 }
 
-if ( isset( $_GET['updateLogo'] ) ) {
-	$action = 'updateLogo';
+
+if ( isset( $_POST['action'] ) ) {
+	$action = $_POST['action'];
 } else {
 	$postData = file_get_contents('php://input');
 	$data = json_decode($postData, true);
@@ -66,17 +67,25 @@ function getSettings() {
 }
 
 function updateLogo() {
-	$filename = '../../img/logo.png';
-	unlink($filename); 
+	if ( $_FILES['logo']['size'] > 2097152) {
+		$resp = array(
+			'done' => false,
+			'errorMsg' => 'Файл слишком большой!'
+		);
+
+		exit(json_encode($resp));
+	} else {
+		$logoPath = '../../img/logo.png';
+		unlink($logoPath); 
+		move_uploaded_file($_FILES['logo']['tmp_name'], '../../img/logo.png');
+
+		$resp = array(
+			'done' => true,
+			'successMsg' => 'Логотип заведения обновлен.'
+		);
+	}
 	
-	move_uploaded_file($_FILES['file']['tmp_name'], '../../img/logo.png');
-
-	$resp = array(
-		'done' => true,
-		'successMsg' => 'Логотип обновлен.'
-	);
-
- 	echo json_encode($resp);
+ 	exit(json_encode($resp));
 }
 
 

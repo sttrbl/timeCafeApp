@@ -43,18 +43,30 @@
 	font-size: 0.95em;
 }
 
-.visits-list__item.completed::after {
+.visits-list__item::after {
 	position: absolute;
 	top: 0;
 	width: 100%;
 	height: 100%;
 	border-radius: 3px;
-	background: rgba(0,0,0,0.4);
 	content: '';
+	z-index: 1;
+	transition: background .1s;
+}
+
+.visits-list__item.completed::after {
+	z-index: 3;
+	background: rgba(0,0,0,0.4);
 }
 
 .visit {
+	position: relative;
 	display: flex;
+	z-index: 2;
+}
+
+.visits-list__item.completed .visit {
+	position: static;
 }
 
 .visit-info-item {
@@ -161,7 +173,7 @@
 
 .btn-remove-visit {
 	position: relative;
-	z-index: 1;
+	z-index: 10;
 	width: 100%;
 	height: 100%;
 	color: #3C4558;

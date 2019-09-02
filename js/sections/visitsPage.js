@@ -280,7 +280,7 @@ const visitsPageModule = (() => {
 			const inputElemValue = inputElem.value.trim();
 
 			//Валидация поля "Номерок"
-			if (inputElem.matches('.visit__person-tag') && !inputElem.checkValidity()) return;
+			if (inputElem.matches('.visit__person-tag') && !inputElem.reportValidity()) return;
 
 			const visitInfoKey = inputElem.className.replace('-', '_').replace('visit__', '');
 

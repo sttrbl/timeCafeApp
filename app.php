@@ -2,15 +2,18 @@
 mb_internal_encoding('UTF-8');
 session_start();
 require_once 'php/connection.php';
+
 if (!$_SESSION['user']) {
     header("Location: authorization.php");
     exit;
 }
+
 if (isset($_GET['logout']) && $_GET['logout'] == true) {
     unset($_SESSION['user']);
     session_destroy();
     header("Location: authorization.php");
 }
+
 $orgName = $pdo->query("SELECT value from settings WHERE name = 'org_name'")->fetchColumn();
 $stmt = $pdo->prepare("SELECT users.name, users.surname, users.position AS 'position', positions.name 
 					   AS 'position_name' FROM users LEFT JOIN positions ON users.position = positions.id 
@@ -97,8 +100,6 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 		</div>
 	</div>
 	
-
-	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
 	<script src="js/helper.js"></script>
 	<script src="js/sections/visitsPage.js"></script>
 	<script src="js/sections/archivePage.js"></script>

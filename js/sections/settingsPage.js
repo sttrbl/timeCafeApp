@@ -45,13 +45,19 @@ const settingsPageModule = (() => {
 		const hiddenFileInput = helper.create('input', 'hidden-input');
 
 		hiddenFileInput.type = 'file';
+		hiddenFileInput.accept = "image/png";
 		infoElem.innerHTML = '<span>Размер загружаемого файла <br> не должен превышать 2 Мб.<br> Формат файла - PNG. </span>';
 		
 		upadateBtn.addEventListener('click', e => hiddenFileInput.click());
 
-		hiddenFileInput.addEventListener('change', e => {
+		hiddenFileInput.addEventListener('change', async e => {
 			const file = e.currentTarget.files[0];
-			updateLogo(file);
+			const operationResult = await updateLogo(file);
+
+			if (operationResult) {
+				document.querySelector('.logo-container__img').src = `img/logo.png?'${Math.random()}`;
+				document.querySelector('.logo-uploader__img').style = `background-image: url(img/logo.png?${Math.random()})`;
+			}
 		});
 
 		logoUploaderElem.append(imgElem, infoElem, upadateBtn, hiddenFileInput);
@@ -164,7 +170,7 @@ const settingsPageModule = (() => {
 		addBtn.hidden = true;
 		theadElem.append(theadRowElem);
 
-		['ID', 'Название', 'Размер'].forEach(columnName => {
+		['ID', 'Название', 'Размер (%)'].forEach(columnName => {
 			theadRowElem.append( helper.create('th', null, columnName))
 		});
 
@@ -412,36 +418,15 @@ const settingsPageModule = (() => {
 
 
 	//(!!!!!) Нужно переписать нативно
-	function updateLogo(file) {
+	async function updateLogo(file) {
 		const formData = new FormData();
-		formData.append('file', file);
 
-		$.ajax({
-			url: 'php/sections/settingsPage.php?updateLogo',
-			type: 'POST',
-			data: formData,
-			processData: false,
-			contentType: false,
-			success: resp => {
+		formData.append('logo', file);
+		formData.append('action', 'updateLogo');
 
-				try {
-					resp = JSON.parse(resp);
+		const resp = await helper.request('php/sections/settingsPage.php', formData);
 
-					if (resp.error) return helper.showError(resp.error);
-
-				} catch (e) {
-					helper.showError("Ошибка чтения данных!");
-					throw e;
-				}
-
-				document.querySelector('.logo-container__img').src = `img/logo.png?'${Math.random()}`;
-				document.querySelector('.logo-uploader__img').style = `background-image: url(img/logo.png?${Math.random()})`;
-			},
-			error: () => {
-				helper.showError("Ошибка соединения с сервером!");
-			}
-		});
-
+		return (resp !== null && resp.done) ? true : false;
 	}
 
 
