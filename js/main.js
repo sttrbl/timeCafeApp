@@ -55,18 +55,25 @@ class Page {
 	}
 };
 
-const navMenu = document.querySelector('.menu');
-const layoutBody = document.querySelector('.layout__body');
-const sidebar = document.querySelector('.layout__sidebar');
+const navMenuElem = document.querySelector('.menu');
+const layoutBodyElem = document.querySelector('.layout__body');
+const sidebarElem = document.querySelector('.layout__sidebar');
 const sidebarToggleBtn = document.querySelector('.btn-sidebar-toggle');
-const alert = document.querySelector('.alert');
+const alertElem = document.querySelector('.alert');
 const page = new Page( document.querySelector('.page') );
 
-alert.style.width = `${layoutBody.offsetWidth}px`;
+alertElem.style.width = `${layoutBodyElem.offsetWidth}px`;
+
+alertElem.addEventListener('transitionend', e => {
+	if (e.propertyName == 'height') {
+		alertElem.style.opacity = 0;
+		alertElem.style.height = '';	
+	}
+});
 
 
 window.addEventListener(`resize`, e => {
-	alert.style.width = `${layoutBody.offsetWidth}px`;
+	alertElem.style.width = `${layoutBodyElem.offsetWidth}px`;
 });
 
 document.addEventListener('input', e => {
@@ -84,19 +91,19 @@ document.addEventListener('change', e => {
 
 
 sidebarToggleBtn.addEventListener('click', e => {
-	layoutBody.classList.toggle('shifted'); 
-	sidebar.classList.toggle('opened'); 
+	layoutBodyElem.classList.toggle('shifted'); 
+	sidebarElem.classList.toggle('opened'); 
 });
 
 
-layoutBody.addEventListener('click', e => {
-	if ( sidebar.matches('.opened') && !e.target.closest('.mobile-header') ) {
+layoutBodyElem.addEventListener('click', e => {
+	if ( sidebarElem.matches('.opened') && !e.target.closest('.mobile-header') ) {
 		toggleSidebar();
 	}
 });
 
 
-navMenu.addEventListener('click', e => {
+navMenuElem.addEventListener('click', e => {
 	e.preventDefault();
 	
 	const menuLinkElem = e.target.closest('.menu__link');
@@ -104,7 +111,7 @@ navMenu.addEventListener('click', e => {
 
 	if ( !menuLinkElem || (menuLinkElem == activeMenuLinkElem) ) return;
 
-	if ( sidebar.matches('.opened') ) toggleSidebar();
+	if ( sidebarElem.matches('.opened') ) toggleSidebar();
 
 	page.render( menuLinkElem.getAttribute('href') );
 

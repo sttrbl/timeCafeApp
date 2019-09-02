@@ -1,6 +1,18 @@
 const helper = (function () {
 	const alertElem = document.querySelector('.alert');
 
+	const timers = {
+		opacity: null,
+		waiting: null,
+		height: null,
+
+		clearTimers() {
+			clearInterval(this.opacity);
+			clearTimeout(this.waiting);
+			clearInterval(this.height);
+		}
+	};
+
 	function createCustomElement(tag, className, textContent) {
 
 		const elem = document.createElement(tag);
@@ -9,33 +21,55 @@ const helper = (function () {
 			elem.className = className;
 		}
 
-		if (textContent) {
-			elem.textContent = textContent;
-		}
-
+		elem.textContent = textContent || null;
+		
 		return elem;
 	}
 
-	function showError(text) {
-		alertElem.classList.remove('success');
-		alertElem.classList.add('error');
-		alertElem.textContent = text;
-		alertElem.style.opacity = 100;
+	function showMessage() {
+		timers.clearTimers();
 
-		setTimeout(() => {
-			alertElem.style.opacity = 0;
-		}, 3000);
+		alertElem.style.height = alertElem.style.opacity  = '';
+		alertElem.style.display = 'block';
+		
+		let opacityValue = 0;
+		let heightValue = alertElem.offsetHeight;
+
+		timers.opacity =  setInterval(() => {
+			opacityValue += 0.06;
+			alertElem.style.opacity = opacityValue.toFixed(3);
+	
+			if (opacityValue >= 1) {
+				clearInterval(timers.opacity);
+
+				timers.waiting = setTimeout(() => {
+					timers.height = setInterval(() => {
+						heightValue -= 2;
+						alertElem.style.height = `${heightValue.toFixed(3)}px`;
+
+						if (heightValue <= 0) {
+							timers.clearTimers();
+							alertElem.style.display = 'none';
+						}
+
+					}, 10);
+
+				}, 3000);
+			}
+		}, 10);
 	}
 
-	function showSuccess(text) {
-		alertElem.classList.remove('error');
-		alertElem.classList.add('success');
-		alertElem.textContent = text;
-		alertElem.style.opacity = 100;
+	function showSuccess(message) {
+		alertElem.style.backgroundColor = '#329e1c';
+		alertElem.textContent = message;
+		showMessage();
+	}
 
-		setTimeout(() => {
-			alertElem.style.opacity = 0;
-		}, 3000);
+
+	function showError(message) {
+		alertElem.style.backgroundColor = '#ef6c1b';
+		alertElem.textContent = message;
+		showMessage();
 	}
 
 

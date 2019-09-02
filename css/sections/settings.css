@@ -251,6 +251,10 @@
 	font-size: 1.1em;
 }
 
+.btn-remove-user:hover {
+	color: rgb(165, 26, 26);
+}
+
 .btn-remove-user i {
 	margin-top: auto;
 	margin-bottom: 0.35em;
