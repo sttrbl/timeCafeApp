@@ -36,10 +36,10 @@ const helper = (function () {
 		let heightValue = alertElem.offsetHeight;
 
 		timers.opacity =  setInterval(() => {
-			opacityValue += 0.1;
+			opacityValue += 0.08;
 			alertElem.style.opacity = opacityValue.toFixed(3);
 	
-			if (opacityValue >= 1) {
+			if (opacityValue >= 0.8) {
 				clearInterval(timers.opacity);
 
 				timers.waiting = setTimeout(() => {

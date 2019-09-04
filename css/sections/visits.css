@@ -34,24 +34,24 @@
 .visits-list__item {
 	position: relative;
 	margin: 1.31em 0;
-	padding: 0.5em 0;
 	border-radius: 3px;
 	background: #F8F7F7;
+	padding: 0.5em 0;
 	-webkit-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
 	   -moz-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
 	        box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
-	font-size: 0.95em;
 }
 
 .visits-list__item::after {
 	position: absolute;
 	top: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
 	border-radius: 3px;
 	content: '';
 	z-index: 1;
-	transition: background .1s;
+	transition: background .3s;
 }
 
 .visits-list__item.completed::after {
@@ -67,55 +67,87 @@
 
 .visits-list__item.completed .visit {
 	position: static;
+	
 }
 
 .visit-info-item {
-	height: 2em;
 	padding: 0 0.65em;
 	border-right: 2px solid #DFDFDF;
-	line-height: 1em;
-
-	flex-grow: 0;
+	line-height: 1.4;
+	min-height: 2.2em;;
 }
 
-.visit-info-item__name h5 {
-	color: #7A7A7A;
-}
-
-
+/*Номер посещения*/
 .visit-info-item:first-child {
-	flex-basis: 1.8em;
+	flex-basis: 1.4em;
 }
 
-
+/*Номерок*/
 .visit-info-item:nth-child(2) {
-	flex-basis: 3em;
+	flex-basis: 3.2em;
 }
 
-.visit-info-item:nth-child(n+4) {
-	flex-basis: 4em;
-}
-
+/*Комментарий*/
 .visit-info-item:nth-child(3) {
-	flex-basis: 6em;
-	flex-grow: 2;
+	flex: 1 1;
+	
 }
 
+/*Всё, кроме номера, номерка и комментария*/
+.visit-info-item:nth-child(n+4) {
+	flex-basis: 3.8em;
+}
 
+/*Скидка*/
+.visit-info-item:nth-child(6) {
+	flex-basis: 4.3em;
+}
+
+/*Контроллер и кнопка удаления*/
+.visit-info-item:nth-child(n+8) {
+	display: flex;
+	align-items: center;
+}
+
+/*Контроллер*/
 .visit-info-item:nth-child(8) {
-	flex-basis: 10em;
+	flex-basis: 9em;
 }
 
+/*Кнопка удаления*/
 .visit-info-item:last-child {
-	border: none;
+	flex-basis: auto;
+	border-right: none;
+}
 
-	flex-basis: 2em;
+
+.visit-info-item h5 {
+	color: rgb(139, 139, 139);
+}
+
+.visit__comment {
+	word-break: break-all;
 }
 
 .btn-visit-controller {
 	box-sizing: border-box;
 	width: 100%;
 	border: 1px solid;
+}
+
+.btn-remove-visit {
+	position: relative;
+	z-index: 10;
+	color: #3C4558;
+	font-size: 1.5em;
+}
+
+.btn-remove-visit:hover {
+	color: #202737;
+}
+
+.btn-remove-visit i {
+	vertical-align: baseline;
 }
 
 .visits-list__item.new .btn-visit-controller {
@@ -164,28 +196,10 @@
 	color: #333;
 	border-color: transparent;
 	background: transparent;
-	cursor: default;
 }
 
 .visits-list__item.completed .btn-visit-controller::after {
 	content: 'Завершено';
-}
-
-.btn-remove-visit {
-	position: relative;
-	z-index: 10;
-	width: 100%;
-	height: 100%;
-	color: #3C4558;
-	font-size: 1.4em;
-}
-
-.btn-remove-visit:hover {
-	color: #202737;
-}
-
-.btn-remove-visit i {
-	vertical-align: text-bottom;
 }
 
 
@@ -209,7 +223,6 @@
 	margin-top: -0.2em;
 	padding-left: 5px;
 	border-radius: 4px;
-	vertical-align: top;
 }
 
 .visit-info-item select {
@@ -217,17 +230,25 @@
 }
 
 
-@media screen and (max-width: 1000px) {
-	.visit {
-		padding: 0 0.65em;
+@media screen and (max-width: 1070px) {
+	.visits-list__item {
+		padding: 0.5em 0.5em;
+	}
 
+	.visit {
 		flex-wrap: wrap;
 	}
 
+	.btn-visit-controller,
+	.btn-remove-visit {
+		height: 100%;
+	}
+	
 	.btn-remove-visit {
 		border: 1px solid #3C4558;
 		border-radius: 3px;
-		font-size: 1em;
+		font-size: 1.1em;
+		width: 100%;
 	}
 
 	.btn-remove-visit:hover {
@@ -238,13 +259,13 @@
 	/*Номер и комментарий*/
 	.visit-info-item:first-child,
 	.visit-info-item:nth-child(3) {
-		padding-left: 0;
+		
 	}
 
 	/*Итого и кнопка "Удалить"*/
 	.visit-info-item:nth-child(7),
 	.visit-info-item:last-child {
-		padding-right: 0;
+		
 	}
 
 	/*Все, кроме кнопок*/
@@ -254,7 +275,7 @@
 	}
 
 	/*Все, кроме номера*/
-	.visit-info-item:nth-child(n+2) {
+	.visit-info-item {
 		flex-basis: 4.5em;
 		flex-grow: 1;
 	}
@@ -271,25 +292,7 @@
 		flex-grow: 2;
 	}
 
-	/*Комментарий (новое посещение)*/
-	.new .visit-info-item:nth-child(3) {
-		border-right: 2px solid #DFDFDF;;
-	}
-
-	/*Кнопки*/
-	.visit-info-item:nth-child(n+8) {
-		padding-top: 0.5em;
-		padding-right: 0;
-		border: none;
-
-		order: 1;
-		flex-basis: 15%;
-	}
-
-	/*Итого*/
-	.visit-info-item:nth-child(7) {
-		border-right: none;
-	}
+	
 }
 
 

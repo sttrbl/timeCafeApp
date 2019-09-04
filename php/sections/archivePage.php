@@ -5,7 +5,6 @@ session_start();
 
 $postData = file_get_contents('php://input');
 $data = json_decode($postData, true);
-
 $action = $data['action'];
 
 switch ($action) {
@@ -13,7 +12,7 @@ switch ($action) {
 	case 'getDatePeriod':
         getDatePeriod();
         break;
-    case 'getPeriodInfo':
+	case 'getPeriodInfo':
         getPeriodInfo($data['from'], $data['to']);
         break;
     case 'getShiftVisits':
@@ -28,11 +27,27 @@ function getDatePeriod() {
 	$period = $pdo->query("SELECT DATE_FORMAT(min(start_time), '%Y-%m-%d') 
 						  as 'from', DATE_FORMAT(max(start_time), '%Y-%m-%d') 
 						  as 'to' FROM shifts WHERE end_time IS NOT NULL")->fetch();
-	echo json_encode($period);
+
+	$resp = array(
+		'done' => true,
+		'data' => $period
+	);
+
+	exit(json_encode($resp));
 }
+
 
 function getPeriodInfo($from, $to) {
 	global $pdo;
+
+	if ($from > $to) {
+		$resp = array(
+			'done' => false,
+			'errorMsg' => 'Некорректное значение диапазона дат!'
+		);
+
+		exit(json_encode($resp));
+	}
 
 	$stmt = $pdo->prepare("SELECT COUNT(DISTINCT id) AS 'total_shifts', COUNT(visit_id) AS 'total_visitors', SUM(total) AS 'total_profit', 
 							ROUND(SUM(total) / COUNT(DISTINCT id)) AS 'average_profit',
@@ -40,6 +55,7 @@ function getPeriodInfo($from, $to) {
 							ROUND(AVG(total)) AS 'average_check' FROM shifts LEFT JOIN archive ON shifts.id = archive.shift_id 
 							WHERE shifts.start_time BETWEEN :from AND DATE_ADD(STR_TO_DATE(:to, '%Y-%m-%d'), INTERVAL 1 DAY) 
 							AND shifts.end_time IS NOT NULL");
+							
 	$stmt->execute( array('from' => $from, 'to' => $to) );
 	$statistics = $stmt->fetch();
 
@@ -49,11 +65,29 @@ function getPeriodInfo($from, $to) {
 						   FROM shifts WHERE start_time BETWEEN :from 
 						   AND DATE_ADD(STR_TO_DATE(:to, '%Y-%m-%d'), INTERVAL 1 DAY) 
 						   AND shifts.end_time IS NOT NULL");
+
 	$stmt->execute( array('from' => $from, 'to' => $to) ); 
 
 	$shifts = $stmt->fetchAll();
-	echo json_encode( array('statistics' => $statistics, 'shifts' => $shifts) );
+
+	if (!$shifts) {
+		$resp = array(
+			'done' => true,
+			'data' => null
+		);
+	} else {
+		$resp = array(
+			'done' => true,
+			'data' => array(
+				'statistics' => $statistics, 
+				'shifts' => $shifts
+			)
+		);
+	}
+
+	exit(json_encode($resp));
 }
+
 
 function getShiftVisits($shiftId) {
 	global $pdo;
@@ -64,8 +98,16 @@ function getShiftVisits($shiftId) {
 						   AS 'status', users.surname AS 'end_user' from archive
 						   LEFT JOIN users on archive.end_user = users.id
 						   LEFT JOIN statuses on archive.status = statuses.id WHERE shift_id = :id");
+
 	$stmt->execute( array('id' => $shiftId) );  
-	echo json_encode( $stmt->fetchAll() );
+	$shiftVisits = $stmt->fetchAll();
+
+	$resp = array(
+		'done' => true,
+		'data' => $shiftVisits
+	);
+
+	exit(json_encode($resp));
 }
 
 

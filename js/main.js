@@ -2,22 +2,18 @@
 class Page {
 
 	constructor(rootElem) {
-		this._rootElem = rootElem;
 		this._cache = {};
 
 		this._modules = {
 			visits: visitsPageModule,
-			arhive: visitsPageModule,
+			archive: archivePageModule,
 			settings: settingsPageModule
 		};
 
-		this._headlineElem =  document.createElement('h1'); 
-		this._headlineElem.className = 'page__headline';
-
-		this._contentContainer =  document.createElement('section'); 
-		this._contentContainer.className = 'page__content';
-
-		this._rootElem.append(this._headlineElem, this._contentContainer);
+		this._headlineElem =  helper.create('h1', 'page__headline'); 
+		this._contentContainer =  helper.create('section', 'page__content'); 
+	
+		rootElem.append(this._headlineElem, this._contentContainer);
 	}
 
 	set headline(text) {
@@ -30,28 +26,29 @@ class Page {
 		this._contentContainer.append(...contentElems);
 	}
 
-	render(pageName) {
+	get content() {
+		return [...this._contentContainer.children];
+	}
+	
+	async render(pageName) {
+		if (this._currentPageName) {
+			this._cache[this._currentPageName] = this.content;
+		}
+
 		const pagesRussianNames = {
 			visits: 'Посещения',
 			archive: 'Архив',
 			settings: 'Настройки'
-		}
+		};
 			
 		if (this._cache[pageName]) {
-			this.headline = pagesRussianNames[pageName];
 			this.content = this._cache[pageName]; 
-			return;
-		} 
+		} else {
+			this.content = await this._modules[pageName].getPageContent();
+		}
 		
-		this._modules[pageName].getPageContent()
-			.then(pageContent => {
-				this.headline = pagesRussianNames[pageName];
-				this.content = pageContent; 
-				this._cache[pageName] = pageContent;
-			})
-			.catch(error => {
-				console.log(`Ошибка загрузки раздела: ${error.message}`);
-			});
+		this._currentPageName = pageName;
+		this.headline = pagesRussianNames[pageName];
 	}
 };
 
@@ -76,6 +73,7 @@ window.addEventListener(`resize`, e => {
 	alertElem.style.width = `${layoutBodyElem.offsetWidth}px`;
 });
 
+
 document.addEventListener('input', e => {
 	if ( !e.target.matches('[type = "text"]') ) return;   
 	
@@ -91,8 +89,7 @@ document.addEventListener('change', e => {
 
 
 sidebarToggleBtn.addEventListener('click', e => {
-	layoutBodyElem.classList.toggle('shifted'); 
-	sidebarElem.classList.toggle('opened'); 
+	toggleSidebar();
 });
 
 
@@ -113,12 +110,23 @@ navMenuElem.addEventListener('click', e => {
 
 	if ( sidebarElem.matches('.opened') ) toggleSidebar();
 
-	page.render( menuLinkElem.getAttribute('href') );
 
-	activeMenuLinkElem.classList.remove('current');
-	menuLinkElem.classList.add('current');
+	page.render( menuLinkElem.getAttribute('href') )
+		.then(() => {
+			activeMenuLinkElem.classList.remove('current');
+			menuLinkElem.classList.add('current');
+		}) 
+		.catch(error => {
+			console.log(`Ошибка загрузки раздела: ${error.message}`);
+		});
+	
 }); 
 
+
+function toggleSidebar() {
+	layoutBodyElem.classList.toggle('shifted'); 
+	sidebarElem.classList.toggle('opened'); 
+}
 
 page.render('visits');
 

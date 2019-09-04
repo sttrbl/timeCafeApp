@@ -15,10 +15,11 @@ if ($_SESSION['user']['position'] != 'adm') {
 
 if ( isset( $_POST['action'] ) ) {
 	$action = $_POST['action'];
+	unset($_POST['action']);
+	$data = $_POST;
 } else {
 	$postData = file_get_contents('php://input');
 	$data = json_decode($postData, true);
-
 	$action = $data['action'];
 }
 
@@ -29,10 +30,10 @@ switch ($action) {
         getSettings();
         break;
     case 'updateLogo':
-        updateLogo();
+        updateLogo($_FILES['logo']);
         break;
-    case 'updateMain':
-        updateMain($data['newSettings']);
+	case 'updateMain':
+        updateMain($data);
         break;
     case 'updateDiscounts':
         updateDiscounts($data['newSettings']);
@@ -63,21 +64,19 @@ function getSettings() {
 		)
 	);
 
-	echo json_encode($resp);
+	exit(json_encode($resp));
 }
 
-function updateLogo() {
-	if ( $_FILES['logo']['size'] > 2097152) {
+function updateLogo($logoFile) {
+	if ( $logoFile['size'] > 2097152) {
 		$resp = array(
 			'done' => false,
 			'errorMsg' => 'Файл слишком большой!'
 		);
-
-		exit(json_encode($resp));
 	} else {
 		$logoPath = '../../img/logo.png';
 		unlink($logoPath); 
-		move_uploaded_file($_FILES['logo']['tmp_name'], '../../img/logo.png');
+		move_uploaded_file($logoFile['tmp_name'], '../../img/logo.png');
 
 		$resp = array(
 			'done' => true,
@@ -100,7 +99,7 @@ function updateMain($newSettings) {
 					'errorMsg' => 'Некорректное значения числового поля!'
 				);
 		
-				exit( json_encode($resp) );
+				exit(json_encode($resp));
 			} 
 
 			if ($key == 'org_name' && ($value == '' || strlen($value) > 20) ) {
@@ -109,7 +108,7 @@ function updateMain($newSettings) {
 					'errorMsg' => 'Некорректное название заведения!'
 				);
 		
-				exit( json_encode($resp) );
+				exit(json_encode($resp));
 			}
 		}
 	}
@@ -120,7 +119,10 @@ function updateMain($newSettings) {
 
 	validate($newSettings);
 
-	$stmt = $pdo->prepare("INSERT INTO settings (name, value) VALUES ('first_cost',:first_cost), ('next_cost',:next_cost), ('org_name',:org_name), ('stop_check',:stop_check) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+	$stmt = $pdo->prepare("INSERT INTO settings (name, value) 
+						   VALUES ('first_cost',:first_cost), ('next_cost',:next_cost), ('org_name',:org_name), ('stop_check',:stop_check) 
+						   ON DUPLICATE KEY UPDATE value = VALUES(value)");
+						   
 	$stmt->execute($newSettings);		
 
 	$resp = array(
@@ -128,7 +130,7 @@ function updateMain($newSettings) {
 		'successMsg' => 'Общие настройки обновлены.'
 	);
 
- 	echo json_encode($resp);
+ 	exit(json_encode($resp));
 }
 
 
@@ -164,7 +166,7 @@ function updateDiscounts($newSettings) {
 		'successMsg' => 'Информация о скидках обновлена.'
 	);
 
- 	echo json_encode($resp);
+ 	exit(json_encode($resp));
 
 }
 
@@ -189,7 +191,7 @@ function removeUser($userId) {
 		'successMsg' => 'Пользователь удален.'
 	);
 
- 	echo json_encode($resp);
+ 	exit(json_encode($resp));
 }
 
 

@@ -213,7 +213,7 @@ const visitsPageModule = (() => {
 					case 'comment':
 						itemContentElem = document.createElement('input');
 						itemContentElem.type = 'text';
-						itemContentElem.maxLength = 40;
+						itemContentElem.maxLength = 30;
 						break;
 					default:
 						itemContentElem = document.createElement('span');
@@ -303,7 +303,6 @@ const visitsPageModule = (() => {
 		allNodeInputs.forEach(inputElem => {
 			inputElem.replaceWith(helper.create('span', inputElem.className, inputElem.value));
 		});
-
 	}
 
 

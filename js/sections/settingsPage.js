@@ -47,8 +47,12 @@ const settingsPageModule = (() => {
 		hiddenFileInput.type = 'file';
 		hiddenFileInput.accept = "image/png";
 		infoElem.innerHTML = '<span>Размер загружаемого файла <br> не должен превышать 2 Мб.<br> Формат файла - PNG. </span>';
+
+		logoUploaderElem.append(imgElem, infoElem, upadateBtn, hiddenFileInput);
+
 		
 		upadateBtn.addEventListener('click', e => hiddenFileInput.click());
+
 
 		hiddenFileInput.addEventListener('change', async e => {
 			const file = e.currentTarget.files[0];
@@ -60,8 +64,7 @@ const settingsPageModule = (() => {
 			}
 		});
 
-		logoUploaderElem.append(imgElem, infoElem, upadateBtn, hiddenFileInput);
-
+		
 		return logoUploaderElem;
 	}
 
@@ -85,7 +88,6 @@ const settingsPageModule = (() => {
 			const labelElem = helper.create('label', 'field__label', optionName[0]);
 			const inputElem = helper.create('input', 'field__input');
 
-			
 			inputElem.name = optionName[1];
 			inputElem.value = settings[optionName[1]];
 			inputElem.required = true;
@@ -94,7 +96,6 @@ const settingsPageModule = (() => {
 				inputElem.type = 'text';
 				inputElem.maxLength = 20;
 				fieldListItemElem.append(labelElem, inputElem);
-				
 			} else {
 				inputElem.type = 'number';
 				inputElem.min = 1;
@@ -105,6 +106,7 @@ const settingsPageModule = (() => {
 			fieldListElem.append(fieldListItemElem);
 		});
 
+		mainSettingsForm.append(fieldListElem, saveBtn);
 
 		mainSettingsForm.addEventListener('input', e => {
 			if (!saveBtn.hidden) return;
@@ -115,28 +117,17 @@ const settingsPageModule = (() => {
 		mainSettingsForm.addEventListener('submit', async e => {
 			e.preventDefault();
 
-			const fieldsElems = e.currentTarget.querySelectorAll('[type = "text"], [type = "number"]');
-			const newSettings = {};
-			
-			for (const fieldElem of fieldsElems) {
-				const fieldElemValue = fieldElem.value.trim();
-				newSettings[fieldElem.name] = (fieldElem.type == 'number') ? +fieldElemValue : fieldElemValue;
-			}
-
-			const operationResult = await updateMain(newSettings);
+			const operationResult = await updateMain(mainSettingsForm);
 
 			if (operationResult) {
-				const newOrgName = newSettings['org_name'];
+				const newOrgName = mainSettingsForm['org_name'].value;
 
 				document.querySelector('.logo-container__text').textContent = newOrgName;
 				document.querySelector('.mobile-header__text').textContent = newOrgName;
-				
 				saveBtn.hidden = true;
 			}
 		});
 
-
-		mainSettingsForm.append(fieldListElem, saveBtn);
 
 		return mainSettingsForm;
 	}
@@ -166,9 +157,13 @@ const settingsPageModule = (() => {
 		const editBtn = helper.create('button', 'btn btn-edit-discounts');
 		const addBtn = helper.create('button', 'btn btn-add-discount', 'Добавить');
 		const permissibleLengths = [6,20,3];
+		//Живая коллекция всех ячеек в tbody
+		const tdElems = tbodyElem.getElementsByTagName('td');
 
 		addBtn.hidden = true;
 		theadElem.append(theadRowElem);
+		tableElem.append(theadElem, tbodyElem);
+		discountEditorContainer.append(labelElem, tableElem, editBtn, addBtn);
 
 		['ID', 'Название', 'Размер (%)'].forEach(columnName => {
 			theadRowElem.append( helper.create('th', null, columnName))
@@ -177,9 +172,6 @@ const settingsPageModule = (() => {
 		for (const key in settings) {
 			tbodyElem.append( createDiscountRow(key, settings[key].name, settings[key].value) );
 		}
-
-		//Живая коллекция всех ячеек в tbody
-		const tdElems = tbodyElem.getElementsByTagName('td');
 
 
 		editBtn.addEventListener('click', e => {
@@ -266,9 +258,6 @@ const settingsPageModule = (() => {
 		});
 
 
-		tableElem.append(theadElem, tbodyElem);
-		discountEditorContainer.append(labelElem, tableElem, editBtn, addBtn);
-
 		return discountEditorContainer;
 	}
 
@@ -290,13 +279,12 @@ const settingsPageModule = (() => {
 		const usersListElem = helper.create('ul', 'users-list');
 		const saveBtn = helper.create('button', 'btn btn-save-users-changes', 'Сохранить изменения');
 		const addUserBtn = helper.create('button', 'btn btn btn-add-user', 'Добавить');
-
-		saveBtn.type = 'submit';
+		
 		saveBtn.hidden = true;
-
 		usersInfo.forEach(userInfo => usersListElem.append( createUserListRow(userInfo) ));
+		usersEditorForm.append(usersListElem, addUserBtn, saveBtn);
 
-		//Лучше переписать
+
 		usersListElem.addEventListener('input', e => {
 			if (!saveBtn.hidden) return;
 
@@ -304,6 +292,16 @@ const settingsPageModule = (() => {
 		});
 
 
+		usersListElem.addEventListener('focusin', e => {
+			if (e.target.name == 'password') e.target.type = 'text';
+		});
+
+
+		usersListElem.addEventListener('focusout', e => {
+			if (e.target.name == 'password') e.target.type = 'password';
+		});
+
+		
 		addUserBtn.addEventListener('click', e => {
 			e.preventDefault();
 			usersListElem.append( createUserListRow() );
@@ -313,11 +311,8 @@ const settingsPageModule = (() => {
 		usersListElem.addEventListener('keydown', e => {
 			if (e.code != 'Enter' || e.target.tagName == 'BUTTON') return;
 
-			if (usersEditorForm.checkValidity()){
-				usersEditorForm.dispatchEvent(new Event('submit'));
-			} 
-		
 			e.preventDefault();
+			saveBtn.click();
 		});
 
 
@@ -330,7 +325,7 @@ const settingsPageModule = (() => {
 			const userId = userRowElem.dataset.userId; 
 
 			if (userId) {
-				if (!confirm('Удалить пользователя?') || !(await removeUser(userId)) ) return;
+				if (!confirm('Удалить пользователя?') || !( await removeUser(userId) ) ) return;
 			}
 
 			userRowElem.remove();
@@ -358,7 +353,6 @@ const settingsPageModule = (() => {
 			if ( await updateUsers(newSettings) ) saveBtn.hidden = true;
 		});
 
-		usersEditorForm.append(usersListElem, addUserBtn, saveBtn);
 
 		return usersEditorForm;
 	}
@@ -374,6 +368,9 @@ const settingsPageModule = (() => {
 		];
 
 		const userRowElem = helper.create('li', 'users-list__item user');
+		const removeUserBtn = helper.create('button', 'btn-remove-user');
+		
+		removeUserBtn.innerHTML = '<i class="fas fa-user-minus"></i>';
 
 		if (userInfo) userRowElem.dataset.userId = userInfo.id;
 
@@ -387,7 +384,7 @@ const settingsPageModule = (() => {
 				fieldElem.append(new Option('Адм.', "adm"), new Option("Сотр.", "emp"));
 			} else {
 				fieldElem = document.createElement('input');
-				fieldElem.type = 'text';
+				fieldElem.type = (itemName[1] == 'password') ? 'password' : 'text';
 			}
 
 			fieldElem.required = true;
@@ -398,9 +395,6 @@ const settingsPageModule = (() => {
 			userRowElem.append(userRowItemElem);
 		});
 
-		const removeUserBtn = helper.create('button', 'btn-remove-user');
-
-		removeUserBtn.innerHTML = '<i class="fas fa-user-minus"></i>';
 		userRowElem.append(removeUserBtn);
 
 		return userRowElem;
@@ -430,11 +424,12 @@ const settingsPageModule = (() => {
 	}
 
 
-	async function updateMain(newSettings) {
-		const resp = await helper.request('php/sections/settingsPage.php', {
-			action: 'updateMain',
-			newSettings
-		});
+	async function updateMain(mainSettingsForm) {
+		const formData = new FormData(mainSettingsForm);
+
+		formData.append('action', 'updateMain');
+
+		const resp = await helper.request('php/sections/settingsPage.php', formData);
 
 		return (resp !== null && resp.done) ? true : false;
 	}

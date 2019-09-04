@@ -4,9 +4,7 @@ session_start();
 
 $postData = file_get_contents('php://input');
 $data = json_decode($postData, true);
-
 $action = $data['action'];
-
 
 
 switch ($action) {
@@ -40,8 +38,8 @@ switch ($action) {
 			exit( json_encode($resp) );
 		}
 		break;
-
 }
+
 
 switch ($action) {
 	case 'getShiftInfo':
