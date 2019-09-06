@@ -1,18 +1,5 @@
-
-.settings {
-	display: flex;
-}
-
-.settings input,
-.settings select {
-	padding-left: 0.5em;
-	border-radius: 5px;
-}
-
 .settings label {
-	display: block;
 	font-size: 0.8em;
-	font-weight: bold;
 }
 
 .settings .btn {
@@ -30,14 +17,21 @@
 	background: #61B74A;
 }
 
+.settings input,
+.settings select {
+	padding-left: 0.5em;
+}
+
+.settings {
+	display: flex;
+}
 
 .settings__common {
-	flex-shrink: 0;
-	flex-basis: 390px;
+	flex-basis: 400px;
 }
 
 .settings__users {
-	flex-grow: 1;
+	flex: 1 1;
 	margin-left: 20px;
 }
 
@@ -55,7 +49,7 @@
 }
 
 .logo-uploader {
-	padding: 1.5em 0;
+	padding: 1.25em 0;
 	border-bottom: 1px solid #C5C5C5;
 	text-align: center;
 }
@@ -89,21 +83,35 @@
 .field-list {
 	display: flex;
 	
-
-	justify-content: space-between;
 	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.field__label {
+	vertical-align: super;
 }
 
 .field-list__item {
-	display: inline-block;
 	box-sizing: border-box;
+	line-height: 1em;
+	flex-shrink: 0;
 }
 
+/*Название*/
 .field-list__item:first-child {
-	width: 100%;
+	flex-basis: 100%;
 	margin-bottom: 1em;
 }
 
+/*Первый час и стоп-чек*/
+.field-list__item:nth-child(2n) {
+	flex-basis: 5.8em;
+}
+
+/*Последующие*/
+.field-list__item:nth-child(3) {
+	flex-basis: 8.3em;
+}
 
 .field__input {
 	width: 2.75em;
@@ -116,7 +124,7 @@
 }
 
 .btn-save-main {
-	margin-top: 1.25em;
+	margin-top: 1.43em;
 }
 
 .btn-save-main::after {
@@ -126,8 +134,13 @@
 
 
 .discounts-editor {
-	padding-top: 1.3em;
+	padding-top: 1em;
 	border-top: 1px solid #C5C5C5;
+	line-height: 1em;
+}
+
+.discounts-editor__label {
+	vertical-align: super;
 }
 
 
@@ -150,24 +163,28 @@
 	padding: 0.4em 0;
 }
 
-
 .table-header :first-child {
-	width: 4em;
 	border-right: 1px solid #F8F7F7;
 	border-top-left-radius: 5px;
+	width: 5em;
 }
 
 
 .table-header :last-child {
-	width: 6.5em;
 	border-left: 1px solid #F8F7F7;
 	border-top-right-radius: 5px;
+	width: 6em;
 }
 
 .discounts-editor__table td {
-	padding: 0.2em 0;
+	padding: 0.4em 0;
+	line-height: 1em;
 	border-bottom: 1px solid #3C4558;
 	border-left: 1px solid #3C4558;
+}
+
+.discounts-editor__table td:nth-child(2) {
+	word-break: break-all;
 }
 
 .discounts-editor__table td:last-child {
@@ -211,19 +228,23 @@
 	background: #21A1DC;;
 }
 
-.users-list__item {
+.user {
 	display: flex;
-	padding: 0.8em 0;
+	padding: 1em 0;
 	border-bottom: 1px dashed #B8B8B8;
+}
+
+.user:first-child {
+	padding-top: 0.5em;
 }
 
 .user__info {
 	margin-right: 0.5em;
-	line-height: 1em;
+	line-height: 0.6em;
 }
 
-.user__info input {
-	width: 100%;
+.info-label {
+	vertical-align: super;
 }
 
 
@@ -233,11 +254,16 @@
 	padding-top: 0.2em;
 	padding-bottom: 0.2em;
 	font-size: 0.9em;
+	width: 100%;
 }
 
 .user__info select {
 	font-size: 0.86em;
-	padding-top: 0.19em;
+}
+
+/*Статус*/
+.user__info:nth-child(5) {
+	flex: 0 0 4.5em;
 }
 
 .settings .info-label {
@@ -247,26 +273,21 @@
 .btn-remove-user {
 	display: flex;
 	flex-direction: column;
-	width: 2em;
+	justify-content: flex-end;
 	color: #CC1414;
-	font-size: 1.1em;
+	font-size: 1.15em;
+}
+
+
+.btn-remove-user i {
+	margin-bottom: 0.25em;
 }
 
 .btn-remove-user:hover {
 	color: rgb(165, 26, 26);
 }
 
-.btn-remove-user i {
-	margin-top: auto;
-	margin-bottom: 0.35em;
-}
-
-.btn-add-user {
-	margin: 0;
-	margin-top: 0.3em;
-}
-
-.users-list__item:last-child {
+.user:last-child {
 	border-bottom: none;
 }
 
@@ -275,41 +296,92 @@
 }
 
 
-@media screen and (max-width: 1000px) {
-	.settings__common {
-		flex-shrink: 0.4;
+@media screen and (max-width: 1070px) {
+		
+	.user {
+		flex-wrap: wrap;
+	}
+
+	.user__info {
+		order: 2;
+	}
+
+	.btn-remove-user {
+		order: 3;
+		flex: 0 0 3.915em;
+	}
+
+	/*Всё, кроме статуса и кнопки*/
+	.user__info:nth-child(-n+4) {
+		flex: 1 1 35%;
+	}
+	
+	/*Имя и фамилия*/
+	.user__info:nth-child(-n+2) {
+		margin-bottom: 0.8em;
+		order: 0;
+	}
+
+	/*Статус*/
+	.user__info:nth-child(5) {
+		order: 1;
+		margin-right: 0;
+	}
+
+	.btn-remove-user {
+		align-items: center;
 	}
 }
 
-@media screen and (max-width: 760px) {
+
+
+@media screen and (max-width: 800px) {
 
 	.settings {
 		flex-wrap: wrap;
 	}
 
-	.settings__common {
-		flex-shrink: 0;
-		flex-grow: 1;
+	
+	
+	.settings__common,
+	.settings__users {
+		flex: 1 1 100%;
 	}
 
 	.settings__users {
 		margin-left:0;
-		margin-top: 1.5em;
+		margin-top: 1.65em;
 	}
 
-	.field__input {
-	    width: 4.5em;
+	.user {
+		border-color:  rgb(165, 165, 165);
 	}
+	
 }
 
 @media screen and (max-width: 450px) {
+	.settings .btn {
+		width: 100%;
+		padding: 1em;
+	}
 
-	.settings__common {
-		flex-shrink: 1;
-		font-size: 0.9em;
+	.btn-add-discount,
+	.btn-save-users-changes {
+		margin-left: 0;
+		margin-top: 1em;
+	}
+
+	/*Первый час и стоп-чек*/
+	.field-list__item:nth-child(2n) {
+		flex-basis: 5.2em;
+	}
+
+	/*Последующие*/
+	.field-list__item:nth-child(3) {
+		flex-basis: 7.5em;
 	}
 
 	.field__input {
-	    width: 2.5em;
+	    width: 2em;
 	}
 }

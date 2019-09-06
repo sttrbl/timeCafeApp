@@ -108,7 +108,8 @@ const archivePageModule = (() => {
 
 
 		shifts.forEach(({id, date, start_time: startTime, end_time: endTime}) => {
-			const shiftElem = helper.create('li', 'period-shifts__item shift');
+			const shiftContainer = helper.create('li', 'period-shifts__item');
+			const shiftElem = helper.create('div', 'shift');
 			const {day: shiftDay, month: shiftMonth} = parseShiftDate(date);
 			const shiftDayElem = helper.create('h1', 'shift__day', shiftDay);
 			const shiftMonthElem = helper.create('h2', 'shift__month', shiftMonth);
@@ -118,7 +119,8 @@ const archivePageModule = (() => {
 			shiftElem.dataset.shiftDate = date;
 
 			shiftElem.append(shiftDayElem, shiftMonthElem, shiftTimeElem);
-			periodShiftsContainer.append(shiftElem);
+			shiftContainer.append(shiftElem);
+			periodShiftsContainer.append(shiftContainer);
 		});
 
 
@@ -129,7 +131,7 @@ const archivePageModule = (() => {
 
 			const pageContainer = e.target.closest('.page__content');
 
-			[...pageContainer.children].forEach(childElem => childElem.hidden = true);
+			[...pageContainer.children].forEach(childElem => childElem.style.display = 'none');
 
 			const shiftVisits = await getShiftVisits(shiftElem.dataset.shiftId);
 
@@ -166,9 +168,9 @@ const archivePageModule = (() => {
 			const pageContainer = e.target.closest('.page__content');
 
 			[...pageContainer.children].forEach(childElem => {
-				if (!childElem.hidden) return childElem.remove();
+				if (childElem.style.display != 'none') return childElem.remove();
 
-				childElem.hidden = false;
+				childElem.style.display = '';
 			});
 		});
 

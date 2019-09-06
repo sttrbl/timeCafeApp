@@ -81,6 +81,7 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 						</a>
 					</li>
 				</ul>
+				<a href="#" onclick="DeveloperTool.Init().ReloadAllCSSThisPage()" class="dev-css">Обновить CSS</a>
 			</nav>
 		</aside>
 
@@ -99,6 +100,7 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 			<main class="page"></main>
 		</div>
 	</div>
+
 	
 	<script src="js/helper.js"></script>
 	<script src="js/sections/visitsPage.js"></script>

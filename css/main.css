@@ -60,6 +60,13 @@ button {
 	cursor: pointer;
 }
 
+label {
+	color: rgb(139, 139, 139);
+	font-weight: bold;
+	display: inline-block;
+	width: 100%;
+}
+
 body,
 input,
 select,
@@ -83,6 +90,14 @@ input:focus,
 select:focus,
 option:focus {
 	border-color: #2E78E9;
+}
+
+.btn {
+	padding: 0.6em;
+	border-radius: 3px;
+	font-size: 0.8em;
+	font-weight: bold;
+	transition: background 0.15s, color 0.15s;
 }
 
 .clearfix::after {
@@ -250,7 +265,7 @@ nav {
 
 
 .page {
-	padding: 40px 35px;
+	padding: 40px 35px 15px;
 	color: #333;
 	font-size: 1em;
 }
@@ -259,14 +274,6 @@ nav {
 	margin-bottom: 0.65rem;
 	padding-bottom: 0.05em;
 	border-bottom: 1.5px solid #DBDBDB;
-}
-
-.btn {
-	padding: 0.6em;
-	border-radius: 3px;
-	font-size: 0.8em;
-	font-weight: bold;
-	transition: background 0.1s;
 }
 
 
@@ -324,3 +331,12 @@ nav {
 		padding-left: 10px;
 	}
 }
+
+
+@media screen and (max-width: 380px) {
+	html {
+		font-size: 14px;
+	}
+}
+
+

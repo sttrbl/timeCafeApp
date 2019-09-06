@@ -156,6 +156,7 @@ const visitsPageModule = (() => {
 		return visitsPanelContainer;
 	}
 
+
 	//Хорошо бы это отрефакторить
 	function createVisit({visitNum, discounts, visitInfo}) {
 		const visitItemsNames = [
@@ -190,7 +191,7 @@ const visitsPageModule = (() => {
 		}
 
 		visitItemsNames.forEach((itemName, i) => {
-			const itemHeadlineElem = helper.create('h5', null, itemName[0]);
+			const itemHeadlineElem = helper.create('label', null, itemName[0]);
 			let itemContentElem;
 
 			if (visitStatus != 'completed' && itemName[1] == 'discount') {
@@ -279,7 +280,6 @@ const visitsPageModule = (() => {
 		for (let inputElem of allNodeInputs) {
 			const inputElemValue = inputElem.value.trim();
 
-			//Валидация поля "Номерок"
 			if (inputElem.matches('.visit__person-tag') && !inputElem.reportValidity()) return;
 
 			const visitInfoKey = inputElem.className.replace('-', '_').replace('visit__', '');
