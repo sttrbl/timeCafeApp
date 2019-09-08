@@ -4,7 +4,12 @@
 	session_start();
 
 	if (trim($_POST['login']) == '' || trim($_POST['password']) == '') {
-		exit ( json_encode( array('error' => 'Заполните все поля!') ) );
+		$resp = array(
+			'done' => false,
+			'errorMsg' => 'Заполните все поля!'
+		);
+
+		exit(json_encode($resp));
 	}
 
 	$login = $_POST['login'];
@@ -14,13 +19,18 @@
 	$stmt->execute(array('login' => $login));
 	$data = $stmt->fetch();
 
-	if (count($data) == 0 ) exit ( json_encode( array('error' => 'Такого пользователя не существует!') ) );
-
-	if ($password == $data['password']){
+	if ($data &&  ($data['password'] == $password) ){
 		$_SESSION['user']['id'] = $data['id'];
-		exit ( json_encode( array('success' => 'Авторизация прошла успешно!') ) );
+		
+		$resp = array(
+			'done' => true,
+		);
 	} else {
-		exit ( json_encode( array('error' => 'Неверный пароль!') ) );
+		$resp = array(
+			'done' => false,
+			'errorMsg' => 'Неверный логин или пароль!'
+		);
 	}
- 		
+
+	exit(json_encode($resp));
 ?>

@@ -126,11 +126,11 @@ option:focus {
 
 .layout {
 	position: relative;
-	overflow-x: hidden;
 	max-width: 1440px;
 	min-height: 100%;
 	margin: auto;
 	background: #FFF;
+	overflow-x: hidden;
 }
 
 .layout__sidebar {
@@ -148,6 +148,7 @@ option:focus {
 
 .layout__body {
 	margin-left: 250px;
+	min-height: 100vh;;
 }
 
 .mobile-header {

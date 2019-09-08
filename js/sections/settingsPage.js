@@ -411,7 +411,6 @@ const settingsPageModule = (() => {
 	}
 
 
-	//(!!!!!) Нужно переписать нативно
 	async function updateLogo(file) {
 		const formData = new FormData();
 

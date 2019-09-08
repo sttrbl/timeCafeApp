@@ -1,5 +1,15 @@
 @charset 'utf-8';
-@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+@font-face { 
+    font-family: "Roboto";
+    src: url(../fonts/Roboto-Regular.ttf) format("truetype"); 
+}
+
+@font-face { 
+    font-family: "PT Sans";
+    src: url(../fonts/PTSans-Regular.ttf) format("truetype"); 
+}
+
 * {
 	margin: 0;
 }
@@ -10,29 +20,54 @@
 	box-sizing: border-box;
 }
 
+html {
+	height: 100%;
+}
+
 body {
 	background: #F3F3F3;
+	padding-top: 100px;
+	min-height: 100%;
+}
+
+.alert {
+	height: 2.6rem;
+	border-radius: 0 0 20px 20px;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	opacity: 0;
+	color: #FFF;
+	text-align: center;
+	line-height: 2.6rem;
+	font-size: 0.9em;
+	display: none;
+	overflow: hidden;
+	font-family: "PT Sans", Roboto, Arial, sans-serif;
+	-webkit-box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.14);
+	-moz-box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.14);
+	box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.14);
 }
 
 
 form {
 	max-width: 350px;
-	margin: 100px auto;
+	margin: auto;
 	padding: 40px;
 	border: 1px solid #C6C7CC;
 	border-radius: 4px;
 	background: #FFF;
 	box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
-	font: 1.2em/1.4 Roboto, Helvetica, Arial, sans-serif;
+	font: 1.2em/1.4 Roboto, Arial, Verdana, sans-serif;
 }
 
-form input {
+input {
 	width: 100%;
 	border-radius: 3px;
 }
 
-form input[type = 'text'],
-form input[type = 'password'] {
+input[type = 'text'],
+input[type = 'password'] {
 	margin-top: 5px;
 	padding: 5px;
 	padding-left: 10px;
@@ -42,21 +77,22 @@ form input[type = 'password'] {
 }
 
 
-form h1 {
+h1 {
 	margin-bottom: 1em;
 	padding-bottom: 0.5em;
 	border-bottom: 1px solid #DBDBDB;
 	font-size: 1.4em;
 }
 
-form label {
+label {
 	display: block;
 	margin-bottom: 30px;
 	font-size: 0.7em;
 	font-weight: bold;
 }
 
-form input[type = 'submit'] {
+input[type = 'submit'] {
+	font-family: Roboto, Arial, Verdana, sans-serif;
 	padding: 12px;
 	color: #FFF;
 	border: none;
@@ -66,15 +102,18 @@ form input[type = 'submit'] {
 	cursor: pointer;
 }
 
-form input[type = 'submit']:hover {
+input[type = 'submit']:hover {
 	background: #303746;
 }
 
 
 @media screen and (max-width: 700px) {
+	body {
+		padding-top: 50px;
+	}
+
 	form {
 		max-width: 300px;
-		margin: 40px auto;
 	}
 
 }

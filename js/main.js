@@ -74,6 +74,8 @@ window.addEventListener(`resize`, e => {
 });
 
 
+
+
 document.addEventListener('input', e => {
 	if ( !e.target.matches('[type = "text"]') ) return;   
 	
@@ -126,6 +128,7 @@ navMenuElem.addEventListener('click', e => {
 function toggleSidebar() {
 	layoutBodyElem.classList.toggle('shifted'); 
 	sidebarElem.classList.toggle('opened'); 
+	sidebarElem.style.top = 0;
 }
 
 page.render('visits');

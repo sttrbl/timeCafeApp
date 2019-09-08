@@ -1,7 +1,8 @@
 <?php
+require_once 'php/connection.php';
+
 mb_internal_encoding('UTF-8');
 session_start();
-require_once 'php/connection.php';
 
 if (!$_SESSION['user']) {
     header("Location: authorization.php");
@@ -95,7 +96,7 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 				<h1 class="mobile-header__text"><?php echo $orgName; ?></h1>
 			</header>
 			
-			<div class="alert">ооо круто</div>	
+			<div class="alert"></div>	
 						
 			<main class="page"></main>
 		</div>

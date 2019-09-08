@@ -17,6 +17,7 @@ if(isset($_SESSION['user'])){
 </head>
 
 <body>
+	<div class="alert"></div>
 	<form>
 		<h1>Вход</h1>
 			<label for="login">
@@ -25,45 +26,27 @@ if(isset($_SESSION['user'])){
 			</label>
 			<label for="password">
 				Пароль
-				<input type="password" id="password" name="password" required />
+				<input type="password" name="password" required />
 			</label>
-			<input type="submit" id="enterButton" name="enterButton" value="Войти">
+			<input type="submit"  name="enterButton" value="Войти">
 	</form>
 
 
-<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
-<script src="js/helper.js"></script>
-<script type="text/javascript">
-	const form = document.querySelector('form');
+	<script src="js/helper.js"></script>
 
-	document.getElementById('enterButton').addEventListener('click', (e) => {
-		var login = document.getElementById('login').value;
-		var password = document.getElementById('password').value;
+	<script type="text/javascript">
+		const form = document.querySelector('form');
 
-		$.ajax({
-		    type: "POST",
-		    url: "php/login.php",
-		    data: {login:login, password:password},
-		    success: resp => {
-		    	try {
-		    		resp = JSON.parse(resp);
-		    		if (resp.error) return helper.showError(resp.error);
-		    	} catch(e) {
-		    		helper.showError("Ошибка чтения данных!");
-		    		throw e;
-		    	}
-		 
-		    	location.href = "app.php";
-		    },
-		    error: resp => {
-		    	helper.showError("Ошибка соединения с сервером!");
-		    }
+		form.addEventListener('submit', async e => {
+			e.preventDefault();
+		
+			const resp = await helper.request('php/login.php', new FormData(form));
+
+			if (resp === null || !resp.done) return;
+
+			location.href = "app.php";
 		});
-
-		e.preventDefault();
-	});
-
-</script>
+	</script>
 
 </body>
 
