@@ -350,20 +350,21 @@ const visitsPageModule = (() => {
 
 	async function endVisit(visitNode) {
 		const discountSelect = visitNode.querySelector('.visit__discount');
-		const selectedElem = discountSelect.querySelector('[value ="' + discountSelect.value + '"]');
+		const selectedElem = discountSelect.options[discountSelect.selectedIndex];
+		const discountId = selectedElem.textContent;
 
 		const resp = await helper.request('php/sections/visitsPage.php', {
 			action: 'endVisit',
 			visitInfo: {
 				visitId: +visitNode.dataset.realId,
 				finalTotal: +visitNode.querySelector('.visit__total').textContent,
-				discount: selectedElem.textContent || null
+				discount: discountId || null
 			}
 		});
 
 		if (resp === null || !resp.done) return;
 
-		const discountValueSpan = helper.create('span', discountSelect.className, selectedElem.textContent);
+		const discountValueSpan = helper.create('span', discountSelect.className, discountId);
 
 		discountSelect.replaceWith(discountValueSpan);
 		visitNode.removeAttribute("data-pure-total");

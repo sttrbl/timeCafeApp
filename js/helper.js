@@ -13,6 +13,7 @@ const helper = (function () {
 		}
 	};
 
+
 	function createCustomElement(tag, className, textContent) {
 
 		const elem = document.createElement(tag);
@@ -25,6 +26,7 @@ const helper = (function () {
 		
 		return elem;
 	}
+
 
 	function showMessage() {
 		timers.clearTimers();
@@ -59,6 +61,7 @@ const helper = (function () {
 		}, 10);
 	}
 
+	
 	function showSuccess(message) {
 		alertElem.style.backgroundColor = '#329e1c';
 		alertElem.textContent = message;

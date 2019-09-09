@@ -83,7 +83,7 @@ const archivePageModule = (() => {
 			['average_check', 'Средний чек : ', 'руб.'],
 			['average_profit', 'Средняя выручка за смену : ', 'руб.'],
 			['average_duration', 'Средняя длит. посещения : ', 'мин.'],
-			['total_profit', 'Общая выручка : ', 'руб.']
+			['total_profit', 'Суммарная выручка : ', 'руб.']
 		];
 
 		const statisticsContainer = helper.create('ul', 'period-statistics');

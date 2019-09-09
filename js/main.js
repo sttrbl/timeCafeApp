@@ -1,6 +1,5 @@
 //Класс для области отображения разделов
 class Page {
-
 	constructor(rootElem) {
 		this._cache = {};
 
@@ -16,20 +15,24 @@ class Page {
 		rootElem.append(this._headlineElem, this._contentContainer);
 	}
 
+
 	set headline(text) {
 		this._headlineElem.textContent = text;
 		document.title = text;
 	}
+
 
 	set content(contentElems) {
 		this._contentContainer.innerHTML = '';
 		this._contentContainer.append(...contentElems);
 	}
 
+
 	get content() {
 		return [...this._contentContainer.children];
 	}
 	
+
 	async render(pageName) {
 		if (this._currentPageName) {
 			this._cache[this._currentPageName] = this.content;
@@ -61,6 +64,7 @@ const page = new Page( document.querySelector('.page') );
 
 alertElem.style.width = `${layoutBodyElem.offsetWidth}px`;
 
+
 alertElem.addEventListener('transitionend', e => {
 	if (e.propertyName == 'height') {
 		alertElem.style.opacity = 0;
@@ -72,8 +76,6 @@ alertElem.addEventListener('transitionend', e => {
 window.addEventListener(`resize`, e => {
 	alertElem.style.width = `${layoutBodyElem.offsetWidth}px`;
 });
-
-
 
 
 document.addEventListener('input', e => {
@@ -135,36 +137,6 @@ page.render('visits');
 
 
 
-
-
-var DeveloperTool={
-	Init:function(){
-			this.headObj =
-	document.getElementsByTagName('html')[0].getElementsByTagName('head')[0];
-			return this;
-	},
-	ReloadAllCSS : function(headObj) {
-			console.log("DT:ReloadAllCSS");
-			var links = headObj.getElementsByTagName('link');
-			for (var i=0 ; i < links.length ; i++){
-					var link = links[i];
-					this.ReloadCSSLink(link);
-			}
-			return this;
-	},
-	ReloadCSSLink : function(item) {
-			var value = item.getAttribute('href');
-			var cutI = value.lastIndexOf('?');
-			if (cutI != -1)
-					value = value.substring(0, cutI);
-			item.setAttribute('href', value + '?t=' + new Date().valueOf());
-			return this;
-	},
-	ReloadAllCSSThisPage : function() {
-			this.ReloadAllCSS(this.headObj);
-			return this;
-	}
-};
 
 
 
