@@ -341,8 +341,9 @@ const visitsPageModule = (() => {
 		endTimeElem.textContent = resp.data.endTime;
 		visitNode.dataset.pureTotal = pureTotalCost;
 
-		totalCostElem.textContent = discountValue ? pureTotalCost - (pureTotalCost / 100 * discountValue) : pureTotalCost;
+		const finalTotalCost = discountValue ? pureTotalCost - (pureTotalCost / 100 * discountValue) : pureTotalCost;
 
+		totalCostElem.textContent = Math.round(finalTotalCost);
 		visitNode.classList.remove('active');
 		visitNode.classList.add('calculated');
 	}
