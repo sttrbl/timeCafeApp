@@ -116,5 +116,4 @@ const helper = (function () {
 		showSuccess,
 		request
 	}
-
 })();

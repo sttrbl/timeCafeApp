@@ -1,41 +1,37 @@
 <?php
-require_once '../connection.php';
 session_start();
+
+require_once '../connection.php';
+require_once '../common.php';
 
 $postData = file_get_contents('php://input');
 $data = json_decode($postData, true);
 $action = $data['action'];
 
 
-switch ($action) {
-	case 'endShift':
-    case 'startNewVisit':
-    case 'removeVisit':
-    case 'calculateVisit':
-	case 'endVisit':
-		if ( !shiftIsActive() ) {
-			$resp = array(
-				'done' => false,
-				'errorMsg' => 'Смена уже завершена, перезагрузите страницу.'
-			);
+if ($action !== 'startShift' && $action !== 'getShiftInfo' && !shiftIsActive() ) {
+	$resp = array(
+		'done' => false,
+		'errorMsg' => 'Смена уже завершена, перезагрузите страницу!'
+	);
 
-			exit( json_encode($resp) );
-		}
-		break;
+	exit(json_encode($resp));
 }
 
 
 switch ($action) {
     case 'removeVisit':
-    case 'calculateVisit':
-	//Придумать что нибудь с case 'endVisit':
-		if ( !isExist($data['visitId']) ) {
+	case 'calculateVisit':
+	case 'endVisit':
+		$visitid = isset($data['visitId']) ? $data['visitId'] : $data['visitInfo']['visitId'];
+
+		if (!isExist($visitid)) {
 			$resp = array(
 				'done' => false,
-				'errorMsg' => 'Запись уже удалена, обновите страницу.'
+				'errorMsg' => 'Запись уже удалена, обновите страницу!'
 			);
 
-			exit( json_encode($resp) );
+			exit(json_encode($resp));
 		}
 		break;
 }
@@ -44,25 +40,31 @@ switch ($action) {
 switch ($action) {
 	case 'getShiftInfo':
         getshiftInfo();
-        break;
+		break;
+		
     case 'getDiscountsValues':
         getDiscountsValues();
-        break;
+		break;
+		
     case 'startShift':
         startShift();
-        break;
+		break;
+		
     case 'endShift':
         endShift($data['shiftId']);
         break;
     case 'startNewVisit':
         startNewVisit($data['visitInfo']);
-        break;
+		break;
+		
     case 'removeVisit':
         removeVisit($data['visitId']);
-        break;
+		break;
+		
     case 'calculateVisit':
         calculateVisit($data['visitId']);
-        break;
+		break;
+		
     case 'endVisit':
         endVisit($data['visitInfo']);
         break;
@@ -71,18 +73,18 @@ switch ($action) {
 
 function shiftIsActive() {
 	global $pdo;
-	$stmt = $pdo->query('SELECT COUNT(*) FROM shifts WHERE end_time IS NULL');
-	if ( $stmt->fetchColumn() == 0) return false;
-	return true; 
+	$rowCount = $pdo->query('SELECT COUNT(*) FROM shifts WHERE end_time IS NULL')->fetchColumn();
+	return $rowCount !== 0; 
 }
+
 
 function isExist($visitId) {
 	global $pdo;
 	$stmt = $pdo->prepare("SELECT COUNT(*) FROM current_shift WHERE id = :id");
 	$stmt->execute(array('id' => $visitId));
-	if ( $stmt->fetchColumn() == 0) return false;
-	return true; 
+	return $stmt->fetchColumn() !== 0;
 }
+
 
 function getDiscountsValues() {
 	global $pdo;
@@ -103,13 +105,11 @@ function getShiftInfo() {
 		exit( json_encode($resp) );
 	}
 
-	$stmt = $pdo->query('SELECT id FROM shifts WHERE end_time IS NULL');
-	$stmt = $stmt->fetch(PDO::FETCH_LAZY);
-	$shiftId = $stmt['id'];
-	$stmt = $pdo->query("SELECT id, person_tag, comment, date_format(start_time,'%H:%i') 
+	$shiftId = $pdo->query('SELECT id FROM shifts WHERE end_time IS NULL')->fetchColumn();
+
+	$visits = $pdo->query("SELECT id, person_tag, comment, date_format(start_time,'%H:%i') 
 						 AS start_time, date_format(end_time,'%H:%i') AS end_time, discount, 
-						 total, status FROM current_shift");
-	$visits = $stmt->fetchAll();
+						 total, status FROM current_shift")->fetchAll();
 
 	$resp = array(
 		'done' => true,
@@ -120,7 +120,7 @@ function getShiftInfo() {
 		)
 	);
 
-	echo json_encode($resp);
+	exit(json_encode($resp));
 }
 
 
@@ -130,10 +130,10 @@ function startShift() {
 	if ( shiftIsActive() ) {
 		$resp = array(
 			'done' => false,
-			'errorMsg' => 'Смена уже начата, перезагрузите страницу.'
+			'errorMsg' => 'Смена уже начата, перезагрузите страницу!'
 		);
 
-		exit( json_encode($resp) );
+		exit(json_encode($resp));
 	}
 
 	$stmt = $pdo->prepare("INSERT INTO shifts(start_user) VALUES (:user_id)");
@@ -141,14 +141,14 @@ function startShift() {
 
 	$resp = array(
 		'done' => true,
+		'successMsg' => 'Новая смена запущена',
 		'data' => array(
 			'shiftId' => $pdo->lastInsertId(), 
 			'discounts' => getDiscountsValues() 
 		)
 	);
 
-	echo json_encode($resp);
-
+	exit(json_encode($resp));
 }
 
 
@@ -166,11 +166,17 @@ function endShift($shiftId) {
 						   discount, total, status, end_user FROM current_shift");
 
 	$stmt->execute(array('shift_id' => $shiftId));
+
 	$pdo->query('TRUNCATE TABLE current_shift');
 	$pdo->query('ALTER TABLE current_shift AUTO_INCREMENT = 1');
 
-	$resp = array('done' => true);
-	echo( json_encode($resp) );
+	$resp = array(
+		'done' => true,
+		'successMsg' => 'Смена завершена успешно'
+	
+	);
+
+	exit(json_encode($resp));
 }
 
 
@@ -220,7 +226,7 @@ function startNewVisit($inputs) {
 		)
 	);
 
-	echo json_encode($resp);
+	exit(json_encode($resp));
 }
 
 
@@ -230,7 +236,7 @@ function removeVisit($visitId) {
 	$stmt->execute(array('id' => $visitId));
 
 	$resp = array('done' => true);
-	echo( json_encode($resp) );
+	exit(json_encode($resp));
 }
 
 
@@ -247,19 +253,14 @@ function calculateVisit($visitId) {
 	$stmt = $pdo->prepare("SELECT (unix_timestamp(end_time) - unix_timestamp(start_time)) / 60
 						   AS time FROM current_shift WHERE id = :id");
 	$stmt->execute(array('id' => $visitId));
-	$data = $stmt->fetch(PDO::FETCH_ASSOC);
+	$time = $stmt->fetchColumn();
 
 	$firstCost = $pdo->query("SELECT value from settings WHERE name = 'first_cost'")->fetchColumn();
 	$nextCost = $pdo->query("SELECT value from settings WHERE name = 'next_cost'")->fetchColumn();
 	$stopCheck = $pdo->query("SELECT value from settings WHERE name = 'stop_check'")->fetchColumn();
-	$time = $data['time'];
 
 	//Рассчет стоимости
-	if ($time <= 60) {
-		$pureTotal = $firstCost;
-	} else {
-		$pureTotal = $firstCost + ( ($time - 60) * $nextCost );
-	}
+	$pureTotal = ($time <= 60) ? $firstCost : ( $firstCost + (($time - 60) * $nextCost) );
 
 	if ($pureTotal >= $stopCheck) {
 		$pureTotal = $stopCheck;
@@ -276,9 +277,8 @@ function calculateVisit($visitId) {
 		)
 	);
 
-	echo json_encode($resp);
+	exit(json_encode($resp));
 }
-
 
 
 function endVisit($data) {
@@ -294,10 +294,10 @@ function endVisit($data) {
 	$stmt->execute(array('end_user' => $_SESSION['user']['id'], 'visit_id' => $visitId, 'total' => $finalTotal, 'discount' => $discount));
 
 	$resp = array(
-		'done' => true,
+		'done' => true
 	);
 	
-	echo json_encode($resp);
+	exit(json_encode($resp));
 }
 ?>
 

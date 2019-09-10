@@ -1,9 +1,14 @@
 <?php
-require_once '../connection.php';
-
 session_start();
 
-if ($_SESSION['user']['position'] != 'adm') {
+require_once '../connection.php';
+require_once '../common.php';
+
+
+$userPosition = $pdo->query("SELECT position  FROM users WHERE id =".$_SESSION['user']['id'])->fetchColumn();
+
+
+if ($userPosition != 'adm') {
 	$resp = array(
 		'done' => false,
 		'errorMsg' => 'Ошибка доступа!'
@@ -25,22 +30,26 @@ if ( isset( $_POST['action'] ) ) {
 
 
 switch ($action) {
-
 	case 'getSettings':
         getSettings();
-        break;
+		break;
+		
     case 'updateLogo':
         updateLogo($_FILES['logo']);
-        break;
+		break;
+		
 	case 'updateMain':
         updateMain($data);
-        break;
+		break;
+		
     case 'updateDiscounts':
         updateDiscounts($data['newSettings']);
-        break;
+		break;
+		
     case 'removeUser':
         removeUser($data['userId']);
-        break;
+		break;
+		
     case 'updateUsers':
         updateUsers($data['newSettings']);
         break;
@@ -80,7 +89,7 @@ function updateLogo($logoFile) {
 
 		$resp = array(
 			'done' => true,
-			'successMsg' => 'Логотип заведения обновлен.'
+			'successMsg' => 'Логотип заведения обновлен'
 		);
 	}
 	
@@ -127,7 +136,7 @@ function updateMain($newSettings) {
 
 	$resp = array(
 		'done' => true,
-		'successMsg' => 'Общие настройки обновлены.'
+		'successMsg' => 'Общие настройки обновлены'
 	);
 
  	exit(json_encode($resp));
@@ -163,7 +172,7 @@ function updateDiscounts($newSettings) {
 
 	$resp = array(
 		'done' => true,
-		'successMsg' => 'Информация о скидках обновлена.'
+		'successMsg' => 'Информация о скидках обновлена'
 	);
 
  	exit(json_encode($resp));
@@ -188,7 +197,7 @@ function removeUser($userId) {
 
 	$resp = array(
 		'done' => true,
-		'successMsg' => 'Пользователь удален.'
+		'successMsg' => 'Пользователь удален'
 	);
 
  	exit(json_encode($resp));
@@ -227,10 +236,10 @@ function updateUsers($newSettings) {
 
 	$resp = array(
 		'done' => true,
-		'successMsg' => 'Информация о пользователях обновлена.'
+		'successMsg' => 'Информация о пользователях обновлена'
 	);
 
-	echo json_encode($resp);
+	exit(json_encode($resp));
 }
 
 ?>

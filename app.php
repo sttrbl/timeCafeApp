@@ -16,14 +16,14 @@ if (isset($_GET['logout']) && $_GET['logout'] == true) {
 }
 
 $orgName = $pdo->query("SELECT value from settings WHERE name = 'org_name'")->fetchColumn();
+
 $stmt = $pdo->prepare("SELECT users.name, users.surname, users.position AS 'position', positions.name 
 					   AS 'position_name' FROM users LEFT JOIN positions ON users.position = positions.id 
 					   WHERE users.id = :id");
+					   
 $stmt->execute(array('id' => $_SESSION['user']['id']));
+
 $usersInfo = $stmt->fetch();
-$_SESSION['user']['position'] = $usersInfo['position'];
-$_SESSION['user']['surname'] = $usersInfo['surname'];
-$_SESSION['user']['name'] = $usersInfo['name'];
 $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1) . '.';
 ?>
 

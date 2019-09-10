@@ -1,7 +1,9 @@
 <?php
-require_once '../connection.php';
-
 session_start();
+
+require_once '../connection.php';
+require_once '../common.php';
+
 
 $postData = file_get_contents('php://input');
 $data = json_decode($postData, true);
