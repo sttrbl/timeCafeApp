@@ -1,364 +1,394 @@
 .day-panel{
-	margin-bottom: 0.6em;
-	padding-bottom: 0.66em;
-	border-bottom: 2px solid #3C4558;
+  margin-bottom: 0.6em;
+  padding-bottom: 0.66em;
+  border-bottom: 2px solid #3C4558;
 }
 
 .day-panel__date {
-	display: inline-block;
-	margin-top: 0.25em;
+  display: inline-block;
+  margin-top: 0.25em;
 }
 
 
 .btn-day-controller {
-	float: right;
-	width: 11.4em;
-	padding: 0.65em 0;
-	color: #FFF;
-	background: #3C4558;
+  float: right;
+  width: 11.4em;
+  padding: 0.65em 0;
+  color: #FFF;
+  background: #3C4558;
 }
 
 .btn-day-controller:hover {
-	color: #FFF;
-	background: #202737;
+  color: #FFF;
+  background: #202737;
 }
 
 .btn-day-controller::after {
-	content: 'Начать смену';
+  content: 'Начать смену';
 }
 
 .btn-day-controller.active::after {
-	content: 'Завершить смену';
+  content: 'Завершить смену';
 }
 
 .visits-list__item {
-	position: relative;
-	margin: 1.31em 0;
-	border-radius: 3px;
-	background: #F8F7F7;
-	padding: 0.5em 0;
-	-webkit-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
-	   -moz-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
-	        box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
+  position: relative;
+  margin: 1.31em 0;
+  border-radius: 3px;
+  background: #F8F7F7;
+  padding: 0.5em 0;
+  -webkit-box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
+          box-shadow: 0 3px 9px 0 rgba(0,0,0,0.58);
 }
 
 .visits-list__item::after {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	border-radius: 3px;
-	content: '';
-	z-index: 1;
-	transition: background .3s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  content: '';
+  z-index: 1;
+  -webkit-transition: background .3s;
+  transition: background .3s;
 }
 
 .visits-list__item.completed::after {
-	z-index: 3;
-	background: rgba(0,0,0,0.4);
+  z-index: 3;
+  background: rgba(0,0,0,0.4);
 }
 
 .visit {
-	position: relative;
-	display: flex;
-	z-index: 2;
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  z-index: 2;
 }
 
 .visits-list__item.completed .visit {
-	position: static;
-	
+  position: static;
+
 }
 
 .visit-info-item {
-	padding: 0 0.5em;
-	border-right: 2px solid #DFDFDF;
-	line-height: 0.8em;
-	min-height: 2.1em;
+  padding: 0 0.5em;
+  border-right: 2px solid #DFDFDF;
+  line-height: 0.8em;
+  min-height: 2.1em;
 }
 
 .visit-info-item label {
-	vertical-align: super;
-	font-size: 0.6em;
+  vertical-align: super;
+  font-size: 0.6em;
 }
 
 .visit-info-item span {
-	vertical-align: middle;
-	line-height: 1em;
-	word-break: break-all;
+  vertical-align: middle;
+  line-height: 1em;
+  word-break: break-all;
 }
 
 
 /*Номер посещения*/
 .visit-info-item:first-child {
-	flex-basis: 1.4em;
+  -ms-flex-preferred-size: 1.4em;
+      flex-basis: 1.4em;
 }
 
 /*Номерок*/
 .visit-info-item:nth-child(2) {
-	flex-basis: 3.2em;
+  -ms-flex-preferred-size: 3.2em;
+      flex-basis: 3.2em;
 }
 
 /*Комментарий*/
 .visit-info-item:nth-child(3) {
-	flex: 1 1;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1;
+          flex: 1 1;
 }
 
 
 /*Всё, кроме номера, номерка и комментария*/
 .visit-info-item:nth-child(n+4) {
-	flex-basis: 3.8em;
+  -ms-flex-preferred-size: 3.8em;
+      flex-basis: 3.8em;
 }
 
 /*Скидка*/
 .visit-info-item:nth-child(6) {
-	flex-basis: 4.3em;
+  -ms-flex-preferred-size: 4.3em;
+      flex-basis: 4.3em;
 }
 
 /*Контроллер и кнопка удаления*/
 .visit-info-item:nth-child(n+8) {
-	display: flex;
-	align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 /*Контроллер*/
 .visit-info-item:nth-child(8) {
-	flex-basis: 9em;
+  -ms-flex-preferred-size: 9em;
+      flex-basis: 9em;
 }
 
 /*Кнопка удаления*/
 .visit-info-item:last-child {
-	flex-basis: auto;
-	border-right: none;
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
+  border-right: none;
 }
 
 .btn-visit-controller {
-	box-sizing: border-box;
-	width: 100%;
-	border: 1px solid;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  width: 100%;
+  border: 1px solid;
 }
 
 .btn-remove-visit {
-	position: relative;
-	z-index: 10;
-	color: #3C4558;
-	font-size: 1.5em;
+  position: relative;
+  z-index: 10;
+  color: #3C4558;
+  font-size: 1.5em;
 }
 
 .btn-remove-visit:hover {
-	color: #202737;
+  color: #202737;
 }
 
 .btn-remove-visit i {
-	vertical-align: baseline;
+  vertical-align: baseline;
 }
 
 .visits-list__item.new .btn-visit-controller {
-	color: #61B74A;
-	border-color: #61B74A;
+  color: #61B74A;
+  border-color: #61B74A;
 }
 
 .visits-list__item.new .btn-visit-controller::after {
-	content: 'Начать';
+  content: 'Начать';
 }
 
 .visits-list__item.new .btn-visit-controller:hover {
-	color: #FFF;
-	background: #61B74A;
+  color: #FFF;
+  background: #61B74A;
 }
 
 .visits-list__item.active .btn-visit-controller {
-	color: #0078FF;
-	border-color: #0078FF;
+  color: #0078FF;
+  border-color: #0078FF;
 }
 
 .visits-list__item.active .btn-visit-controller::after {
-	content: 'Рассчитать';
+  content: 'Рассчитать';
 }
 
 .visits-list__item.active .btn-visit-controller:hover {
-	color: #FFF;
-	background: #0078FF;
+  color: #FFF;
+  background: #0078FF;
 }
 
 .visits-list__item.calculated .btn-visit-controller {
-	color: #F73F14;
-	border-color: #F73F14;
+  color: #F73F14;
+  border-color: #F73F14;
 }
 
 .visits-list__item.calculated .btn-visit-controller::after {
-	content: 'Завершить';
+  content: 'Завершить';
 }
 
 .visits-list__item.calculated .btn-visit-controller:hover {
-	color: #FFF;
-	background: #F73F14;
+  color: #FFF;
+  background: #F73F14;
 }
 
 .visits-list__item.completed .btn-visit-controller {
-	color: #333;
-	border-color: transparent;
-	background: transparent;
+  color: #333;
+  border-color: transparent;
+  background: transparent;
 }
 
 .visits-list__item.completed .btn-visit-controller::after {
-	content: 'Завершено';
+  content: 'Завершено';
 }
 
-
 .btn-add-visit {
-	width: 12em;
-	color: #FFF;
-	background: #0078FF;
+  width: 12em;
+  color: #FFF;
+  background: #0078FF;
 }
 
 
 .btn-add-visit:hover {
-	background: #0A65CC;
+  background: #0A65CC;
 }
-
 
 .visit-info-item input,
 .visit-info-item select {
-	box-sizing: border-box;
-	width: 100%;
-	height: 1.4em;
-	margin-top: -0.2em;
-	padding-left: 5px;
-	border-radius: 4px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  width: 100%;
+  height: 1.4em;
+  margin-top: -0.2em;
+  padding-left: 5px;
+  border-radius: 4px;
 }
 
 .visit-info-item select {
-	padding-left: 0;
+  padding-left: 0;
 }
 
 
 @media screen and (max-width: 1070px) {
-	.visits-list__item {
-		padding: 0.5em 0.5em;
-	}
+  .visits-list__item {
+    padding: 0.5em 0.5em;
+  }
 
-	.visit {
-		flex-wrap: wrap;
-	}
+  .visit {
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+  }
 
-	.btn-visit-controller,
-	.btn-remove-visit {
-		height: 90%;
-		box-sizing: border-box;
-	}
-	
-	.btn-remove-visit {
-		border: 1px solid #3C4558;
-		border-radius: 3px;
-		font-size: 1.1em;
-		width: 100%;
-	}
+  .btn-visit-controller,
+  .btn-remove-visit {
+    height: 90%;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+  }
 
-	.btn-remove-visit:hover {
-		color: #FFF;
-		background: #3C4558;
-	}
+  .btn-remove-visit {
+    border: 1px solid #3C4558;
+    border-radius: 3px;
+    font-size: 1.1em;
+    width: 100%;
+  }
 
-	/*Все*/
-	.visit-info-item:nth-child(n+1) {
-		flex: 1 1 14.3%;
-		padding: 0 1%;
-	}
+  .btn-remove-visit:hover {
+    color: #FFF;
+    background: #3C4558;
+  }
 
-	/*Все, кроме кнопок и комментария*/
-	.visit-info-item:nth-child(-n+7):not(:nth-child(3)){
-		padding-bottom: 0.5em;
-		border-bottom: 2px solid #DFDFDF;
-	}
+  /*Все*/
+  .visit-info-item:nth-child(n+1) {
+    -webkit-box-flex: 1;
+        -ms-flex: 1 1 14.3%;
+            flex: 1 1 14.3%;
+    padding: 0 1%;
+  }
 
-	/*Кнопки и комментарий*/
-	.visit-info-item:nth-child(3),
-	.visit-info-item:nth-child(n+8) {
-		padding-top: 0.5em;
-		border-color: transparent;
-	}
+  /*Все, кроме кнопок и комментария*/
+  .visit-info-item:nth-child(-n+7):not(:nth-child(3)){
+    padding-bottom: 0.5em;
+    border-bottom: 2px solid #DFDFDF;
+  }
 
-	/*Комментарий*/
-	.visit-info-item:nth-child(3) {
-		order: 1;
-		flex: 63.65%;
-	}
+  /*Кнопки и комментарий*/
+  .visit-info-item:nth-child(3),
+  .visit-info-item:nth-child(n+8) {
+    padding-top: 0.5em;
+    border-color: transparent;
+  }
 
-	/*Комментарий (новое посещение)*/
-	.new .visit-info-item:nth-child(3) {
-		border-color: #DFDFDF;
-	}
+  /*Комментарий*/
+  .visit-info-item:nth-child(3) {
+    -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+            order: 1;
+    -webkit-box-flex: 63.65%;
+        -ms-flex: 63.65%;
+            flex: 63.65%;
+  }
 
-	/*Итого*/
-	.visit-info-item:nth-child(7) {
-		border-right: none;
-	}
+  /*Комментарий (новое посещение)*/
+  .new .visit-info-item:nth-child(3) {
+    border-color: #DFDFDF;
+  }
 
-	/*Кнопки*/
-	.visit-info-item:nth-child(n+8) {
-		max-height: 2.1em;
-		order: 1;
-	}
+  /*Итого*/
+  .visit-info-item:nth-child(7) {
+    border-right: none;
+  }
 
-	/*Контроллер*/
-	.visit-info-item:nth-child(8) {
-		padding-right: 0.25%;
-	}
+  /*Кнопки*/
+  .visit-info-item:nth-child(n+8) {
+    max-height: 2.1em;
+    -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+            order: 1;
+  }
 
-	/*Кнопка удаления*/
-	.visit-info-item:last-child {
-		padding-left: 0.25%;
-	}
-	
+  /*Контроллер*/
+  .visit-info-item:nth-child(8) {
+    padding-right: 0.25%;
+  }
+
+  /*Кнопка удаления*/
+  .visit-info-item:last-child {
+    padding-left: 0.25%;
+  }
+
 }
 
 
 @media screen and (max-width: 550px) {
 
-	.btn-visit-controller,
-	.btn-remove-visit {
-		height: 100%;
-	}
+  .btn-visit-controller,
+  .btn-remove-visit {
+    height: 100%;
+  }
 
-	/*Все*/
-	.visit-info-item:nth-child(n+1) {
-		flex: 1 0;
-		padding: 0.5em 1%;
-	}
+  /*Все*/
+  .visit-info-item:nth-child(n+1) {
+    -webkit-box-flex: 1;
+        -ms-flex: 1 0;
+            flex: 1 0;
+    padding: 0.5em 1%;
+  }
 
-	/*Номер посещения и комментарий*/
-	.visit-info-item:first-child,
-	.visit-info-item:nth-child(3) {
-		flex: 100%;
-		border-right: none;
-	}
+  /*Номер посещения и комментарий*/
+  .visit-info-item:first-child,
+  .visit-info-item:nth-child(3) {
+    -webkit-box-flex: 100%;
+        -ms-flex: 100%;
+            flex: 100%;
+    border-right: none;
+  }
 
-	/*Номер посещения*/
-	.visit-info-item:first-child {
-		padding-top: 0;
-	}
+  /*Номер посещения*/
+  .visit-info-item:first-child {
+    padding-top: 0;
+  }
 
-	/*Кнопки*/
-	.visit-info-item:nth-child(n+8) {
-		order: 1;
-		padding-bottom: 0;
-		border-right: none;
-		border-top: 2px solid #DFDFDF;
-	}
+  /*Кнопки*/
+  .visit-info-item:nth-child(n+8) {
+    -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+            order: 1;
+    padding-bottom: 0;
+    border-right: none;
+    border-top: 2px solid #DFDFDF;
+  }
 
-	/*Контроллер*/
-	.visit-info-item:nth-child(8) {
-		padding-left: 0;
-	}
+  /*Контроллер*/
+  .visit-info-item:nth-child(8) {
+    padding-left: 0;
+  }
 
-	/*Кнопка удаления*/
-	.visit-info-item:last-child {
-		padding-right: 0;
-	}
+  /*Кнопка удаления*/
+  .visit-info-item:last-child {
+    padding-right: 0;
+  }
 
-	.btn-add-visit {
-		width: 100%;
-		height: 3.25em;
-	}
+  .btn-add-visit {
+    width: 100%;
+    height: 3.25em;
+  }
 }
