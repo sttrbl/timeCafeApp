@@ -10,12 +10,11 @@ const helper = (function () {
       clearInterval(this.opacity);
       clearTimeout(this.waiting);
       clearInterval(this.height);
-    }
+    },
   };
 
 
   function createCustomElement(tag, className, textContent) {
-
     const elem = document.createElement(tag);
 
     if (className) {
@@ -31,13 +30,14 @@ const helper = (function () {
   function showMessage() {
     timers.clearTimers();
 
-    alertElem.style.height = alertElem.style.opacity  = '';
+    alertElem.style.height = '';
+    alertElem.style.opacity = '';
     alertElem.style.display = 'block';
 
     let opacityValue = 0;
     let heightValue = alertElem.offsetHeight;
 
-    timers.opacity =  setInterval(() => {
+    timers.opacity = setInterval(() => {
       opacityValue += 0.08;
       alertElem.style.opacity = opacityValue.toFixed(3);
 
@@ -53,9 +53,7 @@ const helper = (function () {
               timers.clearTimers();
               alertElem.style.display = 'none';
             }
-
           }, 10);
-
         }, 3000);
       }
     }, 10);
@@ -76,27 +74,28 @@ const helper = (function () {
   }
 
 
-  //Любой запрос возвращает тело ответа в случае успеха и null в случае ошибки
+  // Любой запрос возвращает тело ответа в случае успеха и null в случае ошибки
   async function request(URL, data) {
-    let resp, respBody;
+    let resp;
+    let respBody;
 
     try {
       resp = await fetch(URL, {
         method: 'POST',
-        body: (data instanceof FormData) ? data : JSON.stringify(data)
+        body: (data instanceof FormData) ? data : JSON.stringify(data),
       });
 
-      if (!resp.ok) throw new Error(resp.status);
+      if (!resp.ok) {
+        throw new Error(resp.status);
+      }
 
       respBody = await resp.json();
-
-    } catch(e) {
-      showError("Серверная ошибка!");
+    } catch (e) {
+      showError('Серверная ошибка!');
 
       if (e instanceof SyntaxError) {
         console.log(`Ошибка чтения данных: ${e.message}`);
-      }
-      else {
+      } else {
         console.log(`Ошибка соединения с сервером: ${e.message}`);
       }
 
@@ -111,9 +110,9 @@ const helper = (function () {
 
 
   return {
+    request,
     create: createCustomElement,
     showError,
     showSuccess,
-    request
-  }
-})();
+  };
+}());

@@ -1,13 +1,15 @@
-//********* Модуль для подготовки компонентов раздела "Архив" **********//
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+
+/* ********* Модуль для создания элементов раздела "Архив" ********** */
 
 const archivePageModule = (() => {
-
   async function getPageContent() {
     const pageContent = [];
     const datePeriod = await getDatePeriod();
 
     if (datePeriod === false) {
-      throw new Error('Не удалось загрузить информацию о датах смен.')
+      throw new Error('Не удалось загрузить информацию о датах смен.');
     }
 
     pageContent.push(createOutputController(datePeriod));
@@ -21,9 +23,9 @@ const archivePageModule = (() => {
     const sendBtn = helper.create('button', 'btn btn-apply-dates', 'Вывести');
 
     for (let i = 0; i < 2; i++) {
-      const inputName = (i == 0) ? 'from' : 'to';
+      const inputName = (i === 0) ? 'from' : 'to';
       const dateInputContainer = helper.create('div', 'output-controll__date');
-      const labelElem = helper.create('label', 'output-controll__label', (inputName == 'from') ? 'От :' : 'До :');
+      const labelElem = helper.create('label', 'output-controll__label', (inputName === 'from') ? 'От :' : 'До :');
       const dateInput = document.createElement('input');
 
       dateInput.type = 'date';
@@ -38,17 +40,16 @@ const archivePageModule = (() => {
     outputControllerForm.append(sendBtn);
 
     outputControllerForm.querySelectorAll('input, button').forEach((elem) => {
-      elem.disabled = (fromDate && toDate) ? false : true;
+      elem.disabled = (fromDate && toDate) || true;
     });
 
 
-    outputControllerForm.addEventListener('submit', async e => {
+    outputControllerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const statisticsElem = outputControllerForm.nextElementSibling;
       const periodInfo = await getPeriodInfo(outputControllerForm.from.value, outputControllerForm.to.value);
 
-      if (periodInfo == false) return;
+      if (periodInfo === false) return;
 
       const periodOutputElem = outputControllerForm.nextElementSibling;
 
@@ -69,7 +70,7 @@ const archivePageModule = (() => {
     if (periodInfo) {
       periodOutoutContainer.append(createStatistics(periodInfo.statistics), createPeriodShifts(periodInfo.shifts));
     } else {
-      periodOutoutContainer.textContent = 'Смены за данный период времени отсутствуют.'
+      periodOutoutContainer.textContent = 'Смены за данный период времени отсутствуют.';
     }
 
     return periodOutoutContainer;
@@ -83,12 +84,12 @@ const archivePageModule = (() => {
       ['average_check', 'Средний чек : ', 'руб.'],
       ['average_profit', 'Средняя выручка за смену : ', 'руб.'],
       ['average_duration', 'Средняя длит. посещения : ', 'мин.'],
-      ['total_profit', 'Суммарная выручка : ', 'руб.']
+      ['total_profit', 'Суммарная выручка : ', 'руб.'],
     ];
 
     const statisticsContainer = helper.create('ul', 'period-statistics');
 
-    itemsNames.forEach(itemName => {
+    itemsNames.forEach((itemName) => {
       const itemElem = helper.create('li', 'period-statistics__item');
       const itemLabelElem = helper.create('span', 'item__label', itemName[1]);
       const itemValueElem = helper.create('span', 'item__value');
@@ -105,7 +106,6 @@ const archivePageModule = (() => {
 
   function createPeriodShifts(shifts) {
     const periodShiftsContainer = helper.create('ul', 'period-shifts');
-
 
     shifts.forEach(({ id, date, start_time: startTime, end_time: endTime }) => {
       const shiftContainer = helper.create('li', 'period-shifts__item');
@@ -124,21 +124,23 @@ const archivePageModule = (() => {
     });
 
 
-    periodShiftsContainer.addEventListener('click', async e => {
+    periodShiftsContainer.addEventListener('click', async (e) => {
       const shiftElem = e.target.closest('.shift');
 
       if (!shiftElem) return;
 
       const pageContainer = e.target.closest('.page__content');
 
-      [...pageContainer.children].forEach(childElem => childElem.style.display = 'none');
+      [...pageContainer.children].forEach((childElem) => {
+        childElem.style.display = 'none';
+      });
 
       const shiftVisits = await getShiftVisits(shiftElem.dataset.shiftId);
 
       if (shiftVisits) {
         const shiftDate = {
           date: shiftElem.dataset.shiftDate,
-          timePeriod: shiftElem.querySelector('.shift__time').textContent
+          timePeriod: shiftElem.querySelector('.shift__time').textContent,
         };
 
         pageContainer.append(createShiftOutput(shiftVisits, shiftDate));
@@ -157,18 +159,18 @@ const archivePageModule = (() => {
     const visitsListElem = helper.create('ul', 'shift-visits');
 
     for (const [i, visit] of visits.entries()) {
-      visitsListElem.append(createVisitRow(visit, i + 1))
+      visitsListElem.append(createVisitRow(visit, i + 1));
     }
 
     shiftHeaderElem.append(backBtn, shiftHeadline);
     shiftOutputContainer.append(shiftHeaderElem, visitsListElem);
 
 
-    backBtn.addEventListener('click', e => {
+    backBtn.addEventListener('click', (e) => {
       const pageContainer = e.target.closest('.page__content');
 
-      [...pageContainer.children].forEach(childElem => {
-        if (childElem.style.display != 'none') return childElem.remove();
+      [...pageContainer.children].forEach((childElem) => {
+        if (childElem.style.display !== 'none') return childElem.remove();
 
         childElem.style.display = '';
       });
@@ -188,7 +190,7 @@ const archivePageModule = (() => {
       ['discount', 'Скидка :'],
       ['total', 'Итого :'],
       ['status', 'Статус :'],
-      ['end_user', 'Завершил :']
+      ['end_user', 'Завершил :'],
     ];
 
     const visitRowElem = helper.create('li', 'shift-visits__item visit');
@@ -210,7 +212,7 @@ const archivePageModule = (() => {
     const shiftDate = new Date(stringDate);
     const parsedDate = {
       day: shiftDate.getDate(),
-      month: shiftDate.toLocaleString('ru-RU', { month: 'long' })
+      month: shiftDate.toLocaleString('ru-RU', { month: 'long' }),
     };
 
     parsedDate.month = parsedDate.month[0].toUpperCase() + parsedDate.month.slice(1);
@@ -219,11 +221,11 @@ const archivePageModule = (() => {
   }
 
 
-  //******************** Сервер ********************//
+  //* ******************* Сервер ********************//
 
   async function getDatePeriod() {
     const resp = await helper.request('php/sections/archivePage.php', {
-      action: 'getDatePeriod'
+      action: 'getDatePeriod',
     });
 
     return (resp !== null && resp.done) ? resp.data : false;
@@ -234,7 +236,7 @@ const archivePageModule = (() => {
     const resp = await helper.request('php/sections/archivePage.php', {
       action: 'getPeriodInfo',
       from,
-      to
+      to,
     });
 
     return (resp !== null && resp.done) ? resp.data : false;
@@ -244,13 +246,13 @@ const archivePageModule = (() => {
   async function getShiftVisits(shiftId) {
     const resp = await helper.request('php/sections/archivePage.php', {
       action: 'getShiftVisits',
-      shiftId
+      shiftId,
     });
 
     return (resp !== null && resp.done) ? resp.data : false;
   }
 
   return {
-    getPageContent
+    getPageContent,
   };
 })();

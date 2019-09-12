@@ -1,13 +1,14 @@
-//********* Модуль для подготовки компонентов раздела "Посещения" **********//
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 
+/* ******** Модуль для создания элементов раздела "Посещения" ********* */
 const visitsPageModule = (() => {
-
   async function getPageContent() {
     const pageContent = [];
     const shiftInfo = await getShiftInfo();
 
     if (shiftInfo === false) {
-      throw new Error('Не удалось загрузить информацию о смене.')
+      throw new Error('Не удалось загрузить информацию о смене.');
     }
 
     if (shiftInfo !== null) {
@@ -22,12 +23,11 @@ const visitsPageModule = (() => {
 
 
   function createDayPanel(shiftId) {
-
     function formatDate(date) {
-      const currentDate = date.toLocaleString('ru-RU', {month: 'long', day: 'numeric'});
-      const weekday = date.toLocaleString('ru-RU', {weekday: 'long'});
+      const currentDate = date.toLocaleString('ru-RU', { month: 'long', day: 'numeric' });
+      const weekday = date.toLocaleString('ru-RU', { weekday: 'long' });
 
-      return  `${currentDate}, ${weekday[0].toUpperCase() + weekday.slice(1)}`
+      return `${currentDate}, ${weekday[0].toUpperCase() + weekday.slice(1)}`;
     }
 
     const dayPanelContainer = helper.create('div', 'day-panel clearfix');
@@ -39,10 +39,8 @@ const visitsPageModule = (() => {
       dayPanelContainer.dataset.shiftId = shiftId;
     }
 
-    shiftContollBtn.addEventListener('click', async e => {
-
+    shiftContollBtn.addEventListener('click', async () => {
       if (!shiftContollBtn.matches('.active')) {
-
         if (!confirm('Начать смену?')) return;
 
         const startedShiftInfo = await startShift();
@@ -52,19 +50,17 @@ const visitsPageModule = (() => {
           dayPanelContainer.dataset.shiftId = startedShiftInfo.shiftId;
           shiftContollBtn.classList.toggle('active');
         }
-
       } else {
-
         if (!confirm('Завершить смену?')) return;
 
         const visitsPanelElem = dayPanelContainer.nextElementSibling;
-        const operationResult =  await endShift(+dayPanelContainer.dataset.shiftId);
+        const operationResult = await endShift(+dayPanelContainer.dataset.shiftId);
 
         if (operationResult) {
           visitsPanelElem.remove();
           shiftContollBtn.classList.toggle('active');
           dayPanelContainer.removeAttribute('data-shift-id');
-        };
+        }
       }
     });
 
@@ -73,7 +69,7 @@ const visitsPageModule = (() => {
   }
 
 
-  function createVisitsPanel({visits = null, discounts}) {
+  function createVisitsPanel({ visits = null, discounts }) {
     const visitsPanelContainer = helper.create('div', 'visits-panel');
     const visitsListElem = helper.create('ul', 'visits-list');
     const addBtn = helper.create('button', 'btn btn-add-visit', 'Добавить');
@@ -84,22 +80,21 @@ const visitsPageModule = (() => {
         const newVisitOptions = {
           visitNum: i + 1,
           discounts,
-          visitInfo
-        }
+          visitInfo,
+        };
 
         visitsListElem.append(createVisit(newVisitOptions));
       }
-
     }
 
 
-    visitsListElem.addEventListener('click', e => {
+    visitsListElem.addEventListener('click', (e) => {
       const btn = e.target.closest('button');
       const visitContainer = e.target.closest('.visits-list__item');
 
       if (!btn) return;
 
-      if (btn.matches('.btn-remove-visit') && confirm('Удалить посещение?') ) {
+      if (btn.matches('.btn-remove-visit') && confirm('Удалить посещение?')) {
         removeVisit(visitContainer);
       } else if (btn.matches('.btn-visit-controller')) {
         const visitStatus = visitContainer.classList[1];
@@ -116,24 +111,26 @@ const visitsPageModule = (() => {
           case 'calculated':
             endVisit(visitContainer);
             break;
+
+          default:
         }
       }
     });
 
 
-    visitsListElem.addEventListener('change', e => {
+    visitsListElem.addEventListener('change', (e) => {
       if (!e.target.closest('.visit__discount')) return;
 
       const discountSelectElem = e.target;
       const visitContainer = discountSelectElem.closest('.visits-list__item');
       const totalCostElem = visitContainer.querySelector('.visit__total');
-      let totalCost = visitContainer.dataset.pureTotal
+      let totalCost = visitContainer.dataset.pureTotal;
 
       if (!totalCost) return;
 
       const discountValue = +discountSelectElem.value;
 
-      if (discountValue != 0) {
+      if (discountValue !== 0) {
         totalCost = Math.round(totalCost - ((totalCost / 100) * discountValue));
       }
 
@@ -141,11 +138,11 @@ const visitsPageModule = (() => {
     });
 
 
-    addBtn.addEventListener('click', e => {
+    addBtn.addEventListener('click', () => {
       const visitsElems = visitsListElem.querySelectorAll('.visit');
       const newVisitOptions = {
         visitNum: visitsElems.length + 1,
-        discounts
+        discounts,
       };
 
       visitsListElem.append(createVisit(newVisitOptions));
@@ -157,8 +154,8 @@ const visitsPageModule = (() => {
   }
 
 
-  //Хорошо бы это отрефакторить
-  function createVisit({visitNum, discounts, visitInfo}) {
+  // Хорошо бы это отрефакторить
+  function createVisit({ visitNum, discounts, visitInfo }) {
     const visitItemsNames = [
       ['№', 'num'],
       ['Номерок :', 'person-tag'],
@@ -166,7 +163,7 @@ const visitsPageModule = (() => {
       ['Начало :', 'start-time'],
       ['Окончание :', 'end-time'],
       ['Скидка :', 'discount'],
-      ['Итого :', 'total']
+      ['Итого :', 'total'],
     ];
 
     const visitContainer = helper.create('li', 'visits-list__item ');
@@ -177,7 +174,7 @@ const visitsPageModule = (() => {
       visitStatus = visitInfo.status;
       visitContainer.dataset.realId = visitInfo.id;
 
-      if (visitStatus == 'calculated') {
+      if (visitStatus === 'calculated') {
         visitContainer.dataset.pureTotal = visitInfo.total;
       }
     }
@@ -194,16 +191,14 @@ const visitsPageModule = (() => {
       const itemHeadlineElem = helper.create('label', null, itemName[0]);
       let itemContentElem;
 
-      if (visitStatus != 'completed' && itemName[1] == 'discount') {
+      if (visitStatus !== 'completed' && itemName[1] === 'discount') {
         itemContentElem = document.createElement('select');
         itemContentElem.append(new Option('', 0));
 
-        for (const discount of discounts) {
-          itemContentElem.append(new Option(discount['id'], discount['value']));
-        }
-
-      } else if (visitStatus == 'new' && i > 0) {
-
+        discounts.forEach((discount) => {
+          itemContentElem.append(new Option(discount.id, discount.value));
+        });
+      } else if (visitStatus === 'new' && i > 0) {
         switch (itemName[1]) {
           case 'person-tag':
             itemContentElem = document.createElement('input');
@@ -220,14 +215,13 @@ const visitsPageModule = (() => {
             itemContentElem = document.createElement('span');
             break;
         }
-
       } else {
         itemContentElem = document.createElement('span');
         const itemNameOnServer = itemName[1].replace('-', '_');
         itemContentElem.textContent = (i > 0) ? visitInfo[itemNameOnServer] : visitNum;
       }
 
-      itemContentElem.classList.add('visit__' + itemName[1]);
+      itemContentElem.classList.add(`visit__${itemName[1]}`);
 
       visitInnerContainer.children[i].append(itemHeadlineElem, itemContentElem);
     });
@@ -243,11 +237,11 @@ const visitsPageModule = (() => {
   }
 
 
-  //************** Функции для работы с сервером ***************//
+  /* ************* Функции для работы с сервером ************** */
 
   async function getShiftInfo() {
     const resp = await helper.request('php/sections/visitsPage.php', {
-      action: 'getShiftInfo'
+      action: 'getShiftInfo',
     });
 
     return (resp !== null && resp.done) ? resp.data : false;
@@ -256,7 +250,7 @@ const visitsPageModule = (() => {
 
   async function startShift() {
     const resp = await helper.request('php/sections/visitsPage.php', {
-      action: 'startShift'
+      action: 'startShift',
     });
 
     return (resp !== null && resp.done) ? resp.data : false;
@@ -266,10 +260,10 @@ const visitsPageModule = (() => {
   async function endShift(shiftId) {
     const resp = await helper.request('php/sections/visitsPage.php', {
       action: 'endShift',
-      shiftId
+      shiftId,
     });
 
-    return (resp !== null && resp.done) ? true : false;
+    return (resp !== null && resp.done) || false;
   }
 
 
@@ -277,20 +271,20 @@ const visitsPageModule = (() => {
     const visitInfo = {};
     const allNodeInputs = visitNode.querySelectorAll('input');
 
-    for (let inputElem of allNodeInputs) {
+    for (const inputElem of allNodeInputs) {
       const inputElemValue = inputElem.value.trim();
 
       if (inputElem.matches('.visit__person-tag') && !inputElem.reportValidity()) return;
 
       const visitInfoKey = inputElem.className.replace('-', '_').replace('visit__', '');
 
-      visitInfo[visitInfoKey] = (inputElem.type == 'number') ? +inputElemValue : inputElemValue || null;
+      visitInfo[visitInfoKey] = (inputElem.type === 'number') ? +inputElemValue : inputElemValue || null;
     }
 
 
     const resp = await helper.request('php/sections/visitsPage.php', {
       action: 'startNewVisit',
-      visitInfo
+      visitInfo,
     });
 
     if (resp === null || !resp.done) return;
@@ -300,7 +294,7 @@ const visitsPageModule = (() => {
     visitNode.dataset.realId = resp.data.visitId;
     visitNode.querySelector('.visit__start-time').textContent = resp.data.startTime;
 
-    allNodeInputs.forEach(inputElem => {
+    allNodeInputs.forEach((inputElem) => {
       inputElem.replaceWith(helper.create('span', inputElem.className, inputElem.value));
     });
   }
@@ -313,22 +307,23 @@ const visitsPageModule = (() => {
     if (!visitNode.matches('.new')) {
       const resp = await helper.request('php/sections/visitsPage.php', {
         action: 'removeVisit',
-        visitId: +visitNode.dataset.realId
+        visitId: +visitNode.dataset.realId,
       });
 
       if (resp === null || !resp.done) return;
     }
 
     visitNode.remove();
-    [].forEach.call(visitsNumsElems, (numElem, i) => numElem.textContent = i + 1);
+    [].forEach.call(visitsNumsElems, (numElem, i) => {
+      numElem.textContent = i + 1;
+    });
   }
 
 
   async function calculateVisit(visitNode) {
-
     const resp = await helper.request('php/sections/visitsPage.php', {
       action: 'calculateVisit',
-      visitId: +visitNode.dataset.realId
+      visitId: +visitNode.dataset.realId,
     });
 
     if (resp === null || !resp.done) return;
@@ -341,7 +336,7 @@ const visitsPageModule = (() => {
     endTimeElem.textContent = resp.data.endTime;
     visitNode.dataset.pureTotal = pureTotalCost;
 
-    const finalTotalCost = discountValue ? pureTotalCost - (pureTotalCost / 100 * discountValue) : pureTotalCost;
+    const finalTotalCost = discountValue ? pureTotalCost - (pureTotalCost / 100) * discountValue : pureTotalCost;
 
     totalCostElem.textContent = Math.round(finalTotalCost);
     visitNode.classList.remove('active');
@@ -359,8 +354,8 @@ const visitsPageModule = (() => {
       visitInfo: {
         visitId: +visitNode.dataset.realId,
         finalTotal: +visitNode.querySelector('.visit__total').textContent,
-        discount: discountId || null
-      }
+        discount: discountId || null,
+      },
     });
 
     if (resp === null || !resp.done) return;
@@ -368,13 +363,13 @@ const visitsPageModule = (() => {
     const discountValueSpan = helper.create('span', discountSelect.className, discountId);
 
     discountSelect.replaceWith(discountValueSpan);
-    visitNode.removeAttribute("data-pure-total");
+    visitNode.removeAttribute('data-pure-total');
     visitNode.classList.remove('calculated');
     visitNode.classList.add('completed');
   }
 
 
   return {
-    getPageContent
+    getPageContent,
   };
 })();

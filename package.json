@@ -1,0 +1,25 @@
+{
+  "name": "timeCafe",
+  "version": "1.0.0",
+  "description": "![Раздел \"Посещения\"](screenshots/1.PNG)\r ____\r ![Раздел \"Архив\"](screenshots/2.PNG)\r ____\r ![Просмотр посещений за смену](screenshots/3.PNG)\r ____\r ![Раздел \"Настройки\"](screenshots/4.PNG)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sttrbl/time-cafe-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sttrbl/time-cafe-app/issues"
+  },
+  "homepage": "https://github.com/sttrbl/time-cafe-app#readme",
+  "devDependencies": {
+    "eslint": "^6.3.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2"
+  }
+}

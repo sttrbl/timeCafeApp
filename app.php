@@ -29,6 +29,7 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
 
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <title>Time-cafe app</title>
@@ -107,4 +108,5 @@ $userFullName = $usersInfo['surname'] . ' ' . mb_substr($usersInfo['name'], 0, 1
   <script src="js/sections/settingsPage.js"></script>
   <script src="js/main.js"></script>
 </body>
+
 </html>
